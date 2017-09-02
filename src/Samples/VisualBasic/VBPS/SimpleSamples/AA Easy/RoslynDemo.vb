@@ -1,14 +1,16 @@
 Imports System
-Imports System.Diagnostics
 
-Module Module1
+Module Program
 
-    Sub Main()
+    Sub Main(args As String())
 
-        Dim anInt As Integer
-        anInt = 42
-        Debug.Print(anInt.ToString)
+        Dim aString As String
+        aString = "42.42"
+        Dim aDouble = Double.Parse(aString)
+        Dim aLong = CType(aDouble + aDouble, Long)
 
+        For z = 0 To aLong
+            Console.WriteLine(z.ToString)
+        Next
     End Sub
-
 End Module

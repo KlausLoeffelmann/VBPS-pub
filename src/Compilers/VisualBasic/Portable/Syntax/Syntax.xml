@@ -5665,7 +5665,7 @@ Unify Enum declarations with other block type declarations.
         <native-equiv name=""></native-equiv>
       </child>
     </node-structure>
-
+    
     <node-structure name="CTypeExpressionSyntax" parent="CastExpressionSyntax">
       <node-kind name="CTypeExpression" />
     </node-structure>
@@ -5676,6 +5676,38 @@ Unify Enum declarations with other block type declarations.
 
     <node-structure name="TryCastExpressionSyntax" parent="CastExpressionSyntax">
       <node-kind name="TryCastExpression" />
+    </node-structure>
+    
+    <!--****************
+      -  New Cast: As Type
+      ******************-->
+    <node-structure name="AsCastExpressionSyntax" parent="ExpressionSyntax">
+      <description>
+        Represents an As Type conversion expression.
+      </description>
+      <lm-equiv name=""></lm-equiv>
+      <native-equiv name=""></native-equiv>
+      <spec-section></spec-section>
+      <grammar>AsCastExpression</grammar>
+      <node-kind name="AsCastExpression"/>
+
+      <child name="Expression" kind="@ExpressionSyntax">
+        <description>The expression being cast.</description>
+        <lm-equiv name=""></lm-equiv>
+        <native-equiv name=""></native-equiv>
+      </child>
+
+      <child name="AsKeyword" kind="AsKeyword">
+        <description>The "As" keyword.</description>
+        <lm-equiv name=""></lm-equiv>
+        <native-equiv name=""></native-equiv>
+      </child>
+
+      <child name="Type" kind="@TypeSyntax">
+        <description>The type the expression is being cast to.</description>
+        <lm-equiv name=""></lm-equiv>
+        <native-equiv name=""></native-equiv>
+      </child>
     </node-structure>
 
     <!--****************

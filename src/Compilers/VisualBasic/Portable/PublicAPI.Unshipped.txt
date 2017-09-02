@@ -1,1 +1,17 @@
 Microsoft.CodeAnalysis.VisualBasic.LanguageVersion.VisualBasic15_5 = 1505 -> Microsoft.CodeAnalysis.VisualBasic.LanguageVersion
+Microsoft.CodeAnalysis.VisualBasic.Syntax.AsCastExpressionSyntax
+Microsoft.CodeAnalysis.VisualBasic.Syntax.AsCastExpressionSyntax.AsKeyword() -> Microsoft.CodeAnalysis.SyntaxToken
+Microsoft.CodeAnalysis.VisualBasic.Syntax.AsCastExpressionSyntax.Expression() -> Microsoft.CodeAnalysis.VisualBasic.Syntax.ExpressionSyntax
+Microsoft.CodeAnalysis.VisualBasic.Syntax.AsCastExpressionSyntax.Type() -> Microsoft.CodeAnalysis.VisualBasic.Syntax.TypeSyntax
+Microsoft.CodeAnalysis.VisualBasic.Syntax.AsCastExpressionSyntax.Update(expression As Microsoft.CodeAnalysis.VisualBasic.Syntax.ExpressionSyntax, asKeyword As Microsoft.CodeAnalysis.SyntaxToken, type As Microsoft.CodeAnalysis.VisualBasic.Syntax.TypeSyntax) -> Microsoft.CodeAnalysis.VisualBasic.Syntax.AsCastExpressionSyntax
+Microsoft.CodeAnalysis.VisualBasic.Syntax.AsCastExpressionSyntax.WithAsKeyword(asKeyword As Microsoft.CodeAnalysis.SyntaxToken) -> Microsoft.CodeAnalysis.VisualBasic.Syntax.AsCastExpressionSyntax
+Microsoft.CodeAnalysis.VisualBasic.Syntax.AsCastExpressionSyntax.WithExpression(expression As Microsoft.CodeAnalysis.VisualBasic.Syntax.ExpressionSyntax) -> Microsoft.CodeAnalysis.VisualBasic.Syntax.AsCastExpressionSyntax
+Microsoft.CodeAnalysis.VisualBasic.Syntax.AsCastExpressionSyntax.WithType(type As Microsoft.CodeAnalysis.VisualBasic.Syntax.TypeSyntax) -> Microsoft.CodeAnalysis.VisualBasic.Syntax.AsCastExpressionSyntax
+Microsoft.CodeAnalysis.VisualBasic.SyntaxKind.AsCastExpression = 793 -> Microsoft.CodeAnalysis.VisualBasic.SyntaxKind
+Overridable Microsoft.CodeAnalysis.VisualBasic.VisualBasicSyntaxVisitor(Of TResult).VisitAsCastExpression(node As Microsoft.CodeAnalysis.VisualBasic.Syntax.AsCastExpressionSyntax) -> TResult
+Overridable Microsoft.CodeAnalysis.VisualBasic.VisualBasicSyntaxVisitor.VisitAsCastExpression(node As Microsoft.CodeAnalysis.VisualBasic.Syntax.AsCastExpressionSyntax) -> Void
+Overrides Microsoft.CodeAnalysis.VisualBasic.Syntax.AsCastExpressionSyntax.Accept(Of TResult)(visitor As Microsoft.CodeAnalysis.VisualBasic.VisualBasicSyntaxVisitor(Of TResult)) -> TResult
+Overrides Microsoft.CodeAnalysis.VisualBasic.Syntax.AsCastExpressionSyntax.Accept(visitor As Microsoft.CodeAnalysis.VisualBasic.VisualBasicSyntaxVisitor) -> Void
+Overrides Microsoft.CodeAnalysis.VisualBasic.VisualBasicSyntaxRewriter.VisitAsCastExpression(node As Microsoft.CodeAnalysis.VisualBasic.Syntax.AsCastExpressionSyntax) -> Microsoft.CodeAnalysis.SyntaxNode
+Shared Microsoft.CodeAnalysis.VisualBasic.SyntaxFactory.AsCastExpression(expression As Microsoft.CodeAnalysis.VisualBasic.Syntax.ExpressionSyntax, asKeyword As Microsoft.CodeAnalysis.SyntaxToken, type As Microsoft.CodeAnalysis.VisualBasic.Syntax.TypeSyntax) -> Microsoft.CodeAnalysis.VisualBasic.Syntax.AsCastExpressionSyntax
+Shared Microsoft.CodeAnalysis.VisualBasic.SyntaxFactory.AsCastExpression(expression As Microsoft.CodeAnalysis.VisualBasic.Syntax.ExpressionSyntax, type As Microsoft.CodeAnalysis.VisualBasic.Syntax.TypeSyntax) -> Microsoft.CodeAnalysis.VisualBasic.Syntax.AsCastExpressionSyntax

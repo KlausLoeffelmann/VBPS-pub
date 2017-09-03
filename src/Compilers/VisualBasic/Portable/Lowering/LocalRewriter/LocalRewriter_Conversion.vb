@@ -25,6 +25,7 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
                                        node.ExplicitCastInCode,
                                        node.ConstantValueOpt,
                                        node.ExtendedInfoOpt,
+                                       node.IsAsTypeConversion,
                                        node.Type)
                 End If
 
@@ -190,14 +191,14 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
                 returnValue = MyBase.VisitConversion(
                     node.Update(node.Operand,
                                       node.ConversionKind, node.Checked, node.ExplicitCastInCode,
-                                      node.ConstantValueOpt,
+                                      node.ConstantValueOpt, isAsTypeConversion:=node.IsAsTypeConversion,
                                       extendedInfoOpt:=Nothing, type:=node.Type))
 
                 returnValue = TransformRewrittenConversion(DirectCast(returnValue, BoundConversion))
             Else
                 returnValue = node.Update(VisitExpressionNode(relaxationLambda),
                                       node.ConversionKind, node.Checked, node.ExplicitCastInCode,
-                                      node.ConstantValueOpt,
+                                      node.ConstantValueOpt, isAsTypeConversion:=node.IsAsTypeConversion,
                                       extendedInfoOpt:=Nothing, type:=node.Type)
             End If
 
@@ -386,6 +387,7 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
                                                     node.ExplicitCastInCode,
                                                     node.ConstantValueOpt,
                                                     node.ExtendedInfoOpt,
+                                                    node.IsAsTypeConversion,
                                                     resultType.GetNullableUnderlyingType)),
                                     resultType)
 
@@ -419,6 +421,7 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
                                         node.ExplicitCastInCode,
                                         node.ConstantValueOpt,
                                         node.ExtendedInfoOpt,
+                                        node.IsAsTypeConversion,
                                         resultType))
             End If
 
@@ -510,6 +513,7 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
                                                     node.ExplicitCastInCode,
                                                     node.ConstantValueOpt,
                                                     node.ExtendedInfoOpt,
+                                                    node.IsAsTypeConversion,
                                                     unwrappedResultType))
                     End If
                 End If
@@ -561,6 +565,7 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
                                             node.ExplicitCastInCode,
                                             node.ConstantValueOpt,
                                             node.ExtendedInfoOpt,
+                                            node.IsAsTypeConversion,
                                             resultType.GetNullableUnderlyingType)),
                                 resultType)
             End If
@@ -583,6 +588,7 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
                                         node.ExplicitCastInCode,
                                         node.ConstantValueOpt,
                                         node.ExtendedInfoOpt,
+                                        node.IsAsTypeConversion,
                                         resultType))
             End If
 

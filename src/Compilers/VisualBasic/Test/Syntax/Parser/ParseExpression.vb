@@ -261,6 +261,9 @@ Public Class ParseExpressionTest
 
         ParseExpression(<Text>TryCast( a, b 
                                         )</Text>)
+        ParseExpression("a As b")
+        ParseExpression("a As b As c")
+        ParseExpression("a As 3", True)
     End Sub
 
     <Fact>

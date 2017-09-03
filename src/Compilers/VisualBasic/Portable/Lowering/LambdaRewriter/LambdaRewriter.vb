@@ -949,6 +949,7 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
                                            conversion.ExplicitCastInCode,
                                            conversion.ConstantValueOpt,
                                            conversion.ExtendedInfoOpt,
+                                           conversion.IsAsTypeConversion,
                                            conversion.Type)
             End If
             Return result

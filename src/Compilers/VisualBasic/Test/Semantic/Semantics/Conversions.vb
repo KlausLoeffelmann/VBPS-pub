@@ -2938,6 +2938,290 @@ End Class
         End Sub
 
         <Fact()>
+        Public Sub AsTypeCastDiagnostic1()
+
+            Dim compilationDef =
+<compilation name="VBConversionsDiagnostic1">
+    <file name="a.vb">
+Imports System
+
+Module Module1
+
+    Sub Main()
+
+        Dim [In] As Integer
+
+        [In] = Console.WriteLine()
+        [In] = Console.WriteLine() As Integer
+        [In] = 1 As UnknownType
+        [In] = unknownValue As Integer
+        [In] = unknownValue As UnknownType
+
+        Dim tr As System.TypedReference = Nothing
+        Dim ai As System.ArgIterator = Nothing
+        Dim ra As System.RuntimeArgumentHandle = Nothing
+
+        Dim Ob As Object
+
+        Ob = tr
+        Ob = ai
+        Ob = ra
+        Ob = CType(tr, Object)
+        Ob = CType(ai, Object)
+        Ob = CType(ra, Object)
+
+        Dim vt As ValueType
+
+        vt = tr
+        vt = ai
+        vt = ra
+        vt = CType(tr, ValueType)
+        vt = CType(ai, ValueType)
+        vt = CType(ra, ValueType)
+
+        Dim collection As Microsoft.VisualBasic.Collection = Nothing
+        Dim _collection As _Collection = Nothing
+
+        collection = _collection
+        _collection = collection
+        collection = CType(_collection, Microsoft.VisualBasic.Collection)
+        _collection = CType(collection, _Collection)
+
+        Dim Si As Single
+        Dim De As Decimal
+
+        [In] = Int64.MaxValue
+        [In] = CInt(Int64.MaxValue)
+        Si = System.Double.MaxValue
+        Si = CSng(System.Double.MaxValue)
+        De = System.Double.MaxValue
+        De = CDec(System.Double.MaxValue)
+        De = 10.0F
+        De = CDec(10.0F)
+
+        Dim Da As DateTime = Nothing
+        [In] = Da
+        [In] = CInt(Da)
+        Da = [In]
+        Da = CDate([In])
+
+        Dim [Do] As Double = Nothing
+        Dim Ch As Char = Nothing
+
+        [Do] = Da
+        [Do] = CDbl(Da)
+        Da = [Do]
+        Da = CDate([Do])
+
+        [In] = Ch
+        [In] = CInt(Ch)
+        Ch = [In]
+        Ch = CChar([In])
+
+        Dim InArray As Integer() = Nothing
+        Dim ObArray As Object() = Nothing
+        Dim VtArray As ValueType() = Nothing
+
+        ObArray = InArray
+        ObArray = CType(InArray, Object())
+        VtArray = InArray
+        VtArray = CType(InArray, ValueType())
+
+        Dim TC1Array As TestClass1() = Nothing
+        Dim TC2Array As TestClass2() = Nothing
+
+        TC1Array = TC2Array
+        TC2Array = CType(TC1Array, TestClass2())
+
+        Dim InArray2 As Integer(,) = Nothing
+
+        InArray = InArray2
+        InArray2 = CType(InArray, Integer(,))
+
+        Dim TI1Array As TestInterface1() = Nothing
+
+        InArray = TI1Array
+        TI1Array = CType(InArray, TestInterface1())
+    End Sub
+
+End Module
+
+Interface TestInterface1
+End Interface
+
+Interface _Collection
+End Interface
+
+Class TestClass1
+End Class
+
+Class TestClass2
+End Class
+    </file>
+</compilation>
+
+            Dim compilation = CompilationUtils.CreateCompilationWithMscorlibAndVBRuntime(compilationDef, New VisualBasicCompilationOptions(OutputKind.ConsoleApplication).WithOptionStrict(OptionStrict.On))
+            compilation.VerifyDiagnostics(
+                Diagnostic(ERRID.ERR_VoidValue, "Console.WriteLine()"),
+                Diagnostic(ERRID.ERR_VoidValue, "Console.WriteLine()"),
+                Diagnostic(ERRID.ERR_UndefinedType1, "UnknownType").WithArguments("UnknownType"),
+                Diagnostic(ERRID.ERR_NameNotDeclared1, "unknownValue").WithArguments("unknownValue"),
+                Diagnostic(ERRID.ERR_NameNotDeclared1, "unknownValue").WithArguments("unknownValue"),
+                Diagnostic(ERRID.ERR_UndefinedType1, "UnknownType").WithArguments("UnknownType"),
+                Diagnostic(ERRID.ERR_RestrictedConversion1, "tr").WithArguments("System.TypedReference"),
+                Diagnostic(ERRID.ERR_RestrictedConversion1, "ai").WithArguments("System.ArgIterator"),
+                Diagnostic(ERRID.ERR_RestrictedConversion1, "ra").WithArguments("System.RuntimeArgumentHandle"),
+                Diagnostic(ERRID.ERR_RestrictedConversion1, "tr").WithArguments("System.TypedReference"),
+                Diagnostic(ERRID.ERR_RestrictedConversion1, "ai").WithArguments("System.ArgIterator"),
+                Diagnostic(ERRID.ERR_RestrictedConversion1, "ra").WithArguments("System.RuntimeArgumentHandle"),
+                Diagnostic(ERRID.ERR_RestrictedConversion1, "tr").WithArguments("System.TypedReference"),
+                Diagnostic(ERRID.ERR_RestrictedConversion1, "ai").WithArguments("System.ArgIterator"),
+                Diagnostic(ERRID.ERR_RestrictedConversion1, "ra").WithArguments("System.RuntimeArgumentHandle"),
+                Diagnostic(ERRID.ERR_RestrictedConversion1, "tr").WithArguments("System.TypedReference"),
+                Diagnostic(ERRID.ERR_RestrictedConversion1, "ai").WithArguments("System.ArgIterator"),
+                Diagnostic(ERRID.ERR_RestrictedConversion1, "ra").WithArguments("System.RuntimeArgumentHandle"),
+                Diagnostic(ERRID.WRN_InterfaceConversion2, "_collection").WithArguments("_Collection", "Microsoft.VisualBasic.Collection"),
+                Diagnostic(ERRID.ERR_NarrowingConversionCollection2, "_collection").WithArguments("_Collection", "Microsoft.VisualBasic.Collection"),
+                Diagnostic(ERRID.WRN_InterfaceConversion2, "collection").WithArguments("Microsoft.VisualBasic.Collection", "_Collection"),
+                Diagnostic(ERRID.ERR_NarrowingConversionCollection2, "collection").WithArguments("Microsoft.VisualBasic.Collection", "_Collection"),
+                Diagnostic(ERRID.WRN_InterfaceConversion2, "_collection").WithArguments("_Collection", "Microsoft.VisualBasic.Collection"),
+                Diagnostic(ERRID.WRN_InterfaceConversion2, "collection").WithArguments("Microsoft.VisualBasic.Collection", "_Collection"),
+                Diagnostic(ERRID.ERR_ExpressionOverflow1, "Int64.MaxValue").WithArguments("Integer"),
+                Diagnostic(ERRID.ERR_ExpressionOverflow1, "Int64.MaxValue").WithArguments("Integer"),
+                Diagnostic(ERRID.ERR_ExpressionOverflow1, "System.Double.MaxValue").WithArguments("Decimal"),
+                Diagnostic(ERRID.ERR_ExpressionOverflow1, "System.Double.MaxValue").WithArguments("Decimal"),
+                Diagnostic(ERRID.ERR_NarrowingConversionDisallowed2, "10.0F").WithArguments("Single", "Decimal"),
+                Diagnostic(ERRID.ERR_TypeMismatch2, "Da").WithArguments("Date", "Integer"),
+                Diagnostic(ERRID.ERR_TypeMismatch2, "Da").WithArguments("Date", "Integer"),
+                Diagnostic(ERRID.ERR_TypeMismatch2, "[In]").WithArguments("Integer", "Date"),
+                Diagnostic(ERRID.ERR_TypeMismatch2, "[In]").WithArguments("Integer", "Date"),
+                Diagnostic(ERRID.ERR_DateToDoubleConversion, "Da"),
+                Diagnostic(ERRID.ERR_DateToDoubleConversion, "Da"),
+                Diagnostic(ERRID.ERR_DoubleToDateConversion, "[Do]"),
+                Diagnostic(ERRID.ERR_DoubleToDateConversion, "[Do]"),
+                Diagnostic(ERRID.ERR_CharToIntegralTypeMismatch1, "Ch").WithArguments("Integer"),
+                Diagnostic(ERRID.ERR_CharToIntegralTypeMismatch1, "Ch").WithArguments("Integer"),
+                Diagnostic(ERRID.ERR_IntegralToCharTypeMismatch1, "[In]").WithArguments("Integer"),
+                Diagnostic(ERRID.ERR_IntegralToCharTypeMismatch1, "[In]").WithArguments("Integer"),
+                Diagnostic(ERRID.ERR_ConvertObjectArrayMismatch3, "InArray").WithArguments("Integer()", "Object()", "Integer"),
+                Diagnostic(ERRID.ERR_ConvertObjectArrayMismatch3, "InArray").WithArguments("Integer()", "Object()", "Integer"),
+                Diagnostic(ERRID.ERR_ConvertObjectArrayMismatch3, "InArray").WithArguments("Integer()", "System.ValueType()", "Integer"),
+                Diagnostic(ERRID.ERR_ConvertObjectArrayMismatch3, "InArray").WithArguments("Integer()", "System.ValueType()", "Integer"),
+                Diagnostic(ERRID.ERR_ConvertArrayMismatch4, "TC2Array").WithArguments("TestClass2()", "TestClass1()", "TestClass2", "TestClass1"),
+                Diagnostic(ERRID.ERR_ConvertArrayMismatch4, "TC1Array").WithArguments("TestClass1()", "TestClass2()", "TestClass1", "TestClass2"),
+                Diagnostic(ERRID.ERR_ConvertArrayRankMismatch2, "InArray2").WithArguments("Integer(*,*)", "Integer()"),
+                Diagnostic(ERRID.ERR_ConvertArrayRankMismatch2, "InArray").WithArguments("Integer()", "Integer(*,*)"),
+                Diagnostic(ERRID.ERR_ConvertArrayMismatch4, "TI1Array").WithArguments("TestInterface1()", "Integer()", "TestInterface1", "Integer"),
+                Diagnostic(ERRID.ERR_ConvertArrayMismatch4, "InArray").WithArguments("Integer()", "TestInterface1()", "Integer", "TestInterface1"))
+
+            compilation = CompilationUtils.CreateCompilationWithMscorlibAndVBRuntime(compilationDef, New VisualBasicCompilationOptions(OutputKind.ConsoleApplication).WithOptionStrict(OptionStrict.Off))
+            compilation.VerifyDiagnostics(
+                Diagnostic(ERRID.ERR_VoidValue, "Console.WriteLine()"),
+                Diagnostic(ERRID.ERR_VoidValue, "Console.WriteLine()"),
+                Diagnostic(ERRID.ERR_UndefinedType1, "UnknownType").WithArguments("UnknownType"),
+                Diagnostic(ERRID.ERR_NameNotDeclared1, "unknownValue").WithArguments("unknownValue"),
+                Diagnostic(ERRID.ERR_NameNotDeclared1, "unknownValue").WithArguments("unknownValue"),
+                Diagnostic(ERRID.ERR_UndefinedType1, "UnknownType").WithArguments("UnknownType"),
+                Diagnostic(ERRID.ERR_RestrictedConversion1, "tr").WithArguments("System.TypedReference"),
+                Diagnostic(ERRID.ERR_RestrictedConversion1, "ai").WithArguments("System.ArgIterator"),
+                Diagnostic(ERRID.ERR_RestrictedConversion1, "ra").WithArguments("System.RuntimeArgumentHandle"),
+                Diagnostic(ERRID.ERR_RestrictedConversion1, "tr").WithArguments("System.TypedReference"),
+                Diagnostic(ERRID.ERR_RestrictedConversion1, "ai").WithArguments("System.ArgIterator"),
+                Diagnostic(ERRID.ERR_RestrictedConversion1, "ra").WithArguments("System.RuntimeArgumentHandle"),
+                Diagnostic(ERRID.ERR_RestrictedConversion1, "tr").WithArguments("System.TypedReference"),
+                Diagnostic(ERRID.ERR_RestrictedConversion1, "ai").WithArguments("System.ArgIterator"),
+                Diagnostic(ERRID.ERR_RestrictedConversion1, "ra").WithArguments("System.RuntimeArgumentHandle"),
+                Diagnostic(ERRID.ERR_RestrictedConversion1, "tr").WithArguments("System.TypedReference"),
+                Diagnostic(ERRID.ERR_RestrictedConversion1, "ai").WithArguments("System.ArgIterator"),
+                Diagnostic(ERRID.ERR_RestrictedConversion1, "ra").WithArguments("System.RuntimeArgumentHandle"),
+                Diagnostic(ERRID.WRN_InterfaceConversion2, "_collection").WithArguments("_Collection", "Microsoft.VisualBasic.Collection"),
+                Diagnostic(ERRID.WRN_InterfaceConversion2, "collection").WithArguments("Microsoft.VisualBasic.Collection", "_Collection"),
+                Diagnostic(ERRID.WRN_InterfaceConversion2, "_collection").WithArguments("_Collection", "Microsoft.VisualBasic.Collection"),
+                Diagnostic(ERRID.WRN_InterfaceConversion2, "collection").WithArguments("Microsoft.VisualBasic.Collection", "_Collection"),
+                Diagnostic(ERRID.ERR_ExpressionOverflow1, "Int64.MaxValue").WithArguments("Integer"),
+                Diagnostic(ERRID.ERR_ExpressionOverflow1, "Int64.MaxValue").WithArguments("Integer"),
+                Diagnostic(ERRID.ERR_ExpressionOverflow1, "System.Double.MaxValue").WithArguments("Decimal"),
+                Diagnostic(ERRID.ERR_ExpressionOverflow1, "System.Double.MaxValue").WithArguments("Decimal"),
+                Diagnostic(ERRID.ERR_TypeMismatch2, "Da").WithArguments("Date", "Integer"),
+                Diagnostic(ERRID.ERR_TypeMismatch2, "Da").WithArguments("Date", "Integer"),
+                Diagnostic(ERRID.ERR_TypeMismatch2, "[In]").WithArguments("Integer", "Date"),
+                Diagnostic(ERRID.ERR_TypeMismatch2, "[In]").WithArguments("Integer", "Date"),
+                Diagnostic(ERRID.ERR_DateToDoubleConversion, "Da"),
+                Diagnostic(ERRID.ERR_DateToDoubleConversion, "Da"),
+                Diagnostic(ERRID.ERR_DoubleToDateConversion, "[Do]"),
+                Diagnostic(ERRID.ERR_DoubleToDateConversion, "[Do]"),
+                Diagnostic(ERRID.ERR_CharToIntegralTypeMismatch1, "Ch").WithArguments("Integer"),
+                Diagnostic(ERRID.ERR_CharToIntegralTypeMismatch1, "Ch").WithArguments("Integer"),
+                Diagnostic(ERRID.ERR_IntegralToCharTypeMismatch1, "[In]").WithArguments("Integer"),
+                Diagnostic(ERRID.ERR_IntegralToCharTypeMismatch1, "[In]").WithArguments("Integer"),
+                Diagnostic(ERRID.ERR_ConvertObjectArrayMismatch3, "InArray").WithArguments("Integer()", "Object()", "Integer"),
+                Diagnostic(ERRID.ERR_ConvertObjectArrayMismatch3, "InArray").WithArguments("Integer()", "Object()", "Integer"),
+                Diagnostic(ERRID.ERR_ConvertObjectArrayMismatch3, "InArray").WithArguments("Integer()", "System.ValueType()", "Integer"),
+                Diagnostic(ERRID.ERR_ConvertObjectArrayMismatch3, "InArray").WithArguments("Integer()", "System.ValueType()", "Integer"),
+                Diagnostic(ERRID.ERR_ConvertArrayMismatch4, "TC2Array").WithArguments("TestClass2()", "TestClass1()", "TestClass2", "TestClass1"),
+                Diagnostic(ERRID.ERR_ConvertArrayMismatch4, "TC1Array").WithArguments("TestClass1()", "TestClass2()", "TestClass1", "TestClass2"),
+                Diagnostic(ERRID.ERR_ConvertArrayRankMismatch2, "InArray2").WithArguments("Integer(*,*)", "Integer()"),
+                Diagnostic(ERRID.ERR_ConvertArrayRankMismatch2, "InArray").WithArguments("Integer()", "Integer(*,*)"),
+                Diagnostic(ERRID.ERR_ConvertArrayMismatch4, "TI1Array").WithArguments("TestInterface1()", "Integer()", "TestInterface1", "Integer"),
+                Diagnostic(ERRID.ERR_ConvertArrayMismatch4, "InArray").WithArguments("Integer()", "TestInterface1()", "Integer", "TestInterface1"))
+
+            compilation = CompilationUtils.CreateCompilationWithMscorlibAndVBRuntime(compilationDef, New VisualBasicCompilationOptions(OutputKind.ConsoleApplication).WithOptionStrict(OptionStrict.Custom))
+            compilation.VerifyDiagnostics(
+                Diagnostic(ERRID.ERR_VoidValue, "Console.WriteLine()"),
+                Diagnostic(ERRID.ERR_VoidValue, "Console.WriteLine()"),
+                Diagnostic(ERRID.ERR_UndefinedType1, "UnknownType").WithArguments("UnknownType"),
+                Diagnostic(ERRID.ERR_NameNotDeclared1, "unknownValue").WithArguments("unknownValue"),
+                Diagnostic(ERRID.ERR_NameNotDeclared1, "unknownValue").WithArguments("unknownValue"),
+                Diagnostic(ERRID.ERR_UndefinedType1, "UnknownType").WithArguments("UnknownType"),
+                Diagnostic(ERRID.ERR_RestrictedConversion1, "tr").WithArguments("System.TypedReference"),
+                Diagnostic(ERRID.ERR_RestrictedConversion1, "ai").WithArguments("System.ArgIterator"),
+                Diagnostic(ERRID.ERR_RestrictedConversion1, "ra").WithArguments("System.RuntimeArgumentHandle"),
+                Diagnostic(ERRID.ERR_RestrictedConversion1, "tr").WithArguments("System.TypedReference"),
+                Diagnostic(ERRID.ERR_RestrictedConversion1, "ai").WithArguments("System.ArgIterator"),
+                Diagnostic(ERRID.ERR_RestrictedConversion1, "ra").WithArguments("System.RuntimeArgumentHandle"),
+                Diagnostic(ERRID.ERR_RestrictedConversion1, "tr").WithArguments("System.TypedReference"),
+                Diagnostic(ERRID.ERR_RestrictedConversion1, "ai").WithArguments("System.ArgIterator"),
+                Diagnostic(ERRID.ERR_RestrictedConversion1, "ra").WithArguments("System.RuntimeArgumentHandle"),
+                Diagnostic(ERRID.ERR_RestrictedConversion1, "tr").WithArguments("System.TypedReference"),
+                Diagnostic(ERRID.ERR_RestrictedConversion1, "ai").WithArguments("System.ArgIterator"),
+                Diagnostic(ERRID.ERR_RestrictedConversion1, "ra").WithArguments("System.RuntimeArgumentHandle"),
+                Diagnostic(ERRID.WRN_InterfaceConversion2, "_collection").WithArguments("_Collection", "Microsoft.VisualBasic.Collection"),
+                Diagnostic(ERRID.WRN_ImplicitConversionSubst1, "_collection").WithArguments("Implicit conversion from '_Collection' to 'Collection'."),
+                Diagnostic(ERRID.WRN_InterfaceConversion2, "collection").WithArguments("Microsoft.VisualBasic.Collection", "_Collection"),
+                Diagnostic(ERRID.WRN_ImplicitConversionSubst1, "collection").WithArguments("Implicit conversion from 'Collection' to '_Collection'."),
+                Diagnostic(ERRID.WRN_InterfaceConversion2, "_collection").WithArguments("_Collection", "Microsoft.VisualBasic.Collection"),
+                Diagnostic(ERRID.WRN_InterfaceConversion2, "collection").WithArguments("Microsoft.VisualBasic.Collection", "_Collection"),
+                Diagnostic(ERRID.ERR_ExpressionOverflow1, "Int64.MaxValue").WithArguments("Integer"),
+                Diagnostic(ERRID.ERR_ExpressionOverflow1, "Int64.MaxValue").WithArguments("Integer"),
+                Diagnostic(ERRID.ERR_ExpressionOverflow1, "System.Double.MaxValue").WithArguments("Decimal"),
+                Diagnostic(ERRID.ERR_ExpressionOverflow1, "System.Double.MaxValue").WithArguments("Decimal"),
+                Diagnostic(ERRID.WRN_ImplicitConversionSubst1, "10.0F").WithArguments("Implicit conversion from 'Single' to 'Decimal'."),
+                Diagnostic(ERRID.ERR_TypeMismatch2, "Da").WithArguments("Date", "Integer"),
+                Diagnostic(ERRID.ERR_TypeMismatch2, "Da").WithArguments("Date", "Integer"),
+                Diagnostic(ERRID.ERR_TypeMismatch2, "[In]").WithArguments("Integer", "Date"),
+                Diagnostic(ERRID.ERR_TypeMismatch2, "[In]").WithArguments("Integer", "Date"),
+                Diagnostic(ERRID.ERR_DateToDoubleConversion, "Da"),
+                Diagnostic(ERRID.ERR_DateToDoubleConversion, "Da"),
+                Diagnostic(ERRID.ERR_DoubleToDateConversion, "[Do]"),
+                Diagnostic(ERRID.ERR_DoubleToDateConversion, "[Do]"),
+                Diagnostic(ERRID.ERR_CharToIntegralTypeMismatch1, "Ch").WithArguments("Integer"),
+                Diagnostic(ERRID.ERR_CharToIntegralTypeMismatch1, "Ch").WithArguments("Integer"),
+                Diagnostic(ERRID.ERR_IntegralToCharTypeMismatch1, "[In]").WithArguments("Integer"),
+                Diagnostic(ERRID.ERR_IntegralToCharTypeMismatch1, "[In]").WithArguments("Integer"),
+                Diagnostic(ERRID.ERR_ConvertObjectArrayMismatch3, "InArray").WithArguments("Integer()", "Object()", "Integer"),
+                Diagnostic(ERRID.ERR_ConvertObjectArrayMismatch3, "InArray").WithArguments("Integer()", "Object()", "Integer"),
+                Diagnostic(ERRID.ERR_ConvertObjectArrayMismatch3, "InArray").WithArguments("Integer()", "System.ValueType()", "Integer"),
+                Diagnostic(ERRID.ERR_ConvertObjectArrayMismatch3, "InArray").WithArguments("Integer()", "System.ValueType()", "Integer"),
+                Diagnostic(ERRID.ERR_ConvertArrayMismatch4, "TC2Array").WithArguments("TestClass2()", "TestClass1()", "TestClass2", "TestClass1"),
+                Diagnostic(ERRID.ERR_ConvertArrayMismatch4, "TC1Array").WithArguments("TestClass1()", "TestClass2()", "TestClass1", "TestClass2"),
+                Diagnostic(ERRID.ERR_ConvertArrayRankMismatch2, "InArray2").WithArguments("Integer(*,*)", "Integer()"),
+                Diagnostic(ERRID.ERR_ConvertArrayRankMismatch2, "InArray").WithArguments("Integer()", "Integer(*,*)"),
+                Diagnostic(ERRID.ERR_ConvertArrayMismatch4, "TI1Array").WithArguments("TestInterface1()", "Integer()", "TestInterface1", "Integer"),
+                Diagnostic(ERRID.ERR_ConvertArrayMismatch4, "InArray").WithArguments("Integer()", "TestInterface1()", "Integer", "TestInterface1"))
+        End Sub
+
+
+        <Fact()>
         Public Sub DirectCastDiagnostic1()
             Dim compilationDef =
 <compilation name="DirectCastDiagnostic1">

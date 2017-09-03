@@ -228,7 +228,7 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
 
             If outConv IsNot Nothing Then
                 outConv = outConv.Update([call], outConv.ConversionKind, outConv.Checked, outConv.ExplicitCastInCode, outConv.ConstantValueOpt,
-                                         outConv.ExtendedInfoOpt, outConv.Type)
+                                         outConv.ExtendedInfoOpt, outConv.IsAsTypeConversion, outConv.Type)
             End If
 
             Dim newInOutConversionFlags As Byte = CByte(If(outConv IsNot Nothing, 2, 0) + If(innerConversionApplied, 1, 0))
@@ -242,7 +242,7 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
 
             Return conversion.Update(userDefinedConv, newConversionKind,
                                      conversion.Checked, conversion.ExplicitCastInCode, conversion.ConstantValueOpt,
-                                     conversion.ExtendedInfoOpt, toType)
+                                     conversion.ExtendedInfoOpt, conversion.IsAsTypeConversion, toType)
         End Function
 
     End Class

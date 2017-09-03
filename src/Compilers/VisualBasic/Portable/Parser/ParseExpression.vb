@@ -436,8 +436,8 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Syntax.InternalSyntax
             ' Complex expressions such as "." or "!" qualified, etc are not allowed cond comp expressions.
             '
             If Not _evaluatingConditionCompilationExpression Then
-                ' Valid suffixes are ".", "!", and "(". Everything else is considered
-                ' to end the term.
+                ' Valid suffixes are ".", "!", "(" and "As" (for modernized type casting).
+                ' Everything else is considered to end the term.
 
                 term = ParsePostFixExpression(RedimOrNewParent, term)
             End If
@@ -501,6 +501,15 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Syntax.InternalSyntax
                     End If
 
                     term = SyntaxFactory.ConditionalAccessExpression(term, qToken, ParsePostFixExpression(RedimOrNewParent, term:=Nothing))
+
+                ElseIf [Next].Kind = SyntaxKind.AsKeyword Then
+                    Dim asToken = DirectCast([Next], KeywordSyntax)
+
+                    GetNextToken()
+
+                    Dim type = ParseTypeName()
+                    term = SyntaxFactory.AsCastExpression(term, asToken, type)
+
                 Else
                     ' We're done with the term.
                     Exit Do

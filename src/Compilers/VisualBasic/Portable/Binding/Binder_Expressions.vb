@@ -157,6 +157,9 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
                      SyntaxKind.DirectCastExpression
                     Return BindCastExpression(DirectCast(node, CastExpressionSyntax), diagnostics)
 
+                Case SyntaxKind.AsCastExpression
+                    Return BindAsCastExpression(DirectCast(node, AsCastExpressionSyntax), diagnostics)
+
                 Case SyntaxKind.PredefinedCastExpression
                     Return BindPredefinedCastExpression(DirectCast(node, PredefinedCastExpressionSyntax), diagnostics)
 

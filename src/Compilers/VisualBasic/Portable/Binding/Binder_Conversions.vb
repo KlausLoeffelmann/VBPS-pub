@@ -258,6 +258,17 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
             Return New BoundTryCast(node, argument, conv, constantResult, targetType)
         End Function
 
+        Private Function BindAsCastExpression(
+             node As AsCastExpressionSyntax,
+             diagnostics As DiagnosticBag
+         ) As BoundExpression
+
+            Dim argument = BindValue(node.Expression, diagnostics)
+            Dim targetType = BindTypeSyntax(node.Type, diagnostics)
+
+            Return ApplyConversion(node, targetType, argument, isExplicit:=True, diagnostics:=diagnostics)
+        End Function
+
         Private Function BindPredefinedCastExpression(
              node As PredefinedCastExpressionSyntax,
              diagnostics As DiagnosticBag
@@ -335,6 +346,7 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
                                            explicitCastInCode:=isExplicit,
                                            type:=targetType,
                                            hasErrors:=True)
+
             End If
 
             If argument.HasErrors Then
@@ -1000,7 +1012,7 @@ DoneWithDiagnostics:
                                                If(boundLambdaOpt Is Nothing,
                                                   Nothing,
                                                   New BoundRelaxationLambda(tree, boundLambdaOpt, relaxationReceiverPlaceholderOpt).MakeCompilerGenerated()),
-                                               targetType)
+                                               tree.IsAsCastExpressionSyntax, targetType)
                 Else
                     Debug.Assert(diagnostics.HasAnyErrors())
                 End If
@@ -1023,7 +1035,8 @@ DoneWithDiagnostics:
 
             Dim tupleElements As BoundConvertedTupleElements = CreateConversionForTupleElements(tree, sourceType, targetType, convKind, isExplicit)
 
-            Return New BoundConversion(tree, argument, convKind, CheckOverflow, isExplicit, constantResult, tupleElements, targetType)
+            Return New BoundConversion(tree, argument, convKind, CheckOverflow, isExplicit, constantResult,
+                                       tupleElements, tree.IsAsCastExpressionSyntax, targetType)
         End Function
 
         Private Function CreateConversionForTupleElements(
@@ -1475,7 +1488,7 @@ DoneWithDiagnostics:
                                            If(relaxationLambdaOpt Is Nothing,
                                               Nothing,
                                               New BoundRelaxationLambda(tree, relaxationLambdaOpt, receiverPlaceholderOpt:=Nothing).MakeCompilerGenerated()),
-                                           targetType)
+                                           False, targetType)
             ElseIf conversionSemantics = SyntaxKind.DirectCastKeyword Then
                 Return New BoundDirectCast(tree, boundLambda, convKind, relaxationLambdaOpt, targetType)
             ElseIf conversionSemantics = SyntaxKind.TryCastKeyword Then

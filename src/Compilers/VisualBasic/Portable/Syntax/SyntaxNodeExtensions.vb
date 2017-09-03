@@ -21,7 +21,7 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
         ''' <param name="node"></param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        <Extension()> _
+        <Extension()>
         Public Function ContainingWithStatement(node As VisualBasicSyntaxNode) As WithStatementSyntax
             Debug.Assert(node IsNot Nothing)
 
@@ -52,7 +52,7 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
             Return Nothing
         End Function
 
-        <Extension()> _
+        <Extension()>
         Public Sub GetAncestors(Of T As VisualBasicSyntaxNode, C As VisualBasicSyntaxNode)(node As VisualBasicSyntaxNode, result As ArrayBuilder(Of T))
 
             Dim current = node.Parent
@@ -66,7 +66,7 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
             result.ReverseContents()
         End Sub
 
-        <Extension()> _
+        <Extension()>
         Public Function GetAncestorOrSelf(Of T As VisualBasicSyntaxNode)(node As VisualBasicSyntaxNode) As T
 
             Do While node IsNot Nothing
@@ -382,5 +382,9 @@ TryAgain:
             Return Nothing
         End Function
 
+        <Extension>
+        Friend Function IsAsCastExpressionSyntax(node As SyntaxNode) As Boolean
+            Return node IsNot Nothing AndAlso node.Kind() = SyntaxKind.AsCastExpression
+        End Function
     End Module
 End Namespace

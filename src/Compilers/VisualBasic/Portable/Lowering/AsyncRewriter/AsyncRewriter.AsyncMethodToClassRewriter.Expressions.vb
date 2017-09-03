@@ -380,6 +380,7 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
                                                                   rewritten.ExplicitCastInCode,
                                                                   rewritten.ConstantValueOpt,
                                                                   rewritten.ExtendedInfoOpt,
+                                                                  rewritten.IsAsTypeConversion,
                                                                   rewritten.Type))
             End Function
 

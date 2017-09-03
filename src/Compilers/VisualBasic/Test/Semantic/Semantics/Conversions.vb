@@ -2966,82 +2966,85 @@ Module Module1
         Ob = tr
         Ob = ai
         Ob = ra
-        Ob = CType(tr, Object)
-        Ob = CType(ai, Object)
-        Ob = CType(ra, Object)
+        Ob = tr As Object
+        Ob = ai As Object
+        Ob = ra As Object
 
         Dim vt As ValueType
 
         vt = tr
         vt = ai
         vt = ra
-        vt = CType(tr, ValueType)
-        vt = CType(ai, ValueType)
-        vt = CType(ra, ValueType)
+        vt = tr As ValueType
+        vt = ai As ValueType
+        vt = ra As ValueType
 
         Dim collection As Microsoft.VisualBasic.Collection = Nothing
         Dim _collection As _Collection = Nothing
 
         collection = _collection
         _collection = collection
-        collection = CType(_collection, Microsoft.VisualBasic.Collection)
-        _collection = CType(collection, _Collection)
+        collection = _collection As Microsoft.VisualBasic.Collection
+        _collection = collection As _Collection
 
         Dim Si As Single
         Dim De As Decimal
 
         [In] = Int64.MaxValue
-        [In] = CInt(Int64.MaxValue)
+        [In] = Int64.MaxValue As Integer
         Si = System.Double.MaxValue
-        Si = CSng(System.Double.MaxValue)
+        Si = System.Double.MaxValue As Single
         De = System.Double.MaxValue
-        De = CDec(System.Double.MaxValue)
+        De = System.Double.MaxValue As Decimal
         De = 10.0F
-        De = CDec(10.0F)
+        De = 10.0F As Decimal
 
         Dim Da As DateTime = Nothing
         [In] = Da
-        [In] = CInt(Da)
+        [In] = Da As Date
         Da = [In]
-        Da = CDate([In])
+        Da = [In] As Date
 
         Dim [Do] As Double = Nothing
         Dim Ch As Char = Nothing
 
         [Do] = Da
-        [Do] = CDbl(Da)
+        [Do] = Da As Double
         Da = [Do]
-        Da = CDate([Do])
+        Da = [Do] As Date
 
         [In] = Ch
-        [In] = CInt(Ch)
+        [In] = Ch As Integer
         Ch = [In]
-        Ch = CChar([In])
+        Ch = [In] As Char
 
         Dim InArray As Integer() = Nothing
         Dim ObArray As Object() = Nothing
         Dim VtArray As ValueType() = Nothing
 
         ObArray = InArray
-        ObArray = CType(InArray, Object())
+        ObArray = InArray As Object()
         VtArray = InArray
-        VtArray = CType(InArray, ValueType())
+        VtArray = InArray As ValueType()
 
         Dim TC1Array As TestClass1() = Nothing
         Dim TC2Array As TestClass2() = Nothing
 
         TC1Array = TC2Array
-        TC2Array = CType(TC1Array, TestClass2())
+        TC2Array = TC1Array As TestClass2()
 
         Dim InArray2 As Integer(,) = Nothing
 
         InArray = InArray2
-        InArray2 = CType(InArray, Integer(,))
+        InArray2 = InArray As Integer(,)
 
         Dim TI1Array As TestInterface1() = Nothing
 
         InArray = TI1Array
-        TI1Array = CType(InArray, TestInterface1())
+        TI1Array = InArray As TestInterface1()
+
+        Dim simpleTestClass as TestClass1 = New TestClass1Inherited
+        Dim simpleTestClassInherited = simpleTestClass As Object As TestClass1Inherited
     End Sub
 
 End Module
@@ -3057,6 +3060,11 @@ End Class
 
 Class TestClass2
 End Class
+
+Class TestClass1Inherited
+    Inherits TestClass1
+End Class
+
     </file>
 </compilation>
 

@@ -4,13 +4,16 @@ Module Program
 
     Sub Main(args As String())
 
-        Dim aString As String
-        aString = "42.42"
-        Dim aDouble = Double.Parse(aString)
-        Dim aLong = CType(aDouble + aDouble, Long)
+        Dim aDouble = 42.6
+        Dim anIntWithCType = CType(aDouble, Integer)
+        Dim anIntWithAsType = aDouble as Integer
 
-        For z = 0 To aLong
-            Console.WriteLine(z.ToString)
-        Next
+        Console.WriteLine($"Ctype Value:{anIntWithCType}; AsType Value:{anIntWithAsType}")
+
+        Dim aChar = 65 as Char
+        Console.WriteLine($"Char Conversion Value: '{aChar}'")
+
+        Dim intChar=aChar as Integer
+        Console.WriteLine($"Char Value:{intChar}")
     End Sub
 End Module

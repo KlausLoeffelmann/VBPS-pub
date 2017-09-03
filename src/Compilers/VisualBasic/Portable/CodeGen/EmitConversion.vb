@@ -23,7 +23,8 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.CodeGen
                      PrimitiveTypeCode.UInt16,
                      PrimitiveTypeCode.UInt32,
                      PrimitiveTypeCode.UInt64,
-                     PrimitiveTypeCode.UInt8
+                     PrimitiveTypeCode.UInt8,
+                     PrimitiveTypeCode.Char
 
                     result = True
             End Select
@@ -35,7 +36,7 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.CodeGen
 
             Debug.Assert(underlyingFrom = conversion.Operand.Type.GetEnumUnderlyingTypeOrSelf().PrimitiveTypeCode)
             Debug.Assert(underlyingTo = conversion.Type.GetEnumUnderlyingTypeOrSelf().PrimitiveTypeCode)
-            Debug.Assert((IsSimpleType(underlyingFrom) AndAlso IsSimpleType(underlyingTo)) OrElse (underlyingFrom = PrimitiveTypeCode.Char AndAlso underlyingTo = PrimitiveTypeCode.Int32))
+            Debug.Assert((IsSimpleType(underlyingFrom) AndAlso IsSimpleType(underlyingTo)))
 
             ' Generate the expression to convert.
             EmitExpression(conversion.Operand, True)
@@ -122,9 +123,10 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.CodeGen
 
         Private Sub EmitConvertSimpleNumeric(conversion As BoundConversion, typeFrom As PrimitiveTypeCode, typeTo As PrimitiveTypeCode, checked As Boolean)
             Debug.Assert(typeFrom.IsIntegral() OrElse typeFrom.IsFloatingPoint() OrElse typeFrom = PrimitiveTypeCode.Char)
-            Debug.Assert(typeTo.IsIntegral() OrElse typeTo.IsFloatingPoint())
+            Debug.Assert(typeTo.IsIntegral() OrElse typeTo.IsFloatingPoint() OrElse typeTo = PrimitiveTypeCode.Char)
 
             Debug.Assert(Not (typeFrom.IsFloatingPoint() AndAlso typeTo.IsIntegral() AndAlso
+                              Not conversion.IsAsTypeConversion AndAlso
                               Not (conversion.Operand.Kind = BoundKind.Call AndAlso
                                    DirectCast(conversion.Operand, BoundCall).Method.Equals(
                                        Me._module.SourceModule.ContainingSourceAssembly.DeclaringCompilation.GetWellKnownTypeMember(WellKnownMember.System_Math__RoundDouble)))),
@@ -153,8 +155,7 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.CodeGen
                 Dim typeFrom = conversion.Operand.Type
                 Dim underlyingFrom = typeFrom.GetEnumUnderlyingTypeOrSelf().PrimitiveTypeCode
 
-                If (IsSimpleType(underlyingFrom) AndAlso IsSimpleType(underlyingTo)) OrElse
-                   (underlyingFrom = PrimitiveTypeCode.Char AndAlso underlyingTo = PrimitiveTypeCode.Int32) Then ' Allow AscW optimization.
+                If (IsSimpleType(underlyingFrom) AndAlso IsSimpleType(underlyingTo)) Then
                     EmitConvertIntrinsic(conversion, underlyingFrom, underlyingTo)
 
                 ElseIf typeFrom.IsNullableType Then

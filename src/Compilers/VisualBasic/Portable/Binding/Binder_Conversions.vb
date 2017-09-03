@@ -404,6 +404,15 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
             Else
                 conv = Conversions.ClassifyConversion(argument, targetType, Me, useSiteDiagnostics)
 
+                'We need to make sure, we overrides the default cast behaviour for AsType Casts for the
+                'cases char --> Integral or integral --> char.
+                If Not Conversions.ConversionExists(conv.Key) AndAlso node.IsAsCastExpressionSyntax Then
+                    If (argument.Type.IsIntegralType AndAlso targetType.IsCharType) OrElse
+                        (argument.Type.IsCharType AndAlso targetType.IsIntegralType) Then
+                        conv = New KeyValuePair(Of ConversionKind, MethodSymbol)(ConversionKind.Narrowing, Nothing)
+                    End If
+                End If
+
                 If diagnostics.Add(node, useSiteDiagnostics) Then
                     ' Suppress any additional diagnostics
                     diagnostics = New DiagnosticBag()
@@ -1786,14 +1795,14 @@ DoneWithDiagnostics:
                 ReportDiagnostic(diagnostics, location, ERRID.ERR_CharToIntegralTypeMismatch1, targetType)
 
             ElseIf copybackConversionParamName IsNot Nothing Then
-                ReportDiagnostic(diagnostics, location, ERRID.ERR_CopyBackTypeMismatch3,
+                    ReportDiagnostic(diagnostics, location, ERRID.ERR_CopyBackTypeMismatch3,
                                  copybackConversionParamName, sourceType, targetType)
 
-            ElseIf sourceType.IsInterfaceType() AndAlso targetType.IsValueType() AndAlso IsIEnumerableOfXElement(sourceType, Nothing) Then
-                ReportDiagnostic(diagnostics, location, ERRID.ERR_TypeMismatchForXml3, sourceType, targetType, sourceType)
+                ElseIf sourceType.IsInterfaceType() AndAlso targetType.IsValueType() AndAlso IsIEnumerableOfXElement(sourceType, Nothing) Then
+                    ReportDiagnostic(diagnostics, location, ERRID.ERR_TypeMismatchForXml3, sourceType, targetType, sourceType)
 
-            Else
-                ReportDiagnostic(diagnostics, location, ERRID.ERR_TypeMismatch2, sourceType, targetType)
+                Else
+                    ReportDiagnostic(diagnostics, location, ERRID.ERR_TypeMismatch2, sourceType, targetType)
             End If
         End Sub
 

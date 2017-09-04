@@ -165,7 +165,7 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.CodeGen
 
                     If (conversion.ConversionKind And ConversionKind.Narrowing) <> 0 Then
                         EmitBox(typeFrom, conversion.Operand.Syntax)
-                        _builder.EmitOpCode(ILOpCode.Castclass)
+                        _builder.EmitOpCode(If(conversion.IsAsTypeConversion, ILOpCode.Isinst, ILOpCode.Castclass))
                         EmitSymbolToken(typeTo, conversion.Syntax)
                     ElseIf used Then
                         ' boxing itself is CLR-widening, so no need to emit unused boxing

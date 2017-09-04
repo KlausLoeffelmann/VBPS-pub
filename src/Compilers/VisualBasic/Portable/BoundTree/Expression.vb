@@ -999,52 +999,6 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
         End Function
     End Class
 
-    Partial Friend Class BoundAsCast
-        Implements IConversionExpression
-
-        Private ReadOnly Property IConversionExpression_ConversionKind As Semantics.ConversionKind Implements IConversionExpression.ConversionKind
-            Get
-                Return Semantics.ConversionKind.Cast
-            End Get
-        End Property
-
-        Private ReadOnly Property IConversionExpression_IsExplicit As Boolean Implements IConversionExpression.IsExplicit
-            Get
-                Return True
-            End Get
-        End Property
-
-        Private ReadOnly Property IConversionExpression_Operand As IOperation Implements IConversionExpression.Operand
-            Get
-                Return Me.Operand
-            End Get
-        End Property
-
-        Private ReadOnly Property IHasOperatorMethodExpression_OperatorMethod As IMethodSymbol Implements IHasOperatorMethodExpression.OperatorMethod
-            Get
-                Return Nothing
-            End Get
-        End Property
-
-        Private ReadOnly Property IHasOperatorMethodExpression_UsesOperatorMethod As Boolean Implements IHasOperatorMethodExpression.UsesOperatorMethod
-            Get
-                Return False
-            End Get
-        End Property
-
-        Protected Overrides Function ExpressionKind() As OperationKind
-            Return OperationKind.ConversionExpression
-        End Function
-
-        Public Overrides Sub Accept(visitor As OperationVisitor)
-            visitor.VisitConversionExpression(Me)
-        End Sub
-
-        Public Overrides Function Accept(Of TArgument, TResult)(visitor As OperationVisitor(Of TArgument, TResult), argument As TArgument) As TResult
-            Return visitor.VisitConversionExpression(Me, argument)
-        End Function
-    End Class
-
     Friend Partial Class BoundConversion
         Implements IConversionExpression
 

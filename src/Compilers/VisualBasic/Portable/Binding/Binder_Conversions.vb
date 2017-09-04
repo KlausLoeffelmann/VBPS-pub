@@ -1795,14 +1795,14 @@ DoneWithDiagnostics:
                 ReportDiagnostic(diagnostics, location, ERRID.ERR_CharToIntegralTypeMismatch1, targetType)
 
             ElseIf copybackConversionParamName IsNot Nothing Then
-                    ReportDiagnostic(diagnostics, location, ERRID.ERR_CopyBackTypeMismatch3,
+                ReportDiagnostic(diagnostics, location, ERRID.ERR_CopyBackTypeMismatch3,
                                  copybackConversionParamName, sourceType, targetType)
 
-                ElseIf sourceType.IsInterfaceType() AndAlso targetType.IsValueType() AndAlso IsIEnumerableOfXElement(sourceType, Nothing) Then
-                    ReportDiagnostic(diagnostics, location, ERRID.ERR_TypeMismatchForXml3, sourceType, targetType, sourceType)
+            ElseIf sourceType.IsInterfaceType() AndAlso targetType.IsValueType() AndAlso IsIEnumerableOfXElement(sourceType, Nothing) Then
+                ReportDiagnostic(diagnostics, location, ERRID.ERR_TypeMismatchForXml3, sourceType, targetType, sourceType)
 
-                Else
-                    ReportDiagnostic(diagnostics, location, ERRID.ERR_TypeMismatch2, sourceType, targetType)
+            Else
+                ReportDiagnostic(diagnostics, location, ERRID.ERR_TypeMismatch2, sourceType, targetType)
             End If
         End Sub
 

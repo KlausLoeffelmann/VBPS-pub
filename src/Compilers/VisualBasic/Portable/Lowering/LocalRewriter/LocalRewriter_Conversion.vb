@@ -101,7 +101,7 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
             ElseIf (node.ConversionKind And ConversionKind.InterpolatedString) = ConversionKind.InterpolatedString Then
                 returnValue = RewriteInterpolatedStringConversion(node)
 
-            ElseIf (node.ConversionKind And (ConversionKind.Tuple Or ConversionKind.Nullable)) = conversionKind.Tuple Then
+            ElseIf (node.ConversionKind And (ConversionKind.Tuple Or ConversionKind.Nullable)) = ConversionKind.Tuple Then
                 returnValue = RewriteTupleConversion(node)
 
             Else
@@ -784,45 +784,45 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
 
                 ElseIf underlyingTypeFrom.IsDecimalType() AndAlso
                     (underlyingTypeTo.IsBooleanType() OrElse underlyingTypeTo.IsIntegralType() OrElse underlyingTypeTo.IsFloatingType) Then
-                        result = RewriteDecimalToNumericOrBooleanConversion(rewrittenConversion, underlyingTypeFrom, underlyingTypeTo)
+                    result = RewriteDecimalToNumericOrBooleanConversion(rewrittenConversion, underlyingTypeFrom, underlyingTypeTo)
 
-                    ElseIf underlyingTypeTo.IsDecimalType() AndAlso
+                ElseIf underlyingTypeTo.IsDecimalType() AndAlso
                     (underlyingTypeFrom.IsBooleanType() OrElse underlyingTypeFrom.IsIntegralType() OrElse underlyingTypeFrom.IsFloatingType) Then
-                        result = RewriteNumericOrBooleanToDecimalConversion(rewrittenConversion, underlyingTypeFrom, underlyingTypeTo)
+                    result = RewriteNumericOrBooleanToDecimalConversion(rewrittenConversion, underlyingTypeFrom, underlyingTypeTo)
 
-                    ElseIf underlyingTypeFrom.IsNullableType OrElse underlyingTypeTo.IsNullableType Then
-                        ' conversions between nullable and reference types are not directcasts, they are boxing/unboxing conversions.
-                        ' CodeGen will handle this.
+                ElseIf underlyingTypeFrom.IsNullableType OrElse underlyingTypeTo.IsNullableType Then
+                    ' conversions between nullable and reference types are not directcasts, they are boxing/unboxing conversions.
+                    ' CodeGen will handle this.
 
-                    ElseIf underlyingTypeFrom.IsObjectType() AndAlso
+                ElseIf underlyingTypeFrom.IsObjectType() AndAlso
                     (underlyingTypeTo.IsTypeParameter() OrElse underlyingTypeTo.IsIntrinsicType()) Then
-                        result = RewriteFromObjectConversion(rewrittenConversion, underlyingTypeFrom, underlyingTypeTo)
+                    result = RewriteFromObjectConversion(rewrittenConversion, underlyingTypeFrom, underlyingTypeTo)
 
-                    ElseIf underlyingTypeFrom.IsTypeParameter() Then
-                        result = RewriteAsDirectCast(rewrittenConversion)
+                ElseIf underlyingTypeFrom.IsTypeParameter() Then
+                    result = RewriteAsDirectCast(rewrittenConversion)
 
-                    ElseIf underlyingTypeTo.IsTypeParameter() Then
-                        result = RewriteAsDirectCast(rewrittenConversion)
+                ElseIf underlyingTypeTo.IsTypeParameter() Then
+                    result = RewriteAsDirectCast(rewrittenConversion)
 
-                    ElseIf underlyingTypeFrom.IsStringType() AndAlso
+                ElseIf underlyingTypeFrom.IsStringType() AndAlso
                      (underlyingTypeTo.IsCharSZArray() OrElse underlyingTypeTo.IsIntrinsicValueType()) Then
-                        result = RewriteFromStringConversion(rewrittenConversion, underlyingTypeFrom, underlyingTypeTo)
+                    result = RewriteFromStringConversion(rewrittenConversion, underlyingTypeFrom, underlyingTypeTo)
 
-                    ElseIf underlyingTypeTo.IsStringType() AndAlso
+                ElseIf underlyingTypeTo.IsStringType() AndAlso
                     (underlyingTypeFrom.IsCharSZArray() OrElse underlyingTypeFrom.IsIntrinsicValueType()) Then
-                        result = RewriteToStringConversion(rewrittenConversion, underlyingTypeFrom, underlyingTypeTo)
+                    result = RewriteToStringConversion(rewrittenConversion, underlyingTypeFrom, underlyingTypeTo)
 
-                    ElseIf underlyingTypeFrom.IsReferenceType AndAlso underlyingTypeTo.IsCharSZArray() Then
-                        result = RewriteReferenceTypeToCharArrayRankOneConversion(rewrittenConversion, underlyingTypeFrom, underlyingTypeTo)
+                ElseIf underlyingTypeFrom.IsReferenceType AndAlso underlyingTypeTo.IsCharSZArray() Then
+                    result = RewriteReferenceTypeToCharArrayRankOneConversion(rewrittenConversion, underlyingTypeFrom, underlyingTypeTo)
 
-                    ElseIf underlyingTypeTo.IsReferenceType Then
-                        result = RewriteAsDirectCast(rewrittenConversion)
+                ElseIf underlyingTypeTo.IsReferenceType Then
+                    result = RewriteAsDirectCast(rewrittenConversion)
 
-                    ElseIf underlyingTypeFrom.IsReferenceType AndAlso underlyingTypeTo.IsIntrinsicValueType() Then
-                        result = RewriteFromObjectConversion(rewrittenConversion, Compilation.GetSpecialType(SpecialType.System_Object), underlyingTypeTo)
+                ElseIf underlyingTypeFrom.IsReferenceType AndAlso underlyingTypeTo.IsIntrinsicValueType() Then
+                    result = RewriteFromObjectConversion(rewrittenConversion, Compilation.GetSpecialType(SpecialType.System_Object), underlyingTypeTo)
 
-                    Else
-                        Debug.Assert(underlyingTypeTo.IsValueType)
+                Else
+                    Debug.Assert(underlyingTypeTo.IsValueType)
                 End If
             End If
 
@@ -869,7 +869,9 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
                          (node.ConversionKind And (Not ConversionKind.DelegateRelaxationLevelMask)) =
                             Conversions.ClassifyDirectCastConversion(node.Operand.Type, node.Type, useSiteDiagnostics))
 #End If
-
+            If node.IsAsTypeConversion Then
+                Return New BoundTryCast(node.Syntax, node.Operand, node.ConversionKind, node.Type, Nothing)
+            End If
             ' TODO: A chain of widening reference conversions that starts from NOTHING literal can be collapsed to a single node.
             '       Semantics::Convert does this in Dev10.
             '       It looks like we already achieve the same result due to folding of NOTHING conversions.

@@ -15,5 +15,23 @@ Module Program
 
         Dim intChar=aChar as Integer
         Console.WriteLine($"Char Value:{intChar}")
+
+        Dim testObject as Object = New Foo
+        Dim testFoo = testObject as Foo
+        Dim testBar as Bar = testObject as Bar
+
+        Console.WriteLine($"testFoo has instance:{(testFoo isnot Nothing)}")
+        Console.WriteLine($"testBar has instance:{(testBar isnot Nothing)}")
+
+        testObject = New Foo
+        testFoo = CType(testObject, Foo)
+        testBar = CType(testObject, Bar)
+
     End Sub
+
+    Public Class Foo
+    End Class
+
+    Public Class Bar
+    End Class
 End Module

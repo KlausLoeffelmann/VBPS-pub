@@ -421,17 +421,30 @@ lReportErrorOnTwoTokens:
                 SourceMemberFlags.Shadows Or SourceMemberFlags.Shared Or
                 SourceMemberFlags.Overridable Or SourceMemberFlags.NotOverridable Or
                 SourceMemberFlags.Overrides Or SourceMemberFlags.MustOverride Or
-                SourceMemberFlags.Async Or SourceMemberFlags.Iterator,
+                SourceMemberFlags.Async Or SourceMemberFlags.Iterator Or
+                SourceMemberFlags.Social Or SourceMemberFlags.Independent,
                 ERRID.ERR_BadMethodFlags1,
                 Accessibility.Public,
                 diagBag)
 
             methodModifiers = binder.ValidateSharedPropertyAndMethodModifiers(modifiers, methodModifiers, False, container, diagBag)
 
-            Const asyncIterator As SourceMemberFlags = SourceMemberFlags.Async Or SourceMemberFlags.Iterator
-            If (methodModifiers.FoundFlags And asyncIterator) = asyncIterator Then
-                binder.ReportModifierError(modifiers, ERRID.ERR_InvalidAsyncIteratorModifiers, diagBag, InvalidAsyncIterator)
-            End If
+            Const asyncIterator As SourceMemberFlags = SourceMemberFlags.Async Or SourceMemberFlags.Iterator Or
+                                                       SourceMemberFlags.Social Or SourceMemberFlags.Independent
+            Select Case methodModifiers.FoundFlags And asyncIterator
+                Case SourceMemberFlags.Independent Or SourceMemberFlags.Iterator,
+                     SourceMemberFlags.Independent,
+                     SourceMemberFlags.Async,
+                     SourceMemberFlags.Social,
+                     SourceMemberFlags.Iterator,
+                     SourceMemberFlags.None
+                Case SourceMemberFlags.Async Or SourceMemberFlags.Iterator
+                    binder.ReportModifierError(modifiers, ERRID.ERR_InvalidAsyncIteratorModifiers, diagBag, InvalidAsyncIterator)
+                Case SourceMemberFlags.Social Or SourceMemberFlags.Iterator
+                    binder.ReportModifierError(modifiers, ERRID.ERR_InvalidSocialInteratorModifiers, diagBag, InvalidAsyncIterator)
+                Case Else
+                    binder.ReportModifierError(modifiers, ERRID.ERR_InvalidSocialModifiers, diagBag, InvalidAsyncIterator)
+            End Select
 
             Return methodModifiers
         End Function

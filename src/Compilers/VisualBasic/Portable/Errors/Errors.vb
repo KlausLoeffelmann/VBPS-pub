@@ -1734,6 +1734,8 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
 
         ERR_NoRefOutWhenRefOnly = 37300
         ERR_NoNetModuleOutputWhenRefOutOrRefOnly = 37301
+        ERR_InvalidSocialModifiers = 37302
+        ERR_InvalidSocialInteratorModifiers = 37303
 
         '// WARNINGS BEGIN HERE
         WRN_UseOfObsoleteSymbol2 = 40000

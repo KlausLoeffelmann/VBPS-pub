@@ -5500,5 +5500,10 @@
   <data name="ERR_InvalidDebugInfo" xml:space="preserve">
     <value>Unable to read debug information of method '{0}' (token 0x{1}) from assembly '{2}'</value>
   </data>
+  <data name="ERR_InvalidSocialInteratorModifiers" xml:space="preserve">
+    <value>'Social' and 'Iterator' modifiers cannot be used together.</value>
+  </data>
+  <data name="ERR_InvalidSocialModifiers" xml:space="preserve">
+    <value>'Social', 'Async', and 'Independent' modifiers cannot be combined.</value>
+  </data>
 </root>
-

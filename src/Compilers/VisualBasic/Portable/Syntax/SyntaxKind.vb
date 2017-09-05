@@ -3200,5 +3200,9 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
         ConflictMarkerTrivia = 792
 
         AsCastExpression = 793
+
+        SocialKeyword = 794
+
+        IndependentKeyword = 795
     End Enum
 End Namespace

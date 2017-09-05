@@ -19,7 +19,10 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
         ''' </summary>
         Public Shared Function IsContextualKeyword(kind As SyntaxKind) As Boolean
             Return kind = SyntaxKind.ReferenceKeyword OrElse
-                (SyntaxKind.AggregateKeyword <= kind AndAlso kind <= SyntaxKind.YieldKeyword)
+                (SyntaxKind.AggregateKeyword <= kind AndAlso
+                kind <= SyntaxKind.YieldKeyword) OrElse
+                (SyntaxKind.SocialKeyword <= kind AndAlso
+                kind <= SyntaxKind.IndependentKeyword)
         End Function
 
         ''' <summary>
@@ -286,7 +289,9 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
             SyntaxKind.AsyncKeyword,
             SyntaxKind.AwaitKeyword,
             SyntaxKind.IteratorKeyword,
-            SyntaxKind.YieldKeyword
+            SyntaxKind.YieldKeyword,
+            SyntaxKind.SocialKeyword,
+            SyntaxKind.IndependentKeyword
             }
         ''' <summary>
         ''' Get contextual keywords
@@ -396,7 +401,9 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
                     SyntaxKind.NarrowingKeyword,
                     SyntaxKind.CustomKeyword,
                     SyntaxKind.AsyncKeyword,
-                    SyntaxKind.IteratorKeyword
+                    SyntaxKind.IteratorKeyword,
+                    SyntaxKind.SocialKeyword,
+                    SyntaxKind.IndependentKeyword
                     Return True
             End Select
 
@@ -813,7 +820,9 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
                    {"async", SyntaxKind.AsyncKeyword},
                    {"await", SyntaxKind.AwaitKeyword},
                    {"iterator", SyntaxKind.IteratorKeyword},
-                   {"yield", SyntaxKind.YieldKeyword}
+                   {"yield", SyntaxKind.YieldKeyword},
+                   {"social", SyntaxKind.SocialKeyword},
+                   {"independent", SyntaxKind.IndependentKeyword}
             }
 
         Public Shared Function GetContextualKeywordKind(text As String) As SyntaxKind

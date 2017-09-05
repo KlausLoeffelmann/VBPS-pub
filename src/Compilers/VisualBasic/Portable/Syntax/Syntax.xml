@@ -8410,6 +8410,14 @@ Unify Enum declarations with other block type declarations.
         <lm-equiv name="XorKeyword" />
         <native-equiv name="" />
       </node-kind>
+      <node-kind name="SocialKeyword" token-text="Social">
+        <lm-equiv name="SocialKeyword" />
+        <native-equiv name="" />
+      </node-kind>
+      <node-kind name="IndependentKeyword" token-text="Independent">
+        <lm-equiv name="IndependentKeyword" />
+        <native-equiv name="" />
+      </node-kind>
       <!-- Obsolete Keywords -->
       <node-kind name="EndIfKeyword" token-text="EndIf">
         <lm-equiv name="EndIfKeyword" />

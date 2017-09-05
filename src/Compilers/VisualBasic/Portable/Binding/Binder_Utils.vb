@@ -107,6 +107,8 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
                 Case SyntaxKind.NotInheritableKeyword : Return SourceMemberFlags.NotInheritable
                 Case SyntaxKind.AsyncKeyword : Return SourceMemberFlags.Async
                 Case SyntaxKind.IteratorKeyword : Return SourceMemberFlags.Iterator
+                Case SyntaxKind.SocialKeyword : Return SourceMemberFlags.Social
+                Case SyntaxKind.IndependentKeyword : Return SourceMemberFlags.Independent
 
                 Case Else
 #If DEBUG Then
@@ -1582,6 +1584,9 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
         [Dim] = CUInt(DeclarationModifiers.Dim) << DeclarationModifierFlagShift
         [Const] = CUInt(DeclarationModifiers.Const) << DeclarationModifierFlagShift
         [Static] = CUInt(DeclarationModifiers.Static) << DeclarationModifierFlagShift
+
+        Social = CUInt(DeclarationModifiers.Social) << DeclarationModifierFlagShift
+        Independent = CUInt(DeclarationModifiers.Independent) << DeclarationModifierFlagShift
 
         DeclarationModifierFlagMask = &HFFFFFF8
         DeclarationModifierFlagShift = 3

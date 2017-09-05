@@ -413,7 +413,7 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Symbols
 
                 Case SyntaxKind.ClassBlock
                     err = ERRID.ERR_BadClassFlags1
-                    allowableModifiers = SourceMemberFlags.AllAccessibilityModifiers Or SourceMemberFlags.Shadows Or SourceMemberFlags.MustInherit Or SourceMemberFlags.NotInheritable Or SourceMemberFlags.Partial
+                    allowableModifiers = SourceMemberFlags.AllAccessibilityModifiers Or SourceMemberFlags.Shadows Or SourceMemberFlags.MustInherit Or SourceMemberFlags.NotInheritable Or SourceMemberFlags.Partial Or SourceMemberFlags.Social
                     typeBlock = DirectCast(node, TypeBlockSyntax)
                     modifiers = typeBlock.BlockStatement.Modifiers
                     id = typeBlock.BlockStatement.Identifier

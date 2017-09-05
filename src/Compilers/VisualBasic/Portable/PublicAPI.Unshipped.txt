@@ -8,6 +8,8 @@ Microsoft.CodeAnalysis.VisualBasic.Syntax.AsCastExpressionSyntax.WithAsKeyword(a
 Microsoft.CodeAnalysis.VisualBasic.Syntax.AsCastExpressionSyntax.WithExpression(expression As Microsoft.CodeAnalysis.VisualBasic.Syntax.ExpressionSyntax) -> Microsoft.CodeAnalysis.VisualBasic.Syntax.AsCastExpressionSyntax
 Microsoft.CodeAnalysis.VisualBasic.Syntax.AsCastExpressionSyntax.WithType(type As Microsoft.CodeAnalysis.VisualBasic.Syntax.TypeSyntax) -> Microsoft.CodeAnalysis.VisualBasic.Syntax.AsCastExpressionSyntax
 Microsoft.CodeAnalysis.VisualBasic.SyntaxKind.AsCastExpression = 793 -> Microsoft.CodeAnalysis.VisualBasic.SyntaxKind
+Microsoft.CodeAnalysis.VisualBasic.SyntaxKind.IndependentKeyword = 795 -> Microsoft.CodeAnalysis.VisualBasic.SyntaxKind
+Microsoft.CodeAnalysis.VisualBasic.SyntaxKind.SocialKeyword = 794 -> Microsoft.CodeAnalysis.VisualBasic.SyntaxKind
 Overridable Microsoft.CodeAnalysis.VisualBasic.VisualBasicSyntaxVisitor(Of TResult).VisitAsCastExpression(node As Microsoft.CodeAnalysis.VisualBasic.Syntax.AsCastExpressionSyntax) -> TResult
 Overridable Microsoft.CodeAnalysis.VisualBasic.VisualBasicSyntaxVisitor.VisitAsCastExpression(node As Microsoft.CodeAnalysis.VisualBasic.Syntax.AsCastExpressionSyntax) -> Void
 Overrides Microsoft.CodeAnalysis.VisualBasic.Syntax.AsCastExpressionSyntax.Accept(Of TResult)(visitor As Microsoft.CodeAnalysis.VisualBasic.VisualBasicSyntaxVisitor(Of TResult)) -> TResult

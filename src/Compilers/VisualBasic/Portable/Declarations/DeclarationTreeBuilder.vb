@@ -790,6 +790,8 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Symbols
                     Case SyntaxKind.NarrowingKeyword : bit = DeclarationModifiers.Narrowing
                     Case SyntaxKind.AsyncKeyword : bit = DeclarationModifiers.Async
                     Case SyntaxKind.IteratorKeyword : bit = DeclarationModifiers.Iterator
+                    Case SyntaxKind.SocialKeyword : bit = DeclarationModifiers.Social
+                    Case SyntaxKind.IndependentKeyword : bit = DeclarationModifiers.Independent
 
                     Case Else
                         ' It is possible to run into other tokens here, but only in error conditions.

@@ -6333,6 +6333,24 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
         End Property
         
         '''<summary>
+        '''  Looks up a localized string similar to &apos;Social&apos; and &apos;Iterator&apos; modifiers cannot be used together..
+        '''</summary>
+        Friend ReadOnly Property ERR_InvalidSocialInteratorModifiers() As String
+            Get
+                Return ResourceManager.GetString("ERR_InvalidSocialInteratorModifiers", resourceCulture)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized string similar to &apos;Social&apos;, &apos;Async&apos;, and &apos;Independent&apos; modifiers cannot be combined..
+        '''</summary>
+        Friend ReadOnly Property ERR_InvalidSocialModifiers() As String
+            Get
+                Return ResourceManager.GetString("ERR_InvalidSocialModifiers", resourceCulture)
+            End Get
+        End Property
+        
+        '''<summary>
         '''  Looks up a localized string similar to Only conversion operators can be declared &apos;{0}&apos;..
         '''</summary>
         Friend ReadOnly Property ERR_InvalidSpecifierOnNonConversion1() As String

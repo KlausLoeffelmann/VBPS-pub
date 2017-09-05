@@ -58,6 +58,9 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Symbols
         [Const] = 1 << 23
         [Static] = 1 << 24
 
+        Social = 1 << 25
+        Independent = 1 << 26
+
         InvalidInNotInheritableClass = [Overridable] Or [NotOverridable] Or [MustOverride] Or [Default]
         InvalidInModule = [Protected] Or [Shared] Or [Default] Or [MustOverride] Or [Overridable] Or [Shadows] Or [Overrides]
         InvalidInInterface = AllAccessibilityModifiers Or [Shared]

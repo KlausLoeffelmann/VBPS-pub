@@ -438,12 +438,13 @@ lReportErrorOnTwoTokens:
                      SourceMemberFlags.Social,
                      SourceMemberFlags.Iterator,
                      SourceMemberFlags.None
+                    'All the above are OK.
                 Case SourceMemberFlags.Async Or SourceMemberFlags.Iterator
                     binder.ReportModifierError(modifiers, ERRID.ERR_InvalidAsyncIteratorModifiers, diagBag, InvalidAsyncIterator)
                 Case SourceMemberFlags.Social Or SourceMemberFlags.Iterator
-                    binder.ReportModifierError(modifiers, ERRID.ERR_InvalidSocialInteratorModifiers, diagBag, InvalidAsyncIterator)
+                    binder.ReportModifierError(modifiers, ERRID.ERR_InvalidSocialInteratorModifiers, diagBag, InvalidAsyncIteratorSocialIndependent)
                 Case Else
-                    binder.ReportModifierError(modifiers, ERRID.ERR_InvalidSocialModifiers, diagBag, InvalidAsyncIterator)
+                    binder.ReportModifierError(modifiers, ERRID.ERR_InvalidSocialModifiers, diagBag, InvalidAsyncIteratorSocialIndependent)
             End Select
 
             Return methodModifiers

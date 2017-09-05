@@ -1705,6 +1705,14 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
                 SyntaxKind.AsyncKeyword,
                 SyntaxKind.IteratorKeyword
             }
+
+        Public InvalidAsyncIteratorSocialIndependent() As SyntaxKind =
+            {
+                SyntaxKind.AsyncKeyword,
+                SyntaxKind.IteratorKeyword,
+                SyntaxKind.SocialKeyword,
+                SyntaxKind.IndependentKeyword
+            }
     End Module
 
     Friend Structure MemberModifiers

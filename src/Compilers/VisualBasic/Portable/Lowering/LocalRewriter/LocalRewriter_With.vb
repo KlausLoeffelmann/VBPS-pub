@@ -25,7 +25,7 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
             Dim statementSyntax = DirectCast(node.Syntax, WithBlockSyntax).WithStatement
 
             Dim doNotUseByRefLocal = Me._currentMethodOrLambda.IsIterator OrElse
-                                    Me._currentMethodOrLambda.IsAsync OrElse
+                                    Me._currentMethodOrLambda.IsAsyncOrSocial OrElse
                                     node.Binder.ExpressionIsAccessedFromNestedLambda
 
             ' What the placeholder should be replaced with

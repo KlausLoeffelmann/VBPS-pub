@@ -5743,7 +5743,7 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Syntax
         Friend _attributeLists as SyntaxNode
         Friend _parameterList as ParameterListSyntax
 
-        Friend Sub New(ByVal green As GreenNode, ByVal parent as SyntaxNode, ByVal startLocation As Integer)
+        Friend Sub New(ByVal green As GreenNode, ByVal parent As SyntaxNode, ByVal startLocation As Integer)
             MyBase.New(green, parent, startLocation)
             Debug.Assert(green IsNot Nothing)
             Debug.Assert(startLocation >= 0)

@@ -13,7 +13,7 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
         Public Overrides Function VisitReturnStatement(node As BoundReturnStatement) As BoundNode
             Debug.Assert(node.FunctionLocalOpt Is Nothing OrElse
                          (Not Me._currentMethodOrLambda.IsIterator AndAlso
-                            Not (Me._currentMethodOrLambda.IsAsync AndAlso Me._currentMethodOrLambda.ReturnType.Equals(Compilation.GetWellKnownType(WellKnownType.System_Threading_Tasks_Task)))))
+                            Not (Me._currentMethodOrLambda.IsAsyncOrSocial AndAlso Me._currentMethodOrLambda.ReturnType.Equals(Compilation.GetWellKnownType(WellKnownType.System_Threading_Tasks_Task)))))
 
             Dim rewritten = RewriteReturnStatement(node)
 
@@ -49,7 +49,7 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
 
                     If functionLocal IsNot Nothing Then
 
-                        If _currentMethodOrLambda.IsAsync Then
+                        If _currentMethodOrLambda.IsAsyncOrSocial Then
                             ' For Async method bodies we don't rewrite Return statements into GoTo's to the method's 
                             ' epilogue in AsyncRewriter, but rather rewrite them to proper jumps to the exit label of 
                             ' MoveNext() method of the generated state machine; we keep the node unmodified to be 
@@ -87,7 +87,7 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
                     Return New BoundGotoStatement(node.Syntax, node.ExitLabelOpt, Nothing)
                 End If
 
-            ElseIf Me._currentMethodOrLambda.IsAsync AndAlso (Me._flags And RewritingFlags.AllowEndOfMethodReturnWithExpression) = 0 Then
+            ElseIf Me._currentMethodOrLambda.IsAsyncOrSocial AndAlso (Me._flags And RewritingFlags.AllowEndOfMethodReturnWithExpression) = 0 Then
 
                 ' This is a synthesized end-of-method return, in case it is inside Async method/lambda it needs
                 ' to be rewritten so it does not return any value. Reasoning: all Return statements will be 

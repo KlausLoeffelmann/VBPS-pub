@@ -51,6 +51,18 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Symbols
             End Get
         End Property
 
+        Public Overrides ReadOnly Property IsSocial As Boolean
+            Get
+                Return (_unboundLambda.Flags And SourceMemberFlags.Social) <> 0
+            End Get
+        End Property
+
+        Public Overrides ReadOnly Property IsIndependent As Boolean
+            Get
+                Return (_unboundLambda.Flags And SourceMemberFlags.Independent) <> 0
+            End Get
+        End Property
+
         Public Overrides ReadOnly Property AssociatedAnonymousDelegate As NamedTypeSymbol
             Get
                 If Me._lazyAnonymousDelegateSymbol Is ErrorTypeSymbol.UnknownResultType Then

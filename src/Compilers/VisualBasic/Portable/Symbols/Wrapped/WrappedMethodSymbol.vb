@@ -97,6 +97,18 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Symbols
             End Get
         End Property
 
+        Public Overrides ReadOnly Property IsSocial As Boolean
+            Get
+                Return Me.UnderlyingMethod.IsSocial
+            End Get
+        End Property
+
+        Public Overrides ReadOnly Property IsIndependent As Boolean
+            Get
+                Return Me.UnderlyingMethod.IsIndependent
+            End Get
+        End Property
+
         Public Overrides ReadOnly Property IsOverrides As Boolean
             Get
                 Return Me.UnderlyingMethod.IsOverrides

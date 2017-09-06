@@ -220,7 +220,7 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
             End If
 
             ' Add accessibility into the flags.
-            Return New MemberModifiers(foundModifiers, DirectCast(access, SourceMemberFlags))
+            Return New MemberModifiers(foundModifiers, DirectCast(CLng(access), SourceMemberFlags))
         End Function
 
         ''' <summary>
@@ -1513,7 +1513,7 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
     ''' </summary>
     ''' <remarks></remarks>
     <Flags()>
-    Friend Enum SourceMemberFlags
+    Friend Enum SourceMemberFlags As Long
         None = 0
         ' These are the actual accessibility level
         ' Bits 0,1,2
@@ -1525,42 +1525,42 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
         AccessibilityMask = &H7
 
         ' DeclarationModifierFlags
-        ' Bits 3,4,5,...,27
+        ' Bits 3,4,5,...,31
 
-        [Private] = CUInt(DeclarationModifiers.Private) << DeclarationModifierFlagShift
-        [Protected] = CUInt(DeclarationModifiers.Protected) << DeclarationModifierFlagShift
-        [Friend] = CUInt(DeclarationModifiers.Friend) << DeclarationModifierFlagShift
-        [Public] = CUInt(DeclarationModifiers.Public) << DeclarationModifierFlagShift
+        [Private] = CUInt(DeclarationModifiers.Private) << CInt(DeclarationModifierFlagShift)
+        [Protected] = CUInt(DeclarationModifiers.Protected) << CInt(DeclarationModifierFlagShift)
+        [Friend] = CUInt(DeclarationModifiers.Friend) << CInt(DeclarationModifierFlagShift)
+        [Public] = CUInt(DeclarationModifiers.Public) << CInt(DeclarationModifierFlagShift)
         AllAccessibilityModifiers = [Private] Or [Friend] Or [Protected] Or [Public]
 
-        [Shared] = CUInt(DeclarationModifiers.Shared) << DeclarationModifierFlagShift
+        [Shared] = CUInt(DeclarationModifiers.Shared) << CInt(DeclarationModifierFlagShift)
 
-        [ReadOnly] = CUInt(DeclarationModifiers.ReadOnly) << DeclarationModifierFlagShift
-        [WriteOnly] = CUInt(DeclarationModifiers.WriteOnly) << DeclarationModifierFlagShift
+        [ReadOnly] = CUInt(DeclarationModifiers.ReadOnly) << CInt(DeclarationModifierFlagShift)
+        [WriteOnly] = CUInt(DeclarationModifiers.WriteOnly) << CInt(DeclarationModifierFlagShift)
         AllWriteabilityModifiers = [ReadOnly] Or [WriteOnly]
 
-        [Overrides] = CUInt(DeclarationModifiers.Overrides) << DeclarationModifierFlagShift
+        [Overrides] = CUInt(DeclarationModifiers.Overrides) << CInt(DeclarationModifierFlagShift)
 
-        [Overridable] = CUInt(DeclarationModifiers.Overridable) << DeclarationModifierFlagShift
-        [MustOverride] = CUInt(DeclarationModifiers.MustOverride) << DeclarationModifierFlagShift
-        [NotOverridable] = CUInt(DeclarationModifiers.NotOverridable) << DeclarationModifierFlagShift
+        [Overridable] = CUInt(DeclarationModifiers.Overridable) << CInt(DeclarationModifierFlagShift)
+        [MustOverride] = CUInt(DeclarationModifiers.MustOverride) << CInt(DeclarationModifierFlagShift)
+        [NotOverridable] = CUInt(DeclarationModifiers.NotOverridable) << CInt(DeclarationModifierFlagShift)
         AllOverrideModifiers = [Overridable] Or [MustOverride] Or [NotOverridable]
 
         PrivateOverridableModifiers = [Overridable] Or [Private]
         PrivateMustOverrideModifiers = [MustOverride] Or [Private]
         PrivateNotOverridableModifiers = [NotOverridable] Or [Private]
 
-        [Overloads] = CUInt(DeclarationModifiers.Overloads) << DeclarationModifierFlagShift
-        [Shadows] = CUInt(DeclarationModifiers.Shadows) << DeclarationModifierFlagShift
+        [Overloads] = CUInt(DeclarationModifiers.Overloads) << CInt(DeclarationModifierFlagShift)
+        [Shadows] = CUInt(DeclarationModifiers.Shadows) << CInt(DeclarationModifierFlagShift)
         AllShadowingModifiers = [Overloads] Or [Shadows]
 
         ShadowsAndOverrides = [Overrides] Or [Shadows]
 
-        [Default] = CUInt(DeclarationModifiers.Default) << DeclarationModifierFlagShift
-        [WithEvents] = CUInt(DeclarationModifiers.WithEvents) << DeclarationModifierFlagShift
+        [Default] = CUInt(DeclarationModifiers.Default) << CInt(DeclarationModifierFlagShift)
+        [WithEvents] = CUInt(DeclarationModifiers.WithEvents) << CInt(DeclarationModifierFlagShift)
 
-        [Widening] = CUInt(DeclarationModifiers.Widening) << DeclarationModifierFlagShift
-        [Narrowing] = CUInt(DeclarationModifiers.Narrowing) << DeclarationModifierFlagShift
+        [Widening] = CUInt(DeclarationModifiers.Widening) << CInt(DeclarationModifierFlagShift)
+        [Narrowing] = CUInt(DeclarationModifiers.Narrowing) << CInt(DeclarationModifierFlagShift)
         AllConversionModifiers = [Widening] Or [Narrowing]
 
         ' These should be kept in sync with the corresponding arrays in InvalidModifiers below.
@@ -1573,64 +1573,64 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
         InvalidIfShared = [Overrides] Or AllOverrideModifiers Or [Default]
         InvalidIfDefault = [Private]
 
-        [Partial] = CUInt(DeclarationModifiers.Partial) << DeclarationModifierFlagShift
-        [MustInherit] = CUInt(DeclarationModifiers.MustInherit) << DeclarationModifierFlagShift
-        [NotInheritable] = CUInt(DeclarationModifiers.NotInheritable) << DeclarationModifierFlagShift
+        [Partial] = CUInt(DeclarationModifiers.Partial) << CInt(DeclarationModifierFlagShift)
+        [MustInherit] = CUInt(DeclarationModifiers.MustInherit) << CInt(DeclarationModifierFlagShift)
+        [NotInheritable] = CUInt(DeclarationModifiers.NotInheritable) << CInt(DeclarationModifierFlagShift)
         TypeInheritModifiers = [MustInherit] Or [NotInheritable]
 
-        Async = CUInt(DeclarationModifiers.Async) << DeclarationModifierFlagShift
-        Iterator = CUInt(DeclarationModifiers.Iterator) << DeclarationModifierFlagShift
+        Async = CUInt(DeclarationModifiers.Async) << CInt(DeclarationModifierFlagShift)
+        Iterator = CUInt(DeclarationModifiers.Iterator) << CInt(DeclarationModifierFlagShift)
 
-        [Dim] = CUInt(DeclarationModifiers.Dim) << DeclarationModifierFlagShift
-        [Const] = CUInt(DeclarationModifiers.Const) << DeclarationModifierFlagShift
-        [Static] = CUInt(DeclarationModifiers.Static) << DeclarationModifierFlagShift
+        [Dim] = CUInt(DeclarationModifiers.Dim) << CInt(DeclarationModifierFlagShift)
+        [Const] = CUInt(DeclarationModifiers.Const) << CInt(DeclarationModifierFlagShift)
+        [Static] = CUInt(DeclarationModifiers.Static) << CInt(DeclarationModifierFlagShift)
 
-        Social = CUInt(DeclarationModifiers.Social) << DeclarationModifierFlagShift
-        Independent = CUInt(DeclarationModifiers.Independent) << DeclarationModifierFlagShift
+        Social = CUInt(DeclarationModifiers.Social) << CInt(DeclarationModifierFlagShift)
+        Independent = CULng(DeclarationModifiers.Independent) << CInt(DeclarationModifierFlagShift)
 
-        DeclarationModifierFlagMask = &HFFFFFF8
+        DeclarationModifierFlagMask = &HFFFFFFFFFFFFFF8
         DeclarationModifierFlagShift = 3
 
-        ' Bits 25 and above are used for different things depending on the member type.
-        ' 25 - [Dim]
-        ' 26 - [Const]
-        ' 27 - [Static]
+        ' Bits 29 and above are used for different things depending on the member type.
+        ' 29 - [Dim]
+        ' 30 - [Const]
+        ' 31 - [Static]
 
         ' Fields only: Indicates that this const field has an inferred type.
-        InferredFieldType = 1 << 30
+        InferredFieldType = 1L << 34
 
         ' Fields and properties only: Indicates that this is the first field (or property representing a WithEvents field) of a particular type.
         ' In "Dim x, y, z As Integer, w As String, a, b as Decimal", set for "x", "w", and "a"
-        FirstFieldDeclarationOfType = 1 << 31
+        FirstFieldDeclarationOfType = 1L << 35
 
         ' Source Methods only: Indicates this method has a void return type / is a Sub.
-        MethodIsSub = 1 << 25
+        MethodIsSub = 1L << 29
 
         ' Source methods only: Indicates that method syntax has "Handles"
-        MethodHandlesEvents = 1 << 26
+        MethodHandlesEvents = 1L << 30
 
-        ' Method symbols only: Bits 27,28,29,30,31
-        MethodKindOrdinary = CUInt(MethodKind.Ordinary) << MethodKindShift
-        MethodKindConstructor = CUInt(MethodKind.Constructor) << MethodKindShift
-        MethodKindSharedConstructor = CUInt(MethodKind.SharedConstructor) << MethodKindShift
-        MethodKindDelegateInvoke = CUInt(MethodKind.DelegateInvoke) << MethodKindShift
-        MethodKindOperator = CUInt(MethodKind.UserDefinedOperator) << MethodKindShift
-        MethodKindConversion = CUInt(MethodKind.Conversion) << MethodKindShift
-        MethodKindPropertyGet = CUInt(MethodKind.PropertyGet) << MethodKindShift
-        MethodKindPropertySet = CUInt(MethodKind.PropertySet) << MethodKindShift
-        MethodKindEventAdd = CUInt(MethodKind.EventAdd) << MethodKindShift
-        MethodKindEventRemove = CUInt(MethodKind.EventRemove) << MethodKindShift
-        MethodKindEventRaise = CUInt(MethodKind.EventRaise) << MethodKindShift
-        MethodKindDeclare = CUInt(MethodKind.DeclareMethod) << MethodKindShift
+        ' Method symbols only: Bits 31,32,33,34,35
+        MethodKindOrdinary = CULng(MethodKind.Ordinary) << CInt(MethodKindShift)
+        MethodKindConstructor = CULng(MethodKind.Constructor) << CInt(MethodKindShift)
+        MethodKindSharedConstructor = CULng(MethodKind.SharedConstructor) << CInt(MethodKindShift)
+        MethodKindDelegateInvoke = CULng(MethodKind.DelegateInvoke) << CInt(MethodKindShift)
+        MethodKindOperator = CULng(MethodKind.UserDefinedOperator) << CInt(MethodKindShift)
+        MethodKindConversion = CULng(MethodKind.Conversion) << CInt(MethodKindShift)
+        MethodKindPropertyGet = CULng(MethodKind.PropertyGet) << CInt(MethodKindShift)
+        MethodKindPropertySet = CULng(MethodKind.PropertySet) << CInt(MethodKindShift)
+        MethodKindEventAdd = CULng(MethodKind.EventAdd) << CInt(MethodKindShift)
+        MethodKindEventRemove = CULng(MethodKind.EventRemove) << CInt(MethodKindShift)
+        MethodKindEventRaise = CULng(MethodKind.EventRaise) << CInt(MethodKindShift)
+        MethodKindDeclare = CULng(MethodKind.DeclareMethod) << CInt(MethodKindShift)
 
         MethodKindMask = &H1F
-        MethodKindShift = 27
+        MethodKindShift = 31
     End Enum
 
     Friend Module SourceMemberFlagsExtensions
         <Extension>
         Friend Function ToMethodKind(flags As SourceMemberFlags) As MethodKind
-            Return CType((flags >> SourceMemberFlags.MethodKindShift) And SourceMemberFlags.MethodKindMask, MethodKind)
+            Return CType((flags >> CInt(SourceMemberFlags.MethodKindShift)) And SourceMemberFlags.MethodKindMask, MethodKind)
         End Function
     End Module
 

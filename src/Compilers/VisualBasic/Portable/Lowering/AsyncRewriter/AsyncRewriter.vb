@@ -359,7 +359,7 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
         ''' </summary>
         Friend Shared Function GetAsyncMethodKind(method As MethodSymbol) As AsyncMethodKind
             Debug.Assert(Not method.IsPartial)
-            If Not method.IsAsync Then
+            If Not method.IsAsyncOrSocial Then
                 Return AsyncMethodKind.None
             End If
 

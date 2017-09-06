@@ -474,6 +474,18 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Symbols
             End Get
         End Property
 
+        Public Overrides ReadOnly Property IsSocial As Boolean
+            Get
+                Return _curriedFromMethod.IsSocial
+            End Get
+        End Property
+
+        Public Overrides ReadOnly Property IsIndependent As Boolean
+            Get
+                Return _curriedFromMethod.IsIndependent
+            End Get
+        End Property
+
         Public Overrides ReadOnly Property IsVararg As Boolean
             Get
                 Return _curriedFromMethod.IsVararg

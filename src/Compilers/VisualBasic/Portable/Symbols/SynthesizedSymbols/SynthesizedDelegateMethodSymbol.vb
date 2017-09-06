@@ -263,6 +263,18 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Symbols
             End Get
         End Property
 
+        Public Overrides ReadOnly Property IsSocial As Boolean
+            Get
+                Return False
+            End Get
+        End Property
+
+        Public Overrides ReadOnly Property IsIndependent As Boolean
+            Get
+                Return False
+            End Get
+        End Property
+
         ''' <summary>
         ''' Gets a value indicating whether this instance is vararg.
         ''' </summary>

@@ -1530,7 +1530,7 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
                     kickoffMethod = stateMachineMethod.StateMachineType.KickoffMethod
                     Debug.Assert(kickoffMethod IsNot Nothing)
 
-                    isAsyncStateMachine = kickoffMethod.IsAsync
+                    isAsyncStateMachine = kickoffMethod.IsAsyncOrSocial
 
                     ' Async Sub may be partial. Debug info needs to be associated with the emitted definition, 
                     ' but the kickoff method is the method implementation (the part with body).
@@ -1590,7 +1590,7 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
                 Dim stateMachineHoistedLocalSlots As ImmutableArray(Of EncHoistedLocalInfo) = Nothing
                 Dim stateMachineAwaiterSlots As ImmutableArray(Of Cci.ITypeReference) = Nothing
                 If optimizations = OptimizationLevel.Debug AndAlso stateMachineTypeOpt IsNot Nothing Then
-                    Debug.Assert(method.IsAsync OrElse method.IsIterator)
+                    Debug.Assert(method.IsAsyncOrSocial OrElse method.IsIterator)
                     GetStateMachineSlotDebugInfo(moduleBuilder, moduleBuilder.GetSynthesizedFields(stateMachineTypeOpt), variableSlotAllocatorOpt, diagnostics, stateMachineHoistedLocalSlots, stateMachineAwaiterSlots)
                     Debug.Assert(Not diagnostics.HasAnyErrors())
                 End If

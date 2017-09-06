@@ -1178,6 +1178,18 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Symbols
                     End Get
                 End Property
 
+                Public Overrides ReadOnly Property IsSocial As Boolean
+                    Get
+                        Return False
+                    End Get
+                End Property
+
+                Public Overrides ReadOnly Property IsIndependent As Boolean
+                    Get
+                        Return False
+                    End Get
+                End Property
+
                 Public Overrides ReadOnly Property IsVararg As Boolean
                     Get
                         Return ClonedFrom.IsVararg

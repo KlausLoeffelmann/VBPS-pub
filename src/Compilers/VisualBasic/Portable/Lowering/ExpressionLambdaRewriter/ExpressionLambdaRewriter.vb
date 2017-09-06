@@ -337,7 +337,7 @@ lSelect:
                 End If
             Next
 
-            Debug.Assert(Not node.LambdaSymbol.IsAsync AndAlso Not node.LambdaSymbol.IsIterator,
+            Debug.Assert(Not node.LambdaSymbol.IsAsyncOrSocial AndAlso Not node.LambdaSymbol.IsIterator,
                          "An error should have been reported by DiagnosticsPass")
             Debug.Assert(node.WasCompilerGenerated OrElse node.IsSingleLine,
                          "An error should have been reported by DiagnosticsPass")

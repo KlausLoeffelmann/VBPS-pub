@@ -54,12 +54,12 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Symbols
         Async = 1 << 20
         Iterator = 1 << 21
 
-        [Dim] = 1 << 22
-        [Const] = 1 << 23
-        [Static] = 1 << 24
+        Social = 1 << 22
+        Independent = 1 << 23
 
-        Social = 1 << 25
-        Independent = 1 << 26
+        [Dim] = 1 << 26
+        [Const] = 1 << 27
+        [Static] = 1 << 28
 
         InvalidInNotInheritableClass = [Overridable] Or [NotOverridable] Or [MustOverride] Or [Default]
         InvalidInModule = [Protected] Or [Shared] Or [Default] Or [MustOverride] Or [Overridable] Or [Shadows] Or [Overrides]

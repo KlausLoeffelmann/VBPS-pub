@@ -111,11 +111,29 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Symbols
         ''' </summary>
         Public MustOverride ReadOnly Property IsAsync As Boolean
 
+        Public ReadOnly Property IsAsyncOrSocial As Boolean
+            Get
+                Return IsAsync OrElse IsSocial
+            End Get
+        End Property
+
         ''' <summary>
         ''' Source: Returns whether this method is an iterator; i.e., does it have the Iterator modifier?
         ''' Metadata: Returns False; methods from metadata cannot be an iterator.
         ''' </summary>
         Public MustOverride ReadOnly Property IsIterator As Boolean
+
+        ''' <summary>
+        ''' Source: Returns whether this method is social; i.e., does it have the Social modifier?
+        ''' Metadata: Returns False; methods from metadata cannot be social.
+        ''' </summary>
+        Public MustOverride ReadOnly Property IsSocial As Boolean
+
+        ''' <summary>
+        ''' Source: Returns whether this method is independent; i.e., does it have the Independent modifier?
+        ''' Metadata: Returns False; methods from metadata cannot be independent.
+        ''' </summary>
+        Public MustOverride ReadOnly Property IsIndependent As Boolean
 
         ''' <summary>
         ''' Source: Returns False; methods from source cannot return by reference.

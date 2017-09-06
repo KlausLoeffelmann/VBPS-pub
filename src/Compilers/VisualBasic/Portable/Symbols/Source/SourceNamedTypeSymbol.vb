@@ -456,7 +456,7 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Symbols
                     Nothing,
                     diagBag).FoundFlags
 
-                Return CType((foundFlags And SourceMemberFlags.DeclarationModifierFlagMask) >> SourceMemberFlags.DeclarationModifierFlagShift, DeclarationModifiers)
+                Return CType((foundFlags And SourceMemberFlags.DeclarationModifierFlagMask) >> CInt(SourceMemberFlags.DeclarationModifierFlagShift), DeclarationModifiers)
             End If
 
             Return Nothing

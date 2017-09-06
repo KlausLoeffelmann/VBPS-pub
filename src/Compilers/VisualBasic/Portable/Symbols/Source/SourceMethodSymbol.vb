@@ -1306,6 +1306,18 @@ lReportErrorOnTwoTokens:
             End Get
         End Property
 
+        Public NotOverridable Overrides ReadOnly Property IsSocial As Boolean
+            Get
+                Return (m_flags And SourceMemberFlags.Social) <> 0
+            End Get
+        End Property
+
+        Public NotOverridable Overrides ReadOnly Property IsIndependent As Boolean
+            Get
+                Return (m_flags And SourceMemberFlags.Independent) <> 0
+            End Get
+        End Property
+
         Friend NotOverridable Overrides Function TryGetMeParameter(<Out> ByRef meParameter As ParameterSymbol) As Boolean
             If IsShared Then
                 meParameter = Nothing
@@ -2338,6 +2350,25 @@ lReportErrorOnTwoTokens:
                                         retType.SpecialType <> SpecialType.System_Collections_IEnumerator Then
                                         Binder.ReportDiagnostic(diagBag, errorLocation, ERRID.ERR_BadIteratorReturn)
                                     End If
+                                End If
+
+                                'TODO Klaus: Take Containing Type/Independent Property into account.
+                                If Me.IsSocial Then
+                                    Dim compilation = Me.DeclaringCompilation
+
+                                    If Debugger.IsAttached Then
+                                        If Me.Name = "ChrW" Then
+                                            Debugger.Break()
+                                            Dim b = Me.IsSocial
+                                        End If
+                                    End If
+
+                                    Dim taskOfT = compilation.GetWellKnownType(WellKnownType.System_Threading_Tasks_Task_T)
+                                    Dim useSiteDiagnostic = taskOfT.GetUseSiteErrorInfo()
+                                    If useSiteDiagnostic IsNot Nothing Then
+                                        Binder.ReportDiagnostic(diagBag, errorLocation, useSiteDiagnostic)
+                                    End If
+                                    retType = taskOfT.Construct(retType)
                                 End If
                             End If
                         End If

@@ -8,6 +8,9 @@ Module Program
         Dim anIntWithCType = CType(aDouble, Integer)
         Dim anIntWithAsType = aDouble as Integer
 
+        Dim aString=anIntWithAsType as String
+        Console.WriteLine($"aString: {aString}")
+
         Console.WriteLine($"Ctype Value:{anIntWithCType}; AsType Value:{anIntWithAsType}")
 
         Dim aChar = 65 as Char
@@ -28,6 +31,19 @@ Module Program
         testBar = CType(testObject, Bar)
 
     End Sub
+
+    'public Social Handles Event Sub SomeEventHandler
+    '    Await System.Threading.Tasks.Task.Delay(0)
+    'End Sub
+
+    Public Social Function SocialFoo As Integer
+        Return 42
+    End Function
+
+    Public Social Function SocialBar As Integer
+        Dim task = SocialFoo
+        return 42
+    End Function
 
     Public Class Foo
     End Class

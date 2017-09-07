@@ -922,7 +922,8 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
                                                  newReceiver,
                                                  methodGroup.QualificationKind)
 
-                Return New BoundCall(
+                'Ask, if we inside a social method --> place an wait around the call.
+                Dim result As BoundExpression = New BoundCall(
                     node,
                     method,
                     methodGroup,
@@ -933,6 +934,46 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
                     suppressObjectClone:=False,
                     hasErrors:=hasErrors)
 
+                If Me.IsInSocialContext Then
+                    If method.ReturnType.OriginalDefinition.Equals(Compilation.GetWellKnownType(WellKnownType.System_Threading_Tasks_Task_T)) Then
+                        'TODO K/J: Figure out a correct statement for bindAsStatement.
+                        Dim configureAwaitSymbol = Me.GetWellKnownTypeMember(WellKnownMember.System_Threading_Tasks_Task_T__ConfigureAwait,
+                                                                             node,
+                                                                             diagnostics)
+                        If configureAwaitSymbol IsNot Nothing Then
+
+                            Dim configuredTaskAwaitableOfT = Me.Compilation.GetWellKnownType(WellKnownType.System_Runtime_CompilerServices_ConfiguredTaskAwaitable_T)
+                            Dim useSiteDiagnostic = configuredTaskAwaitableOfT.GetUseSiteErrorInfo()
+                            If useSiteDiagnostic IsNot Nothing Then
+                                Binder.ReportDiagnostic(diagnostics, node, useSiteDiagnostic)
+                            End If
+                            Dim configureAwaitReturnType = configuredTaskAwaitableOfT.Construct(
+                                DirectCast(result.Type, NamedTypeSymbol).TypeArgumentsNoUseSiteDiagnostics(0))
+
+                            'TODO: K/J Make the Argument true, when we detect the correlating attribute.
+                            Dim configureAwaitArgument As BoundExpression = New BoundLiteral(node, ConstantValue.Create(False),
+                                                                                             GetSpecialType(SpecialType.System_Boolean, node, diagnostics))
+                            configureAwaitArgument.SetWasCompilerGenerated()
+                            Dim configureAwaitBoundInContext = DirectCast(configureAwaitSymbol.AsMember(
+                                            DirectCast(result.Type, NamedTypeSymbol)), MethodSymbol)
+
+                            result = New BoundCall(node, configureAwaitBoundInContext, Nothing,
+                                                   result, ImmutableArray.Create(configureAwaitArgument), Nothing,
+                                                   configureAwaitReturnType, suppressObjectClone:=False, hasErrors:=hasErrors)
+                            result.SetWasCompilerGenerated()
+                        End If
+                        result = BindAwait(result.Syntax,
+                                       result, diagnostics, bindAsStatement:=False)
+                        result.SetWasCompilerGenerated()
+                    ElseIf method.ReturnType.OriginalDefinition.Equals(Compilation.GetWellKnownType(WellKnownType.System_Threading_Tasks_Task)) Then
+                        'TODO KLAUS: Make the Non-Generic Part work.
+                        result = BindAwait(result.Syntax,
+                                       result, diagnostics, bindAsStatement:=True)
+                        result.SetWasCompilerGenerated()
+                    End If
+                End If
+
+                Return result
             Else
                 Dim [property] = DirectCast(methodOrProperty, PropertySymbol)
                 Dim reducedFrom = [property].ReducedFromDefinition

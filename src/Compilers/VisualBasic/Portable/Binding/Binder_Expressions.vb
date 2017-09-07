@@ -4604,6 +4604,10 @@ lElseClause:
             Return ContainingMember.Kind = SymbolKind.Method AndAlso DirectCast(ContainingMember, MethodSymbol).IsIterator
         End Function
 
+        Public Function IsInSocialContext() As Boolean
+            Return ContainingMember.Kind = SymbolKind.Method AndAlso DirectCast(ContainingMember, MethodSymbol).IsSocial
+        End Function
+
         Private Function BindAwait(
             node As AwaitExpressionSyntax,
             diagnostics As DiagnosticBag,
@@ -4622,7 +4626,7 @@ lElseClause:
         End Function
 
         Private Function BindAwait(
-            node As VisualBasicSyntaxNode,
+            node As SyntaxNode,
             operand As BoundExpression,
             diagnostics As DiagnosticBag,
             bindAsStatement As Boolean

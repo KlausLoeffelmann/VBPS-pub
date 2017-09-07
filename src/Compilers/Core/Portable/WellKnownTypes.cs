@@ -264,7 +264,8 @@ namespace Microsoft.CodeAnalysis
 
         Microsoft_CodeAnalysis_Runtime_Instrumentation,
         System_Runtime_CompilerServices_ReferenceAssemblyAttribute,
-
+        System_Runtime_CompilerServices_ConfiguredTaskAwaitable_T,
+        System_Runtime_CompilerServices_ConfiguredTaskAwaitable,
         NextAvailable,
     }
 
@@ -522,7 +523,10 @@ namespace Microsoft.CodeAnalysis
 
             "Microsoft.CodeAnalysis.Runtime.Instrumentation",
 
-            "System.Runtime.CompilerServices.ReferenceAssemblyAttribute"
+            "System.Runtime.CompilerServices.ReferenceAssemblyAttribute",
+
+            "System.Runtime.CompilerServices.ConfiguredTaskAwaitable`1",
+            "System.Runtime.CompilerServices.ConfiguredTaskAwaitable"
         };
 
         private readonly static Dictionary<string, WellKnownType> s_nameToTypeIdMap = new Dictionary<string, WellKnownType>((int)Count);

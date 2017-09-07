@@ -2356,13 +2356,6 @@ lReportErrorOnTwoTokens:
                                 If Me.IsSocial Then
                                     Dim compilation = Me.DeclaringCompilation
 
-                                    If Debugger.IsAttached Then
-                                        If Me.Name = "ChrW" Then
-                                            Debugger.Break()
-                                            Dim b = Me.IsSocial
-                                        End If
-                                    End If
-
                                     Dim taskOfT = compilation.GetWellKnownType(WellKnownType.System_Threading_Tasks_Task_T)
                                     Dim useSiteDiagnostic = taskOfT.GetUseSiteErrorInfo()
                                     If useSiteDiagnostic IsNot Nothing Then

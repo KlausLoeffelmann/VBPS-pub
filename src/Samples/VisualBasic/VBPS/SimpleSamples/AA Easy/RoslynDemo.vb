@@ -1,4 +1,5 @@
 Imports System
+Imports System.Threading.Tasks
 
 Module Program
 
@@ -26,26 +27,34 @@ Module Program
         Console.WriteLine($"testFoo has instance:{(testFoo isnot Nothing)}")
         Console.WriteLine($"testBar has instance:{(testBar isnot Nothing)}")
 
-        testObject = New Foo
-        testFoo = CType(testObject, Foo)
-        testBar = CType(testObject, Bar)
-
+        KickOfAsync
+        Console.ReadLine
     End Sub
+
+    Public Async Sub KickOfAsync
+        Console.WriteLine($"Async Result: {Await Get42Async}")
+        Console.WriteLine($"Async Result: {Await SocialFoo}")
+    End Sub
+
+    Public Async Function Get42Async() As Task(Of Integer)
+        Return Await Task.FromResult(42)
+    End Function
 
     'public Social Handles Event Sub SomeEventHandler
     '    Await System.Threading.Tasks.Task.Delay(0)
     'End Sub
 
     Public Social Function SocialFoo As Integer
-        Return 42
+        Task.Delay(2000)
+        Return Get42Async
     End Function
 
     Public Social Function SocialBar As Integer
-        Dim task = SocialFoo
-        return 42
+        return SocialFoo
     End Function
 
     Public Class Foo
+        Public Property FooProp as String = "42"
     End Class
 
     Public Class Bar

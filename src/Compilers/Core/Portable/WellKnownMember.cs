@@ -419,6 +419,9 @@ namespace Microsoft.CodeAnalysis
 
         System_Runtime_CompilerServices_ReferenceAssemblyAttribute__ctor,
 
+        System_Threading_Tasks_Task_T__ConfigureAwait,
+        System_Threading_Tasks_Task__ConfigureAwait,
+
         Count
     }
 }

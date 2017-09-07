@@ -45,6 +45,8 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
                         DynamicAnalysisInjector.TryCreate(method, body, New SyntheticBoundNodeFactory(method, method, body.Syntax, compilationState, diagnostics), diagnostics, debugDocumentProvider, Instrumenter.NoOp),
                         Nothing)
 
+                Debug.WriteLine("Rewriter:" & method.ToDisplayString)
+
                 ' We don't want IL to differ based upon whether we write the PDB to a file/stream or not.
                 ' Presence of sequence points in the tree affects final IL, therefore, we always generate them.
                 Dim loweredBody = LocalRewriter.Rewrite(body,

@@ -4877,7 +4877,7 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
 
             If method IsNot Nothing Then
                 methodReturnType = method.ReturnType
-                isAsync = method.IsAsync Or method.IsSocial
+                isAsync = method.IsAsyncOrSocial
 
                 ' method cannot be both iterator and async, so async will win here.
                 isIterator = Not isAsync AndAlso method.IsIterator

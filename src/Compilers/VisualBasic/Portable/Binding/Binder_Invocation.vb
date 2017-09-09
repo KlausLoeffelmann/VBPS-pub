@@ -935,11 +935,18 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
                     hasErrors:=hasErrors)
 
                 If Me.IsInSocialContext Then
+
+                    'TODO: K/J Make the Argument true, when we detect the correlating attribute.
+                    Dim configureAwaitArgument As BoundExpression = New BoundLiteral(node, ConstantValue.Create(False),
+                                                                                     GetSpecialType(SpecialType.System_Boolean, node, diagnostics))
+                    configureAwaitArgument.SetWasCompilerGenerated()
+
                     If method.ReturnType.OriginalDefinition.Equals(Compilation.GetWellKnownType(WellKnownType.System_Threading_Tasks_Task_T)) Then
                         'TODO K/J: Figure out a correct statement for bindAsStatement.
                         Dim configureAwaitSymbol = Me.GetWellKnownTypeMember(WellKnownMember.System_Threading_Tasks_Task_T__ConfigureAwait,
-                                                                             node,
-                                                                             diagnostics)
+                                                                         node,
+                                                                         diagnostics)
+
                         If configureAwaitSymbol IsNot Nothing Then
 
                             Dim configuredTaskAwaitableOfT = Me.Compilation.GetWellKnownType(WellKnownType.System_Runtime_CompilerServices_ConfiguredTaskAwaitable_T)
@@ -947,13 +954,10 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
                             If useSiteDiagnostic IsNot Nothing Then
                                 Binder.ReportDiagnostic(diagnostics, node, useSiteDiagnostic)
                             End If
+
                             Dim configureAwaitReturnType = configuredTaskAwaitableOfT.Construct(
                                 DirectCast(result.Type, NamedTypeSymbol).TypeArgumentsNoUseSiteDiagnostics(0))
 
-                            'TODO: K/J Make the Argument true, when we detect the correlating attribute.
-                            Dim configureAwaitArgument As BoundExpression = New BoundLiteral(node, ConstantValue.Create(False),
-                                                                                             GetSpecialType(SpecialType.System_Boolean, node, diagnostics))
-                            configureAwaitArgument.SetWasCompilerGenerated()
                             Dim configureAwaitBoundInContext = DirectCast(configureAwaitSymbol.AsMember(
                                             DirectCast(result.Type, NamedTypeSymbol)), MethodSymbol)
 
@@ -962,23 +966,45 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
                                                    configureAwaitReturnType, suppressObjectClone:=False, hasErrors:=hasErrors)
                             result.SetWasCompilerGenerated()
                         End If
+
                         result = BindAwait(result.Syntax,
                                        result, diagnostics, bindAsStatement:=False)
                         result.SetWasCompilerGenerated()
                     ElseIf method.ReturnType.OriginalDefinition.Equals(Compilation.GetWellKnownType(WellKnownType.System_Threading_Tasks_Task)) Then
-                        'TODO KLAUS: Make the Non-Generic Part work.
+
+                        Dim configureAwaitSymbol = Me.GetWellKnownTypeMember(WellKnownMember.System_Threading_Tasks_Task__ConfigureAwait,
+                                                                             node,
+                                                                             diagnostics)
+                        If configureAwaitSymbol IsNot Nothing Then
+                            Dim configuredTaskAwaitable = Me.Compilation.GetWellKnownType(WellKnownType.System_Runtime_CompilerServices_ConfiguredTaskAwaitable)
+                            Dim useSiteDiagnostic = configuredTaskAwaitable.GetUseSiteErrorInfo()
+
+                            If useSiteDiagnostic IsNot Nothing Then
+                                Binder.ReportDiagnostic(diagnostics, node, useSiteDiagnostic)
+                            End If
+
+                            Dim configureAwaitBoundInContext = DirectCast(configureAwaitSymbol.AsMember(
+                                            DirectCast(result.Type, NamedTypeSymbol)), MethodSymbol)
+
+                            result = New BoundCall(node, configureAwaitBoundInContext, Nothing,
+                                                   result, ImmutableArray.Create(configureAwaitArgument), Nothing,
+                                                   configuredTaskAwaitable, suppressObjectClone:=False, hasErrors:=hasErrors)
+                            result.SetWasCompilerGenerated()
+                        End If
+
                         result = BindAwait(result.Syntax,
-                                       result, diagnostics, bindAsStatement:=True)
+                                       result, diagnostics, bindAsStatement:=False)
                         result.SetWasCompilerGenerated()
                     End If
                 End If
 
+
                 Return result
             Else
                 Dim [property] = DirectCast(methodOrProperty, PropertySymbol)
-                Dim reducedFrom = [property].ReducedFromDefinition
+                    Dim reducedFrom = [property].ReducedFromDefinition
 
-                Debug.Assert(Not boundArguments.Any(Function(a) a.Kind = BoundKind.ByRefArgumentWithCopyBack))
+                    Debug.Assert(Not boundArguments.Any(Function(a) a.Kind = BoundKind.ByRefArgumentWithCopyBack))
 
                 If reducedFrom Is Nothing Then
                     If receiver IsNot Nothing AndAlso receiver.IsPropertyOrXmlPropertyAccess() Then

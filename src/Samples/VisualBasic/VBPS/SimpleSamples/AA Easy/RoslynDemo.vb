@@ -32,8 +32,9 @@ Module Program
     End Sub
 
     Public Async Sub KickOfAsync
+        'Await SocialSubFooAsync
         Console.WriteLine($"Async Result: {Await Get42Async}")
-        Console.WriteLine($"Async Result: {Await SocialFoo}")
+        Console.WriteLine($"Async Result: {Await SocialFooAsync}")
     End Sub
 
     Public Async Function Get42Async() As Task(Of Integer)
@@ -41,16 +42,20 @@ Module Program
     End Function
 
     'public Social Handles Event Sub SomeEventHandler
-    '    Await System.Threading.Tasks.Task.Delay(0)
+    '    Task.Delay(0)
     'End Sub
 
-    Public Social Function SocialFoo As Integer
+    public Social Sub SocialSubFooAsync
+        Task.Delay(1000)
+    End Sub
+
+    Public Social Function SocialFooAsync As Integer
         Task.Delay(2000)
         Return Get42Async
     End Function
 
-    Public Social Function SocialBar As Integer
-        return SocialFoo
+    Public Social Function SocialBarAsync As Integer
+        return SocialFooAsync
     End Function
 
     Public Class Foo

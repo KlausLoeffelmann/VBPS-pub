@@ -2289,9 +2289,22 @@ lReportErrorOnTwoTokens:
 
                             Debug.Assert(Me.IsSub)
                             Binder.DisallowTypeCharacter(GetNameToken(methodStatement), diagBag, ERRID.ERR_TypeCharOnSub)
-                            retType = binder.GetSpecialType(SpecialType.System_Void, Syntax, diagBag)
-                            errorLocation = methodStatement.DeclarationKeyword
 
+                            'TODO Klaus: Take Containing Type/Independent Property into account.
+                            If Me.IsSocial Then
+                                Dim compilation = Me.DeclaringCompilation
+
+                                Dim task = compilation.GetWellKnownType(WellKnownType.System_Threading_Tasks_Task)
+                                Dim useSiteDiagnostic = task.GetUseSiteErrorInfo()
+                                If useSiteDiagnostic IsNot Nothing Then
+                                    Binder.ReportDiagnostic(diagBag, errorLocation, useSiteDiagnostic)
+                                End If
+                                retType = task
+                            Else
+                                retType = binder.GetSpecialType(SpecialType.System_Void, Syntax, diagBag)
+                            End If
+
+                            errorLocation = methodStatement.DeclarationKeyword
                         Case Else
                             Dim getErrorInfo As Func(Of DiagnosticInfo) = Nothing
 
@@ -2314,7 +2327,6 @@ lReportErrorOnTwoTokens:
                             Else
                                 errorLocation = methodStatement.DeclarationKeyword
                             End If
-
                     End Select
 
                     If Not retType.IsErrorType() Then

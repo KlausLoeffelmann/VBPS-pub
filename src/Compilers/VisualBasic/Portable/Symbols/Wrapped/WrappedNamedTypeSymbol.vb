@@ -103,6 +103,12 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Symbols
             End Get
         End Property
 
+        Public Overrides ReadOnly Property IsSocial As Boolean
+            Get
+                Return Me._underlyingType.IsSocial
+            End Get
+        End Property
+
         Public Overrides ReadOnly Property IsNotInheritable As Boolean
             Get
                 Return Me._underlyingType.IsNotInheritable

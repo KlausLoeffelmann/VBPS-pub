@@ -78,6 +78,8 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Symbols
             Dim flags = methodModifiers.AllFlags Or SourceMemberFlags.MethodKindOrdinary
 
             'TODO John: Check if correct.
+            'If we're social and sub, then this needs to be a function for now WITHOUT a return type.
+            'The new return type it gets later.
             If syntax.Kind = SyntaxKind.SubStatement AndAlso
                 Not ((flags And SourceMemberFlags.Social) = SourceMemberFlags.Social) Then
                 flags = flags Or SourceMemberFlags.MethodIsSub
@@ -2298,8 +2300,8 @@ lReportErrorOnTwoTokens:
                             End If
                             Binder.DisallowTypeCharacter(GetNameToken(methodStatement), diagBag, ERRID.ERR_TypeCharOnSub)
 
-                            'TODO Klaus: Take Containing Type/Independent Property into account.
-                            If Me.IsSocial Then
+                            'TODO John: Please check!
+                            If Me.IsSocial Or (Me.ContainingType.IsSocial AndAlso Not (Me.IsIndependent Or Me.IsAsync)) Then
                                 Dim compilation = Me.DeclaringCompilation
 
                                 Dim task = compilation.GetWellKnownType(WellKnownType.System_Threading_Tasks_Task)
@@ -2373,16 +2375,18 @@ lReportErrorOnTwoTokens:
                                     End If
                                 End If
 
-                                'TODO Klaus: Take Containing Type/Independent Property into account.
-                                If Me.IsSocial And Not rewroteAlready Then
-                                    Dim compilation = Me.DeclaringCompilation
+                                'TODO John: Please check!
+                                If Me.IsSocial Or (Me.ContainingType.IsSocial AndAlso Not (Me.IsIndependent Or Me.IsAsync)) Then
+                                    If Not rewroteAlready Then
+                                        Dim compilation = Me.DeclaringCompilation
 
-                                    Dim taskOfT = compilation.GetWellKnownType(WellKnownType.System_Threading_Tasks_Task_T)
-                                    Dim useSiteDiagnostic = taskOfT.GetUseSiteErrorInfo()
-                                    If useSiteDiagnostic IsNot Nothing Then
-                                        Binder.ReportDiagnostic(diagBag, errorLocation, useSiteDiagnostic)
+                                        Dim taskOfT = compilation.GetWellKnownType(WellKnownType.System_Threading_Tasks_Task_T)
+                                        Dim useSiteDiagnostic = taskOfT.GetUseSiteErrorInfo()
+                                        If useSiteDiagnostic IsNot Nothing Then
+                                            Binder.ReportDiagnostic(diagBag, errorLocation, useSiteDiagnostic)
+                                        End If
+                                        retType = taskOfT.Construct(retType)
                                     End If
-                                    retType = taskOfT.Construct(retType)
                                 End If
                             End If
                         End If

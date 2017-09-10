@@ -261,6 +261,13 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Symbols
         Public MustOverride ReadOnly Property IsNotInheritable As Boolean
 
         ''' <summary>
+        ''' Returns true if this type's methods are supposed to automatically handel 
+        ''' async function calls, as long as their methods do not make use of the Async 
+        ''' or the Independent method modifier.
+        ''' </summary>
+        Public MustOverride ReadOnly Property IsSocial As Boolean
+
+        ''' <summary>
         ''' If this property returns false, it is certain that there are no extension
         ''' methods inside this type. If this property returns true, it is highly likely
         ''' (but not certain) that this type contains extension methods. This property allows

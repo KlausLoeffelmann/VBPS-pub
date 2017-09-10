@@ -8,8 +8,9 @@
 
     Social Sub MainKickedOfAsync()
         FooAsync()
-        Console.WriteLine("Calling FredAsync asynchrounosly...")
+        Console.WriteLine("Calling FredAsync/Fred2Async asynchrounosly...")
         FredAsync()
+        Fred2Async()
         Console.WriteLine("...done.")
     End Sub
 
@@ -18,21 +19,24 @@
     End Sub
 
     Social Sub FredAsync()
-        Console.WriteLine("FredAsync waiting asynchrounosly for 942 ms...")
-        Task.Delay(942)
+        Console.WriteLine("FredAsync waiting asynchrounosly for 542 ms...")
+        Threading.Thread.Sleep(542)
         Console.WriteLine("...done.")
     End Sub
 
     Async Function Fred2Async() As Task
-        Console.WriteLine("FredAsync waiting asynchrounosly for 942 ms...")
+        Console.WriteLine("Fred2Async waiting asynchrounosly for 942 ms...")
         Await Task.Delay(942)
         Console.WriteLine("...done.")
     End Function
+End Module
 
-    Independent Function Fred3() As Task(Of Integer)
+Public Social Class SocialClass2
+
+    Independent Function Fred3() As Integer
         'Does not work, yet:
         'Await Task.Delay(1000)
         Return 5
     End Function
 
-End Module
+End Class

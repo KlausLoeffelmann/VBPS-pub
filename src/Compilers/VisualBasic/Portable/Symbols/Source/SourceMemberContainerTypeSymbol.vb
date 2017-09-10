@@ -42,6 +42,7 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Symbols
             [NotInheritable] = 1 << 9
             [Shadows] = 1 << 10
             [Partial] = 1 << 11
+            Social = 1 << 12
         End Enum
 
         ' Flags about the type
@@ -211,7 +212,15 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Symbols
             If (modifiers And DeclarationModifiers.Shadows) <> 0 Then
                 flags = flags Or SourceTypeFlags.Shadows
             End If
+
+            'TODO: John, please check!
+            'Compute Social
+            If (modifiers And DeclarationModifiers.Social) <> 0 Then
+                flags = flags Or SourceTypeFlags.Social
+            End If
+
             Return flags
+
         End Function
 
         Public Shared Function Create(declaration As MergedTypeDeclaration,
@@ -1247,6 +1256,12 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Symbols
         Public Overrides ReadOnly Property IsMustInherit As Boolean
             Get
                 Return (_flags And SourceTypeFlags.MustInherit) <> 0
+            End Get
+        End Property
+
+        Public Overrides ReadOnly Property IsSocial As Boolean
+            Get
+                Return (_flags And SourceTypeFlags.Social) <> 0
             End Get
         End Property
 

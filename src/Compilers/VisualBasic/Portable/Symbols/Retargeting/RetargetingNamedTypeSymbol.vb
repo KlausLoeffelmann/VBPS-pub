@@ -437,6 +437,12 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Symbols.Retargeting
             End Get
         End Property
 
+        Public Overrides ReadOnly Property IsSocial As Boolean
+            Get
+                Return _underlyingType.IsSocial
+            End Get
+        End Property
+
         Friend Overrides ReadOnly Property IsMetadataAbstract As Boolean
             Get
                 Return _underlyingType.IsMetadataAbstract

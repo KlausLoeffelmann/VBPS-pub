@@ -872,6 +872,13 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Symbols.Metadata.PE
             End Get
         End Property
 
+        'TODO: John, please check!
+        Public Overrides ReadOnly Property IsSocial As Boolean
+            Get
+                Return False
+            End Get
+        End Property
+
         Friend Overrides ReadOnly Property IsMetadataAbstract As Boolean
             Get
                 Return (_flags And TypeAttributes.Abstract) <> 0

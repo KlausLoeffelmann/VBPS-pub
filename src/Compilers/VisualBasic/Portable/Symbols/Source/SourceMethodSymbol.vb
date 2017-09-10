@@ -76,7 +76,10 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Symbols
             ' Flags
             Dim methodModifiers = DecodeMethodModifiers(syntax.Modifiers, container, binder, diagBag)
             Dim flags = methodModifiers.AllFlags Or SourceMemberFlags.MethodKindOrdinary
-            If syntax.Kind = SyntaxKind.SubStatement Then
+
+            'TODO John: Check if correct.
+            If syntax.Kind = SyntaxKind.SubStatement AndAlso
+                Not ((flags And SourceMemberFlags.Social) = SourceMemberFlags.Social) Then
                 flags = flags Or SourceMemberFlags.MethodIsSub
             End If
 
@@ -2260,6 +2263,7 @@ lReportErrorOnTwoTokens:
                                        ByRef errorLocation As SyntaxNodeOrToken,
                                        diagBag As DiagnosticBag) As TypeSymbol
             Dim binder As Binder = CreateBinderForMethodDeclaration(sourceModule)
+            Dim rewroteAlready As Boolean
 
             Select Case MethodKind
                 Case MethodKind.Constructor,
@@ -2287,7 +2291,11 @@ lReportErrorOnTwoTokens:
                         Case SyntaxKind.SubStatement,
                             SyntaxKind.DeclareSubStatement
 
-                            Debug.Assert(Me.IsSub)
+                            If Me.IsSocial Then
+                                Debug.Assert(Not Me.IsSub)
+                            Else
+                                Debug.Assert(Me.IsSub)
+                            End If
                             Binder.DisallowTypeCharacter(GetNameToken(methodStatement), diagBag, ERRID.ERR_TypeCharOnSub)
 
                             'TODO Klaus: Take Containing Type/Independent Property into account.
@@ -2300,6 +2308,7 @@ lReportErrorOnTwoTokens:
                                     Binder.ReportDiagnostic(diagBag, errorLocation, useSiteDiagnostic)
                                 End If
                                 retType = task
+                                rewroteAlready = True
                             Else
                                 retType = binder.GetSpecialType(SpecialType.System_Void, Syntax, diagBag)
                             End If
@@ -2365,7 +2374,7 @@ lReportErrorOnTwoTokens:
                                 End If
 
                                 'TODO Klaus: Take Containing Type/Independent Property into account.
-                                If Me.IsSocial Then
+                                If Me.IsSocial And Not rewroteAlready Then
                                     Dim compilation = Me.DeclaringCompilation
 
                                     Dim taskOfT = compilation.GetWellKnownType(WellKnownType.System_Threading_Tasks_Task_T)

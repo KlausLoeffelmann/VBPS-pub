@@ -92,7 +92,10 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
                     End If
 
                 Case Else
-                    Debug.Assert(methodSymbol.IsSub)
+                    'Todo: John, please check.
+                    If Not methodSymbol.IsSocial Then
+                        Debug.Assert(methodSymbol.IsSub)
+                    End If
 
             End Select
 

@@ -33,10 +33,14 @@ End Module
 
 Public Social Class SocialClass2
 
-    Independent Function Fred3() As Integer
+    Social Function Fred3() As Integer
         'Does not work, yet:
         'Await Task.Delay(1000)
         Return 5
+    End Function
+
+    Independent Function Fred4() As Integer
+        Return 42
     End Function
 
 End Class

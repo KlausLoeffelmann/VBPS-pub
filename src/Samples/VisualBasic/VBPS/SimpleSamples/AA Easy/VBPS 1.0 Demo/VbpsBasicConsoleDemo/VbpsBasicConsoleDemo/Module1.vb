@@ -33,10 +33,9 @@ End Module
 
 Public Social Class SocialClass2
 
-    Independent Function Fred3() As Integer
+    Independent Sub Fred3Async()
         'Does not work, yet:
         'Await Task.Delay(1000)
-        Return 5
-    End Function
+    End Sub
 
 End Class

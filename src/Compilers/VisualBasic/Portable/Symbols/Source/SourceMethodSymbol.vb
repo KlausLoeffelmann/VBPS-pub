@@ -80,9 +80,19 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Symbols
             'TODO John: Check if correct.
             'If we're social and sub, then this needs to be a function for now WITHOUT a return type.
             'The new return type it gets later.
-            If syntax.Kind = SyntaxKind.SubStatement AndAlso
-                Not ((flags And SourceMemberFlags.Social) = SourceMemberFlags.Social) Then
-                flags = flags Or SourceMemberFlags.MethodIsSub
+            Dim isMethodSocial = (flags And SourceMemberFlags.Social) = SourceMemberFlags.Social
+            Dim isMethodIndependent = (flags And SourceMemberFlags.Independent) = SourceMemberFlags.Independent
+
+            If syntax.Kind = SyntaxKind.SubStatement Then
+                If container.IsSocial Then
+                    If isMethodIndependent Then
+                        flags = flags Or SourceMemberFlags.MethodIsSub
+                    End If
+                Else
+                    If Not isMethodSocial Then
+                        flags = flags Or SourceMemberFlags.MethodIsSub
+                    End If
+                End If
             End If
 
             If syntax.HandlesClause IsNot Nothing Then
@@ -2293,12 +2303,18 @@ lReportErrorOnTwoTokens:
                         Case SyntaxKind.SubStatement,
                             SyntaxKind.DeclareSubStatement
 
-                            If Me.IsSocial Then
+                            If Me.IsSocial Or (Me.ContainingType.IsSocial AndAlso Not (Me.IsIterator Or Me.IsIndependent Or Me.IsAsync)) Then
                                 Debug.Assert(Not Me.IsSub)
                             Else
                                 Debug.Assert(Me.IsSub)
                             End If
                             Binder.DisallowTypeCharacter(GetNameToken(methodStatement), diagBag, ERRID.ERR_TypeCharOnSub)
+
+                            'If Debugger.IsAttached Then
+                            '    If Me.Name = "Fred3Async" Then
+                            '        Debugger.Break()
+                            '    End If
+                            'End If
 
                             'TODO John: Please check!
                             If Me.IsSocial Or (Me.ContainingType.IsSocial AndAlso Not (Me.IsIndependent Or Me.IsAsync)) Then

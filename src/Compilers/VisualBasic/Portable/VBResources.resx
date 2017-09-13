@@ -5506,4 +5506,7 @@
   <data name="ERR_InvalidSocialModifiers" xml:space="preserve">
     <value>'Social', 'Async', and 'Independent' modifiers cannot be combined.</value>
   </data>
+  <data name="ERR_MissingSocialIndependentAsyncModifiers" xml:space="preserve">
+    <value>Subs or Functions in Social classes must have the 'Social', 'Independent' or 'Async' modifier.</value>
+  </data>
 </root>

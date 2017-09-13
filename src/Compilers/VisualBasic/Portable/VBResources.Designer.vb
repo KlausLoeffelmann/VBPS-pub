@@ -7225,6 +7225,15 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
         End Property
         
         '''<summary>
+        '''  Looks up a localized string similar to Subs or Functions in Social classes must have the &apos;Social&apos;, &apos;Independent&apos; or &apos;Async&apos; modifier..
+        '''</summary>
+        Friend ReadOnly Property ERR_MissingSocialIndependentAsyncModifiers() As String
+            Get
+                Return ResourceManager.GetString("ERR_MissingSocialIndependentAsyncModifiers", resourceCulture)
+            End Get
+        End Property
+        
+        '''<summary>
         '''  Looks up a localized string similar to Array subscript expression missing..
         '''</summary>
         Friend ReadOnly Property ERR_MissingSubscript() As String

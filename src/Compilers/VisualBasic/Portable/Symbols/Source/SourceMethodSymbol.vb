@@ -73,26 +73,36 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Symbols
                                                    syntax As MethodStatementSyntax,
                                                    binder As Binder,
                                                    diagBag As DiagnosticBag) As SourceMethodSymbol
+
+            Const asyncIteratorSocialIndependent As SourceMemberFlags = SourceMemberFlags.Async Or SourceMemberFlags.Iterator Or
+                                                    SourceMemberFlags.Social Or SourceMemberFlags.Independent
+
             ' Flags
             Dim methodModifiers = DecodeMethodModifiers(syntax.Modifiers, container, binder, diagBag)
+
+            'TODO John: Please Check!
+            'In a Social Class, we must have the Modifiers Independent, Independent/Iterator, Async or Social as Modifiers.
+            'TODO Klaus: We need HandelsEvent modifiers for Async Sub as well, which we later forbid.
+            If container.IsSocial AndAlso Not container.IsPartial Then
+                Select Case methodModifiers.FoundFlags And asyncIteratorSocialIndependent
+                    Case SourceMemberFlags.Independent Or SourceMemberFlags.Iterator,
+                     SourceMemberFlags.Independent,
+                     SourceMemberFlags.Async,
+                     SourceMemberFlags.Social
+                    Case Else
+                        Binder.ReportDiagnostic(diagBag, syntax.Location, ERRID.ERR_MissingSocialIndependentAsyncModifiers)
+                End Select
+            End If
+
             Dim flags = methodModifiers.AllFlags Or SourceMemberFlags.MethodKindOrdinary
 
             'TODO John: Check if correct.
             'If we're social and sub, then this needs to be a function for now WITHOUT a return type.
             'The new return type it gets later.
-            Dim isMethodSocial = (flags And SourceMemberFlags.Social) = SourceMemberFlags.Social
-            Dim isMethodIndependent = (flags And SourceMemberFlags.Independent) = SourceMemberFlags.Independent
 
-            If syntax.Kind = SyntaxKind.SubStatement Then
-                If container.IsSocial Then
-                    If isMethodIndependent Then
-                        flags = flags Or SourceMemberFlags.MethodIsSub
-                    End If
-                Else
-                    If Not isMethodSocial Then
-                        flags = flags Or SourceMemberFlags.MethodIsSub
-                    End If
-                End If
+            If syntax.Kind = SyntaxKind.SubStatement AndAlso
+                Not (flags And SourceMemberFlags.Social) = SourceMemberFlags.Social Then
+                flags = flags Or SourceMemberFlags.MethodIsSub
             End If
 
             If syntax.HandlesClause IsNot Nothing Then
@@ -444,9 +454,10 @@ lReportErrorOnTwoTokens:
 
             methodModifiers = binder.ValidateSharedPropertyAndMethodModifiers(modifiers, methodModifiers, False, container, diagBag)
 
-            Const asyncIterator As SourceMemberFlags = SourceMemberFlags.Async Or SourceMemberFlags.Iterator Or
-                                                       SourceMemberFlags.Social Or SourceMemberFlags.Independent
-            Select Case methodModifiers.FoundFlags And asyncIterator
+            Const asyncIteratorSocialIndependent As SourceMemberFlags = SourceMemberFlags.Async Or SourceMemberFlags.Iterator Or
+                                                    SourceMemberFlags.Social Or SourceMemberFlags.Independent
+
+            Select Case methodModifiers.FoundFlags And asyncIteratorSocialIndependent
                 Case SourceMemberFlags.Independent Or SourceMemberFlags.Iterator,
                      SourceMemberFlags.Independent,
                      SourceMemberFlags.Async,
@@ -2303,21 +2314,17 @@ lReportErrorOnTwoTokens:
                         Case SyntaxKind.SubStatement,
                             SyntaxKind.DeclareSubStatement
 
-                            If Me.IsSocial Or (Me.ContainingType.IsSocial AndAlso Not (Me.IsIterator Or Me.IsIndependent Or Me.IsAsync)) Then
+                            'TODO John: Please check asserts!
+                            If Me.IsSocial Then
                                 Debug.Assert(Not Me.IsSub)
                             Else
                                 Debug.Assert(Me.IsSub)
                             End If
                             Binder.DisallowTypeCharacter(GetNameToken(methodStatement), diagBag, ERRID.ERR_TypeCharOnSub)
 
-                            'If Debugger.IsAttached Then
-                            '    If Me.Name = "Fred3Async" Then
-                            '        Debugger.Break()
-                            '    End If
-                            'End If
 
                             'TODO John: Please check!
-                            If Me.IsSocial Or (Me.ContainingType.IsSocial AndAlso Not (Me.IsIndependent Or Me.IsAsync)) Then
+                            If Me.IsSocial Then
                                 Dim compilation = Me.DeclaringCompilation
 
                                 Dim task = compilation.GetWellKnownType(WellKnownType.System_Threading_Tasks_Task)
@@ -2392,7 +2399,7 @@ lReportErrorOnTwoTokens:
                                 End If
 
                                 'TODO John: Please check!
-                                If Me.IsSocial Or (Me.ContainingType.IsSocial AndAlso Not (Me.IsIndependent Or Me.IsAsync)) Then
+                                If Me.IsSocial Then
                                     If Not rewroteAlready Then
                                         Dim compilation = Me.DeclaringCompilation
 

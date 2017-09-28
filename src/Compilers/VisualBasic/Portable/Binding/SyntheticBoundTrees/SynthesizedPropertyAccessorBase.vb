@@ -8,15 +8,58 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Symbols
     Friend Module SynthesizedPropertyAccessorHelper
 
         Friend Function GetBoundMethodBody(accessor As MethodSymbol,
-                                                            backingField As FieldSymbol,
-                                                            Optional ByRef methodBodyBinder As Binder = Nothing) As BoundBlock
+                                           backingField As FieldSymbol,
+                                           Optional ByRef methodBodyBinder As Binder = Nothing) As BoundBlock
             methodBodyBinder = Nothing
 
             ' NOTE: Current implementation of this method does generate the code for both getter and setter,
             '       Ideally it could have been split into two different implementations, but the code gen is
             '       quite similar in these two cases and current types hierarchy makes this solution preferable
 
+
+            'IMPLEMENTING AutoProperties with INotifyPropertyChanged.
             Dim propertySymbol = DirectCast(accessor.AssociatedSymbol, PropertySymbol)
+            Dim containingType = accessor.ContainingType
+
+            Dim isUserInterfaceAttributeAssigned = False
+
+            If accessor.MethodKind = MethodKind.PropertySet Then
+
+                '1st Requirement: Containing Type implements INotifyPropertyChanged
+                Dim iNotifyInterface = containingType.InterfacesNoUseSiteDiagnostics().
+                                            Where(Function(interfaceItem) interfaceItem.Name = "INotifyPropertyChanged" AndAlso
+                                                                          interfaceItem.ContainingNamespace.Name = "ComponentModel").FirstOrDefault()
+
+                'TODO: 2nd Requirement: Test, if the Event definition is present.
+                If iNotifyInterface IsNot Nothing Then
+
+                    Dim propertyAttributes = propertySymbol.GetAttributes().
+                                        Where(Function(attributeItem) attributeItem.AttributeClass.Name = "UserInterfaceAttribute" AndAlso
+                                                                      attributeItem.AttributeClass.ContainingNamespace.Name = "CompilerServices").FirstOrDefault()
+                    If propertyAttributes IsNot Nothing Then
+                        If propertyAttributes.NamedArguments.Count = 0 Then
+                            isUserInterfaceAttributeAssigned = True
+                        Else
+                            Debug.Assert(propertyAttributes.NamedArguments(0).Key = "Use")
+                            isUserInterfaceAttributeAssigned = CBool(propertyAttributes.NamedArguments(0).Value.Value)
+                        End If
+
+                    Else
+                        'Might also be defined on Class level.
+                        Dim typeAttributes = containingType.GetAttributes().
+                                            Where(Function(attributeItem) attributeItem.AttributeClass.Name = "UserInterfaceAttribute" AndAlso
+                                                                          attributeItem.AttributeClass.ContainingNamespace.Name = "CompilerServices").FirstOrDefault()
+                        If typeAttributes IsNot Nothing Then
+                            If typeAttributes.NamedArguments.Count = 0 Then
+                                isUserInterfaceAttributeAssigned = True
+                            Else
+                                Debug.Assert(typeAttributes.NamedArguments(0).Key = "Use")
+                                isUserInterfaceAttributeAssigned = CBool(typeAttributes.NamedArguments(0).Value.Value)
+                            End If
+                        End If
+                    End If
+                End If
+            End If
 
             Dim syntax = DirectCast(VisualBasic.VisualBasicSyntaxTree.Dummy.GetRoot(), VisualBasicSyntaxNode)
             Dim meSymbol As ParameterSymbol = Nothing

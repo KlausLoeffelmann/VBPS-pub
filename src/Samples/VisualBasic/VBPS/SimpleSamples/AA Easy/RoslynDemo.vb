@@ -1,5 +1,7 @@
 Imports System
 Imports System.Threading.Tasks
+Imports System.ComponentModel
+Imports System.Runtime.CompilerServices
 
 Module Program
 
@@ -59,9 +61,57 @@ Module Program
     End Function
 
     Public Class Foo
-        Public Property FooProp as String = "42"
+        Implements INotifyPropertyChanged
+
+        Public Event PropertyChanged As PropertyChangedEventHandler Implements INotifyPropertyChanged.PropertyChanged
+
+        <UserInterface(use:=True)>
+        Public Property FooProp As String
     End Class
 
+    <UserInterface>
     Public Class Bar
+        Implements INotifyPropertyChanged
+
+        Public Event PropertyChanged As PropertyChangedEventHandler Implements INotifyPropertyChanged.PropertyChanged
+
+        Private _BarPropComplete As String
+
+        Public Property FooProp As String
+
+        Public Property BarPropComplete As String
+            Get
+                Return _BarPropComplete
+            End Get
+            Set(value As String)
+                If Not Object.Equals(value, _BarPropComplete) Then
+                    _BarPropComplete = value
+                    RaiseEvent PropertyChanged(Me, New PropertyChangedEventArgs("BarPropComplete"))
+                End If
+            End Set
+        End Property
+
+        <UserInterface(Use:=False)>
+        Public Property FooPropIgnored As String
+
     End Class
 End Module
+
+Namespace Global.System.Runtime.CompilerServices
+
+    Public Class UserInterfaceAttribute
+        Inherits Attribute
+
+        Sub New()
+            MyBase.New
+        End Sub
+
+        Sub New(use As Boolean)
+            MyBase.New
+            Me.Use = use
+        End Sub
+
+        Public Property Use As Boolean = True
+
+    End Class
+End Namespace

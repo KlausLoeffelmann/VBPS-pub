@@ -74,6 +74,7 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Symbols
 
             Dim field As FieldSymbol = Nothing
             Dim fieldAccess As BoundFieldAccess = Nothing
+            Dim fieldAccessAsObject As BoundFieldAccess = Nothing
 
             Dim myBaseReference As BoundExpression = Nothing
             Dim baseGet As BoundExpression = Nothing
@@ -96,6 +97,8 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Symbols
                 ' not overriding property operates with field
                 field = backingField
                 fieldAccess = New BoundFieldAccess(syntax, meReference, field, True, field.Type)
+                fieldAccessAsObject = New BoundFieldAccess(syntax, meReference, field, True,
+                                                           accessor.ContainingAssembly.GetSpecialType(SpecialType.System_Object)).MakeRValue
             End If
 
             Dim exitLabel = New GeneratedLabelSymbol("exit")
@@ -130,6 +133,8 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Symbols
                 Debug.Assert(accessor.ParameterCount >= 1)
                 Dim parameter = accessor.Parameters(accessor.ParameterCount - 1)
                 Dim parameterAccess = New BoundParameter(syntax, parameter, isLValue:=False, type:=parameter.Type)
+                Dim parameterAccessAsObject = New BoundParameter(syntax, parameter, isLValue:=False,
+                                                                 type:=accessor.ContainingAssembly.GetSpecialType(SpecialType.System_Object))
 
                 Dim eventsToHookup As ArrayBuilder(Of ValueTuple(Of EventSymbol, PropertySymbol)) = Nothing
 
@@ -329,11 +334,54 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Symbols
                         type:=propertySymbol.Type)
                 End If
 
-                statements.Add(
+                'We need to generate
+                'If Not Object.Equals(field,value) Then
+                '   field = value
+                '   RaiseEvent Me.INotifyPropertyChange(Me, New PropertyChangeEventArgs("PropertyName"))
+                'End If
+                If isUserInterfaceAttributeAssigned Then
+                    Try
+                        Dim objectEqualsMethod = DirectCast(accessor.ContainingAssembly.GetSpecialTypeMember(SpecialMember.System_Object__EqualsObjectObject),
+                                                            MethodSymbol)
+
+                        Dim objectEqualConditionalExpression = New BoundCall(syntax,
+                                                                         objectEqualsMethod,
+                                                                         Nothing,
+                                                                         New BoundTypeExpression(syntax, accessor.ContainingAssembly.GetSpecialType(SpecialType.System_Object)),
+                                                                         ImmutableArray.Create(Of BoundExpression)(fieldAccessAsObject, parameterAccessAsObject),
+                                                                         Nothing,
+                                                                         objectEqualsMethod.ReturnType)
+
+                        Dim notObjectEqualConditionalExpression As New BoundUnaryOperator(syntax,
+                                                                                      UnaryOperatorKind.Not,
+                                                                                      objectEqualConditionalExpression,
+                                                                                      True,
+                                                                                      accessor.ContainingAssembly.GetSpecialType(SpecialType.System_Boolean))
+
+                        'Dim rEventStatement = New BoundRaiseEventStatement(syntax, Nothing, Nothing)
+
+                        Dim consequenceStatementList = ArrayBuilder(Of BoundStatement).GetInstance
+                        consequenceStatementList.Add(New BoundExpressionStatement(syntax, valueSettingExpression).MakeCompilerGenerated())
+                        'consequenceStatementList.Add(rEventStatement)
+
+                        Dim objectsEqualityTest = New BoundIfStatement(
+                                             syntax,
+                                             notObjectEqualConditionalExpression.MakeCompilerGenerated,
+                                             New BoundStatementList(syntax, consequenceStatementList.ToImmutableAndFree),
+                                             Nothing)
+                        statements.Add(objectsEqualityTest.MakeCompilerGenerated)
+                    Catch ex As Exception
+                        If Debugger.IsAttached Then
+                            Debugger.Break()
+                        End If
+                    End Try
+                Else
+                    'memberValue = value
+                    statements.Add(
                     (New BoundExpressionStatement(
                         syntax,
                         valueSettingExpression).MakeCompilerGenerated()))
-
+                End If
 
                 ' after setting new event source, hookup handlers
                 If eventsToHookup IsNot Nothing Then

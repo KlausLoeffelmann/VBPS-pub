@@ -119,6 +119,7 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
                 Interlocked.CompareExchange(_lazyExtensionAttributeConstructor,
                                             DirectCast(attributeCtor, Symbol),
                                             DirectCast(ErrorTypeSymbol.UnknownResultType, Symbol))
+
             End If
 
             useSiteError = DirectCast(Volatile.Read(_lazyExtensionAttributeConstructorErrorInfo), DiagnosticInfo)

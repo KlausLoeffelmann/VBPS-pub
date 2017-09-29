@@ -140,6 +140,7 @@ namespace Microsoft.CodeAnalysis
         System_Nullable_T__ctor,
         System_Nullable_T__op_Implicit_FromT,
         System_Nullable_T__op_Explicit_ToT,
+        System_Object__EqualsObjectObject,
 
         Count
     }

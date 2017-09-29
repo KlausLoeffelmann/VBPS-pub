@@ -965,6 +965,16 @@ namespace Microsoft.CodeAnalysis
                     1,                                                                                                      // Method Signature
                     (byte)SignatureTypeCode.GenericTypeParameter, 0,
                     (byte)SignatureTypeCode.TypeHandle, (byte)SpecialType.System_Nullable_T,
+
+                // System_Object__EqualsObjectObject
+                (byte)(MemberFlags.Method | MemberFlags.Static),                                                            // Flags
+                (byte)SpecialType.System_Object,                                                                            // DeclaringTypeId
+                0,                                                                                                          // Arity
+                    2,                                                                                                      // Method Signature
+                    (byte)SignatureTypeCode.TypeHandle, (byte)SpecialType.System_Boolean,
+                    (byte)SignatureTypeCode.TypeHandle, (byte)SpecialType.System_Object,
+                    (byte)SignatureTypeCode.TypeHandle, (byte)SpecialType.System_Object,
+
             };
 
             string[] allNames = new string[(int)SpecialMember.Count]
@@ -1085,6 +1095,7 @@ namespace Microsoft.CodeAnalysis
                 ".ctor",                                    // System_Nullable_T__ctor
                 "op_Implicit",                              // System_Nullable_T__op_Implicit_FromT
                 "op_Explicit",                              // System_Nullable_T__op_Explicit_ToT
+                "Equals",                                   // System_Object__EqualsObjectObject
             };
 
             s_descriptors = MemberDescriptor.InitializeFromStream(new System.IO.MemoryStream(initializationBytes, writable: false), allNames);

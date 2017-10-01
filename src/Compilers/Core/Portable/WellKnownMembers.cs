@@ -2918,6 +2918,15 @@ namespace Microsoft.CodeAnalysis
                     (byte)SignatureTypeCode.TypeHandle,
                     (byte)WellKnownType.ExtSentinel, (byte)(WellKnownType.System_Runtime_CompilerServices_ConfiguredTaskAwaitable-WellKnownType.ExtSentinel),
                     (byte)SignatureTypeCode.TypeHandle, (byte)SpecialType.System_Boolean,
+
+                // System_ComponentModel_PropertyChangedEventArgs_ctor
+                (byte)MemberFlags.Constructor,                                                                              // Flags
+                (byte)(byte)WellKnownType.ExtSentinel, (byte)(WellKnownType.System_ComponentModel_PropertyChangedEventArgs-WellKnownType.ExtSentinel), // DeclaringTypeId
+                0,                                                                                                          // Arity
+                    1,                                                                                                      // Method Signature
+                    (byte)SignatureTypeCode.TypeHandle, (byte)SpecialType.System_Void,
+                    (byte)SignatureTypeCode.TypeHandle, (byte)SpecialType.System_String,
+
             };
 
             string[] allNames = new string[(int)WellKnownMember.Count]
@@ -3280,7 +3289,8 @@ namespace Microsoft.CodeAnalysis
                 
                 ".ctor",                                    // System_Runtime_CompilerServices_ReferenceAssemblyAttribute__ctor
                 "ConfigureAwait",                           // System_Threading_Tasks_Task_T__ConfigureAwait
-                "ConfigureAwait"                            // System_Threading_Tasks_Task__ConfigureAwait
+                "ConfigureAwait",                           // System_Threading_Tasks_Task__ConfigureAwait
+                ".ctor"                                     // System_ComponentModel_PropertyChangedEventArgs__ctor
             };
 
             s_descriptors = MemberDescriptor.InitializeFromStream(new System.IO.MemoryStream(initializationBytes, writable: false), allNames);

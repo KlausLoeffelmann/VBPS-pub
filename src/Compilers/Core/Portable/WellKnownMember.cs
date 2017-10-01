@@ -421,6 +421,7 @@ namespace Microsoft.CodeAnalysis
 
         System_Threading_Tasks_Task_T__ConfigureAwait,
         System_Threading_Tasks_Task__ConfigureAwait,
+        System_ComponentModel_PropertyChangedEventArgs__ctor,
 
         Count
     }

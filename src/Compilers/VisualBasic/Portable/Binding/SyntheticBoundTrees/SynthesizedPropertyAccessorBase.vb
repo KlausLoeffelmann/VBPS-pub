@@ -9,13 +9,15 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Symbols
 
         Friend Function GetBoundMethodBody(accessor As MethodSymbol,
                                            backingField As FieldSymbol,
+                                           compilationState As TypeCompilationState,
+                                           diagnostics As DiagnosticBag,
                                            Optional ByRef methodBodyBinder As Binder = Nothing) As BoundBlock
+
             methodBodyBinder = Nothing
 
             ' NOTE: Current implementation of this method does generate the code for both getter and setter,
             '       Ideally it could have been split into two different implementations, but the code gen is
             '       quite similar in these two cases and current types hierarchy makes this solution preferable
-
 
             'IMPLEMENTING AutoProperties with INotifyPropertyChanged.
             Dim propertySymbol = DirectCast(accessor.AssociatedSymbol, PropertySymbol)
@@ -64,10 +66,13 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Symbols
             Dim syntax = DirectCast(VisualBasic.VisualBasicSyntaxTree.Dummy.GetRoot(), VisualBasicSyntaxNode)
             Dim meSymbol As ParameterSymbol = Nothing
             Dim meReference As BoundExpression = Nothing
+            Dim meReferenceAsObject As BoundExpression = Nothing
 
             If Not accessor.IsShared Then
                 meSymbol = accessor.MeParameter
                 meReference = New BoundMeReference(syntax, meSymbol.Type)
+                meReferenceAsObject = New BoundMeReference(syntax,
+                                                           accessor.ContainingAssembly.GetSpecialType(SpecialType.System_Object))
             End If
 
             Dim isOverride As Boolean = propertySymbol.IsWithEvents AndAlso propertySymbol.IsOverrides
@@ -340,6 +345,9 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Symbols
                 '   RaiseEvent Me.INotifyPropertyChange(Me, New PropertyChangeEventArgs("PropertyName"))
                 'End If
                 If isUserInterfaceAttributeAssigned Then
+
+
+
                     Try
                         Dim objectEqualsMethod = DirectCast(accessor.ContainingAssembly.GetSpecialTypeMember(SpecialMember.System_Object__EqualsObjectObject),
                                                             MethodSymbol)
@@ -358,11 +366,32 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Symbols
                                                                                       True,
                                                                                       accessor.ContainingAssembly.GetSpecialType(SpecialType.System_Boolean))
 
-                        'Dim rEventStatement = New BoundRaiseEventStatement(syntax, Nothing, Nothing)
+                        Dim propertyChangedEvent = accessor.ContainingType.GetEventsToEmit().
+                                                    Where(Function(eventItem) eventItem.Name = "PropertyChanged").FirstOrDefault
+
+                        Dim invokeMethod = DirectCast(propertyChangedEvent.Type.GetMembers.Where(Function(methodItem) methodItem.Name = "Invoke").FirstOrDefault, MethodSymbol)
+
+                        Dim newEventArgsExpression = New BoundObjectCreationExpression(syntax,
+                                                                                       DirectCast(compilationState.Compilation.GetWellKnownTypeMember(WellKnownMember.System_ComponentModel_PropertyChangedEventArgs__ctor), MethodSymbol),
+                                                                                       ImmutableArray.Create(Of BoundExpression)({New BoundLiteral(syntax, ConstantValue.Create("string"),
+                                                                                                                                                  accessor.ContainingAssembly.GetSpecialType(SpecialType.System_String))}),
+                                                                                       Nothing,
+                                                                                       compilationState.Compilation.GetWellKnownType(WellKnownType.System_ComponentModel_PropertyChangedEventArgs))
+                        'TODO: Create field and assign instance.
+
+                        Dim eventInfoCall = New BoundCall(syntax,
+                                                          invokeMethod,
+                                                          Nothing,
+                                                          New BoundTypeExpression(syntax, propertyChangedEvent.Type),
+                                                          ImmutableArray.Create(Of BoundExpression)(meReferenceAsObject, newEventArgsExpression),
+                                                          Nothing,
+                                                          invokeMethod.ReturnType)
+
+                        Dim rEventStatement = New BoundRaiseEventStatement(syntax, propertyChangedEvent, eventInfoCall)
 
                         Dim consequenceStatementList = ArrayBuilder(Of BoundStatement).GetInstance
                         consequenceStatementList.Add(New BoundExpressionStatement(syntax, valueSettingExpression).MakeCompilerGenerated())
-                        'consequenceStatementList.Add(rEventStatement)
+                        consequenceStatementList.Add(rEventStatement)
 
                         Dim objectsEqualityTest = New BoundIfStatement(
                                              syntax,

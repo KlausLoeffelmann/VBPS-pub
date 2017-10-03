@@ -60,42 +60,44 @@ Module Program
         return SocialFooAsync
     End Function
 
-    Public Class Foo
-        Implements INotifyPropertyChanged
-
-        Public Event PropertyChanged As PropertyChangedEventHandler Implements INotifyPropertyChanged.PropertyChanged
-
-        <UserInterface(use:=True)>
-        Public Property FooProp As String
-    End Class
-
-    <UserInterface>
-    Public Class Bar
-        Implements INotifyPropertyChanged
-
-        Public Event PropertyChanged As PropertyChangedEventHandler Implements INotifyPropertyChanged.PropertyChanged
-
-        Private _BarPropComplete As String
-
-        Public Property FooProp As String
-
-        Public Property BarPropComplete As String
-            Get
-                Return _BarPropComplete
-            End Get
-            Set(value As String)
-                If Not Object.Equals(value, _BarPropComplete) Then
-                    _BarPropComplete = value
-                    RaiseEvent PropertyChanged(Me, New PropertyChangedEventArgs("BarPropComplete"))
-                End If
-            End Set
-        End Property
-
-        <UserInterface(Use:=False)>
-        Public Property FooPropIgnored As String
-
-    End Class
 End Module
+
+Public Class Foo
+    Implements INotifyPropertyChanged
+
+    Public Event PropertyChanged As PropertyChangedEventHandler Implements INotifyPropertyChanged.PropertyChanged
+
+    <UserInterface(use:=True)>
+    Public Property FooProp As String
+End Class
+
+<UserInterface>
+Public Class Bar
+    Implements INotifyPropertyChanged
+
+    Public Event PropertyChanged As PropertyChangedEventHandler Implements INotifyPropertyChanged.PropertyChanged
+
+    Private _BarPropComplete As String
+
+    Public Property FooProp As String
+
+    Public Property BarPropComplete As String
+        Get
+            Return _BarPropComplete
+        End Get
+        Set(value As String)
+            If Not Object.Equals(value, _BarPropComplete) Then
+                _BarPropComplete = value
+                RaiseEvent PropertyChanged(Me, New PropertyChangedEventArgs("BarPropComplete"))
+            End If
+        End Set
+    End Property
+
+    <UserInterface(Use:=False)>
+    Public Property FooPropIgnored As String
+
+End Class
+
 
 Namespace Global.System.Runtime.CompilerServices
 

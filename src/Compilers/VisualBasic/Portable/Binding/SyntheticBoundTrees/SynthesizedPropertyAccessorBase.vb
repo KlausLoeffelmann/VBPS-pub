@@ -7,6 +7,8 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Symbols
 
     Friend Module SynthesizedPropertyAccessorHelper
 
+        Private onPropertyChangedSubSyncer As New Object
+
         Friend Function GetBoundMethodBody(accessor As MethodSymbol,
                                            backingField As FieldSymbol,
                                            compilationState As TypeCompilationState,
@@ -347,79 +349,123 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Symbols
                 If isUserInterfaceAttributeAssigned Then
 
                     Try
-                        Dim objectEqualsMethod = DirectCast(accessor.ContainingAssembly.GetSpecialTypeMember(SpecialMember.System_Object__EqualsObjectObject),
-                                                            MethodSymbol)
+                        SyncLock onPropertyChangedSubSyncer
+                            'Let's find out, if this type already has the Event Raiser Method OnPropertyChanged.
+                            Dim onPropertyChangedMethod = accessor.ContainingType.GetMethodsToEmit().Where(Function(eventItem) eventItem.Name = "OnPropertyChanged").FirstOrDefault
 
-                        Dim objectEqualConditionalExpression = New BoundCall(syntax,
-                                                                         objectEqualsMethod,
-                                                                         Nothing,
-                                                                         New BoundTypeExpression(syntax, accessor.ContainingAssembly.GetSpecialType(SpecialType.System_Object)),
-                                                                         ImmutableArray.Create(Of BoundExpression)(fieldAccessAsObject, parameterAccessAsObject),
-                                                                         Nothing,
-                                                                         objectEqualsMethod.ReturnType,
-                                                                         suppressObjectClone:=True)
+                            Dim propertyChangedEvent = accessor.ContainingType.GetEventsToEmit().
+                                                       Where(Function(eventItem) eventItem.Name = "PropertyChanged").FirstOrDefault
 
-                        Dim notObjectEqualConditionalExpression As New BoundUnaryOperator(syntax,
-                                                                                      UnaryOperatorKind.Not,
-                                                                                      objectEqualConditionalExpression,
-                                                                                      True,
-                                                                                      accessor.ContainingAssembly.GetSpecialType(SpecialType.System_Boolean))
+                            If onPropertyChangedMethod IsNot Nothing Then
+                                'Check for correct Signature.
+                            Else
+                                If compilationState.HasSynthesizedMethods Then
+                                    onPropertyChangedMethod = DirectCast(compilationState.SynthesizedMethods.Where(Function(item) item.Method.Name = "OnPropertyChanged").FirstOrDefault.Method, MethodSymbol)
+                                End If
 
-                        Dim propertyChangedEvent = accessor.ContainingType.GetEventsToEmit().
-                                                    Where(Function(eventItem) eventItem.Name = "PropertyChanged").FirstOrDefault
+                                If onPropertyChangedMethod Is Nothing Then
+                                    onPropertyChangedMethod = New SynthesizedSimpleMethodSymbol(accessor.ContainingType, "OnPropertyChanged",
+                                                                                            accessor.ContainingAssembly.GetSpecialType(SpecialType.System_Void))
 
-                        Dim propertyChangedEventAccess = New BoundEventAccess(syntax, meReference, propertyChangedEvent, propertyChangedEvent.Type)
+                                    Dim eArgsParameter = New SynthesizedParameterSimpleSymbol(DirectCast(onPropertyChangedMethod, SynthesizedSimpleMethodSymbol),
+                                                                                                compilationState.Compilation.GetWellKnownType(WellKnownType.System_ComponentModel_PropertyChangedEventArgs),
+                                                                                                0, "eArgs")
 
-                        Dim invokeMethod = DirectCast(propertyChangedEvent.Type.GetMembers.Where(Function(methodItem) methodItem.Name = "Invoke").FirstOrDefault, MethodSymbol)
+                                    DirectCast(onPropertyChangedMethod, SynthesizedSimpleMethodSymbol).
+                                        SetParameters(ImmutableArray.Create(Of ParameterSymbol)(eArgsParameter))
+
+                                    Dim propertyChangedEventAccess = New BoundEventAccess(syntax, meReference, propertyChangedEvent, propertyChangedEvent.Type)
+                                    Dim invokeMethod = DirectCast(propertyChangedEvent.Type.GetMembers.Where(Function(methodItem) methodItem.Name = "Invoke").FirstOrDefault, MethodSymbol)
+
+                                    Dim receiver = New BoundFieldAccess(syntax,
+                                                    meReference,
+                                                    propertyChangedEvent.AssociatedField,
+                                                    False,
+                                                    propertyChangedEvent.AssociatedField.Type).MakeCompilerGenerated
+
+                                    Dim eArgsAccess = New BoundParameter(syntax, eArgsParameter,
+                                                                         compilationState.Compilation.GetWellKnownType(WellKnownType.System_ComponentModel_PropertyChangedEventArgs)).MakeRValue
+
+                                    Dim eventInfoCall = New BoundCall(syntax,
+                                                              invokeMethod,
+                                                              Nothing,
+                                                              receiver,
+                                                              ImmutableArray.Create(Of BoundExpression)(meReferenceAsObject, eArgsAccess),
+                                                              Nothing,
+                                                              invokeMethod.ReturnType,
+                                                              suppressObjectClone:=True).MakeCompilerGenerated
+
+                                    Dim raiseEventStatement = New BoundRaiseEventStatement(syntax, propertyChangedEvent, eventInfoCall)
+
+                                    'Dim block As BoundBlock = New BoundBlock(syntax,
+                                    '                           Nothing,
+                                    '                           ImmutableArray(Of LocalSymbol).Empty,
+                                    '                           ImmutableArray.Create(Of BoundStatement)(raiseEventStatement))
+
+                                    Dim F = New SyntheticBoundNodeFactory(onPropertyChangedMethod, onPropertyChangedMethod, syntax, compilationState, diagnostics)
+
+                                    Dim tempEventArgs As LocalSymbol = F.SynthesizedLocal(F.WellKnownType(WellKnownType.System_ComponentModel_PropertyChangedEventArgs))
+
+                                    Dim block = F.Block(ImmutableArray.Create(Of LocalSymbol)(tempEventArgs),
+                                            F.Assignment(F.Local(tempEventArgs, True), eArgsAccess))
+                                    block = block.MakeCompilerGenerated
+
+                                    'We generate the Method on demand.
+                                    compilationState.AddSynthesizedMethod(onPropertyChangedMethod,
+                                                                          block)
+
+                                    Dim temp = compilationState.SynthesizedMethods
+                                End If
+                            End If
+
+                            Dim objectEqualsMethod = DirectCast(accessor.ContainingAssembly.GetSpecialTypeMember(SpecialMember.System_Object__EqualsObjectObject),
+                                                                MethodSymbol)
+
+                            Dim objectEqualConditionalExpression = New BoundCall(syntax,
+                                                                             objectEqualsMethod,
+                                                                             Nothing,
+                                                                             New BoundTypeExpression(syntax, accessor.ContainingAssembly.GetSpecialType(SpecialType.System_Object)),
+                                                                             ImmutableArray.Create(Of BoundExpression)(fieldAccessAsObject, parameterAccessAsObject),
+                                                                             Nothing,
+                                                                             objectEqualsMethod.ReturnType,
+                                                                             suppressObjectClone:=True)
+
+                            Dim notObjectEqualConditionalExpression As New BoundUnaryOperator(syntax,
+                                                                                          UnaryOperatorKind.Not,
+                                                                                          objectEqualConditionalExpression,
+                                                                                          True,
+                                                                                          accessor.ContainingAssembly.GetSpecialType(SpecialType.System_Boolean))
+
+                            Dim newEventArgsExpression = New BoundObjectCreationExpression(syntax,
+                                                                                           DirectCast(compilationState.Compilation.GetWellKnownTypeMember(WellKnownMember.System_ComponentModel_PropertyChangedEventArgs__ctor), MethodSymbol),
+                                                                                           ImmutableArray.Create(Of BoundExpression)({New BoundLiteral(syntax, ConstantValue.Create(accessor.AssociatedSymbol.Name),
+                                                                                                                                                      accessor.ContainingAssembly.GetSpecialType(SpecialType.System_String))}),
+                                                                                           Nothing,
+                                                                                           compilationState.Compilation.GetWellKnownType(WellKnownType.System_ComponentModel_PropertyChangedEventArgs))
 
 
+                            Dim consequenceStatementList = ArrayBuilder(Of BoundStatement).GetInstance
+                            consequenceStatementList.Add(New BoundExpressionStatement(syntax, valueSettingExpression).MakeCompilerGenerated())
 
-                        Dim newEventArgsExpression = New BoundObjectCreationExpression(syntax,
-                                                                                       DirectCast(compilationState.Compilation.GetWellKnownTypeMember(WellKnownMember.System_ComponentModel_PropertyChangedEventArgs__ctor), MethodSymbol),
-                                                                                       ImmutableArray.Create(Of BoundExpression)({New BoundLiteral(syntax, ConstantValue.Create(accessor.AssociatedSymbol.Name),
-                                                                                                                                                  accessor.ContainingAssembly.GetSpecialType(SpecialType.System_String))}),
-                                                                                       Nothing,
-                                                                                       compilationState.Compilation.GetWellKnownType(WellKnownType.System_ComponentModel_PropertyChangedEventArgs))
-                        Dim receiver = New BoundFieldAccess(syntax,
-                                                meReference,
-                                                propertyChangedEvent.AssociatedField,
-                                                False,
-                                                propertyChangedEvent.AssociatedField.Type).MakeCompilerGenerated
+                            Dim OnPropertyChangedCall = New BoundCall(syntax,
+                                                                      onPropertyChangedMethod,
+                                                                      Nothing,
+                                                                      meReference,
+                                                                      ImmutableArray.Create(Of BoundExpression)(newEventArgsExpression),
+                                                                      Nothing,
+                                                                      onPropertyChangedMethod.ReturnType,
+                                                                      suppressObjectClone:=True)
 
-                        'Dim eventArgsLocal = New SynthesizedLocal(accessor, newEventArgsExpression.Type, SynthesizedLocalKind.LoweringTemp)
-                        'Dim localEventArgsAccess = New BoundLocal(syntax, eventArgsLocal, eventArgsLocal.Type)
+                            Dim OnPropertyChangedInvocation = New BoundExpressionStatement(syntax, OnPropertyChangedCall)
+                            consequenceStatementList.Add(OnPropertyChangedInvocation)
 
-                        'Dim eventArgsLocalinit = New BoundExpressionStatement(
-                        '                                       syntax,
-                        '                                       New BoundAssignmentOperator(
-                        '                                           syntax,
-                        '                                           localEventArgsAccess,
-                        '                                           newEventArgsExpression,
-                        '                                           False,
-                        '                                           localEventArgsAccess.Type))
-                        'statements.Add(eventArgsLocalinit)
-
-                        Dim eventInfoCall = New BoundCall(syntax,
-                                                          invokeMethod,
-                                                          Nothing,
-                                                          receiver,
-                                                          ImmutableArray.Create(Of BoundExpression)(meReferenceAsObject, newEventArgsExpression),
-                                                          Nothing,
-                                                          invokeMethod.ReturnType,
-                                                          suppressObjectClone:=True).MakeCompilerGenerated
-
-                        Dim rEventStatement = New BoundRaiseEventStatement(syntax, propertyChangedEvent, eventInfoCall)
-
-                        Dim consequenceStatementList = ArrayBuilder(Of BoundStatement).GetInstance
-                        consequenceStatementList.Add(New BoundExpressionStatement(syntax, valueSettingExpression).MakeCompilerGenerated())
-                        consequenceStatementList.Add(rEventStatement)
-
-                        Dim objectsEqualityTest = New BoundIfStatement(
-                                             syntax,
-                                             notObjectEqualConditionalExpression.MakeCompilerGenerated,
-                                             New BoundStatementList(syntax, consequenceStatementList.ToImmutableAndFree),
-                                             Nothing)
-                        statements.Add(objectsEqualityTest.MakeCompilerGenerated)
+                            Dim objectsEqualityTest = New BoundIfStatement(
+                                                 syntax,
+                                                 notObjectEqualConditionalExpression.MakeCompilerGenerated,
+                                                 New BoundStatementList(syntax, consequenceStatementList.ToImmutableAndFree),
+                                                 Nothing)
+                            statements.Add(objectsEqualityTest.MakeCompilerGenerated)
+                        End SyncLock
                     Catch ex As Exception
                         If Debugger.IsAttached Then
                             Debugger.Break()

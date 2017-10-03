@@ -4,6 +4,7 @@ Imports System.Collections.Immutable
 Imports System.IO
 Imports System.Threading.Tasks
 Imports Microsoft.CodeAnalysis.Collections
+Imports Microsoft.CodeAnalysis.CSharp
 Imports Microsoft.CodeAnalysis.Diagnostics
 Imports Microsoft.CodeAnalysis.VisualBasic.Syntax
 
@@ -67,7 +68,19 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
                 Return Nothing
             End If
 
-            Dim tree = VisualBasicSyntaxTree.ParseText(content, If(file.IsScript, scriptParseOptions, parseOptions), file.Path)
+            'TODO: Could we start here to Parse CSharp and return VB?
+            Dim fileInfo = New FileInfo(file.Path)
+
+            Dim tree As SyntaxTree = Nothing
+
+            If fileInfo.Extension = ".cs" Then
+                Dim cSharpTree = CSharpSyntaxTree.ParseText(content, path:=file.Path)
+                'tree = cSharpTree.ToVisualBasicSyntaxTree()
+            Else
+                tree = VisualBasicSyntaxTree.ParseText(content, If(file.IsScript, scriptParseOptions, parseOptions), file.Path)
+            End If
+
+            Debug.Assert(tree IsNot Nothing, "Syntax-Tree must not be null!")
 
             ' prepopulate line tables.
             ' we will need line tables anyways and it is better to Not wait until we are in emit

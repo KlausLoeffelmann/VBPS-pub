@@ -21,8 +21,7 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Symbols
             syntaxNode As VisualBasicSyntaxNode,
             container As NamedTypeSymbol,
             name As String,
-            Optional isShared As Boolean = False
-        )
+            Optional isShared As Boolean = False)
             MyBase.New(container)
 
             m_SyntaxNode = syntaxNode

@@ -738,12 +738,115 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
                 Next
             End If
 
+            'Create synthesized OnPropertyChanged on demand.
+            CompileSynthesizedOnPropertyChangedMethodOnDemand(containingType, compilationState)
+
             ' Add synthetic methods created for this type in above calls to CompileMethod
             If _moduleBeingBuiltOpt IsNot Nothing Then
                 CompileSynthesizedMethods(compilationState)
             End If
 
             compilationState.Free()
+        End Sub
+
+        Private Sub CompileSynthesizedOnPropertyChangedMethodOnDemand(container As NamedTypeSymbol,
+                                                                      compilationState As TypeCompilationState)
+
+
+            Dim syntaxRef = container.DeclaringSyntaxReferences.First() ' use arbitrary part
+            Dim syntax = syntaxRef.GetVisualBasicSyntax
+
+            Dim iNotifyInterface = container.InterfacesNoUseSiteDiagnostics().
+                                            Where(Function(interfaceItem) interfaceItem.Name = "INotifyPropertyChanged" AndAlso
+                                                                          interfaceItem.ContainingNamespace.Name = "ComponentModel").FirstOrDefault()
+            If iNotifyInterface Is Nothing Then
+                Return
+            End If
+
+            'Might also be defined on Class level.
+            Dim userInterfaceAttribute = container.GetAttributes().
+                                            Where(Function(attributeItem) attributeItem.AttributeClass.Name = "UserInterfaceAttribute" AndAlso
+                                                                          attributeItem.AttributeClass.ContainingNamespace.Name = "CompilerServices").FirstOrDefault()
+
+            If userInterfaceAttribute Is Nothing Then
+                Return
+            End If
+
+            Dim isUserInterfaceAttributeAssigned = False
+
+            If userInterfaceAttribute IsNot Nothing Then
+                If userInterfaceAttribute.NamedArguments.Count = 0 Then
+                    isUserInterfaceAttributeAssigned = True
+                Else
+                    Debug.Assert(userInterfaceAttribute.NamedArguments(0).Key = "Use")
+                    isUserInterfaceAttributeAssigned = CBool(userInterfaceAttribute.NamedArguments(0).Value.Value)
+                End If
+            End If
+
+            If isUserInterfaceAttributeAssigned Then
+
+                Dim onPropertyChangedMethod = New SynthesizedOnPropertyChangedMethodSymbol(syntax, container, False)
+
+                Dim diagnosticsThisMethod = DiagnosticBag.GetInstance()
+                Dim boundBody = onPropertyChangedMethod.GetBoundMethodBody(compilationState, diagnosticsThisMethod)
+
+                If diagnosticsThisMethod.HasAnyErrors Then
+                    _diagnostics.AddRange(diagnosticsThisMethod)
+                    diagnosticsThisMethod.Free()
+                Else
+
+                    Dim lazyVariableSlotAllocator As VariableSlotAllocator = Nothing
+                    Dim statemachineTypeOpt As StateMachineTypeSymbol = Nothing
+
+                    Dim lambdaDebugInfoBuilder = ArrayBuilder(Of LambdaDebugInfo).GetInstance()
+                    Dim closureDebugInfoBuilder = ArrayBuilder(Of ClosureDebugInfo).GetInstance()
+                    Dim delegateRelaxationIdDispenser = 0
+                    Dim dynamicAnalysisSpans As ImmutableArray(Of SourceSpan) = ImmutableArray(Of SourceSpan).Empty
+
+                    Dim rewrittenBody = Rewriter.LowerBodyOrInitializer(
+                            onPropertyChangedMethod,
+                            methodOrdinal:=DebugId.UndefinedOrdinal,
+                            body:=boundBody,
+                            previousSubmissionFields:=Nothing,
+                            compilationState:=compilationState,
+                            instrumentForDynamicAnalysis:=False,
+                            dynamicAnalysisSpans:=dynamicAnalysisSpans,
+                            debugDocumentProvider:=_debugDocumentProvider,
+                            diagnostics:=diagnosticsThisMethod,
+                            lazyVariableSlotAllocator:=lazyVariableSlotAllocator,
+                            lambdaDebugInfoBuilder:=lambdaDebugInfoBuilder,
+                            closureDebugInfoBuilder:=closureDebugInfoBuilder,
+                            delegateRelaxationIdDispenser:=delegateRelaxationIdDispenser,
+                            stateMachineTypeOpt:=statemachineTypeOpt,
+                            allowOmissionOfConditionalCalls:=_moduleBeingBuiltOpt.AllowOmissionOfConditionalCalls,
+                            isBodySynthesized:=True)
+
+                    Dim emittedBody = GenerateMethodBody(_moduleBeingBuiltOpt,
+                                                         onPropertyChangedMethod,
+                                                         methodOrdinal:=DebugId.UndefinedOrdinal,
+                                                         block:=rewrittenBody,
+                                                         lambdaDebugInfo:=ImmutableArray(Of LambdaDebugInfo).Empty,
+                                                         closureDebugInfo:=ImmutableArray(Of ClosureDebugInfo).Empty,
+                                                         stateMachineTypeOpt:=Nothing,
+                                                         variableSlotAllocatorOpt:=Nothing,
+                                                         debugDocumentProvider:=If(_emitTestCoverageData, _debugDocumentProvider, Nothing),
+                                                         diagnostics:=diagnosticsThisMethod,
+                                                         emittingPdb:=False,
+                                                         emitTestCoverageData:=_emitTestCoverageData,
+                                                         dynamicAnalysisSpans:=ImmutableArray(Of SourceSpan).Empty)
+
+                    _diagnostics.AddRange(diagnosticsThisMethod)
+                    diagnosticsThisMethod.Free()
+
+                    ' error while generating IL
+                    If emittedBody Is Nothing Then
+                        Return
+                    End If
+
+                    _moduleBeingBuiltOpt.SetMethodBody(onPropertyChangedMethod, emittedBody)
+                    _moduleBeingBuiltOpt.AddSynthesizedDefinition(container, DirectCast(onPropertyChangedMethod, Microsoft.Cci.IMethodDefinition))
+                End If
+            End If
         End Sub
 
         Private Sub CreateExplicitInterfaceImplementationStubs(compilationState As TypeCompilationState, method As MethodSymbol)

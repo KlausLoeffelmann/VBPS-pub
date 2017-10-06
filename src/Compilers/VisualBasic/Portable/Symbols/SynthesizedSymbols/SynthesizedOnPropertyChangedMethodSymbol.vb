@@ -57,18 +57,17 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Symbols
                                       suppressObjectClone:=True).MakeCompilerGenerated
 
             Dim raiseEventStatement = New BoundRaiseEventStatement(Syntax, propertyChangedEvent, eventInfoCall)
+            Dim block As BoundBlock = New BoundBlock(Syntax,
+                                       Nothing,
+                                       ImmutableArray(Of LocalSymbol).Empty,
+                                       ImmutableArray.Create(Of BoundStatement)(raiseEventStatement))
 
-            'Dim block As BoundBlock = New BoundBlock(syntax,
-            '                           Nothing,
-            '                           ImmutableArray(Of LocalSymbol).Empty,
-            '                           ImmutableArray.Create(Of BoundStatement)(raiseEventStatement))
+            'Dim F = New SyntheticBoundNodeFactory(Me, Me, Syntax, compilationState, diagnostics)
 
-            Dim F = New SyntheticBoundNodeFactory(Me, Me, Syntax, compilationState, diagnostics)
+            'Dim tempEventArgs As LocalSymbol = F.SynthesizedLocal(F.WellKnownType(WellKnownType.System_ComponentModel_PropertyChangedEventArgs))
 
-            Dim tempEventArgs As LocalSymbol = F.SynthesizedLocal(F.WellKnownType(WellKnownType.System_ComponentModel_PropertyChangedEventArgs))
-
-            Dim block = F.Block(ImmutableArray.Create(Of LocalSymbol)(tempEventArgs),
-                    F.Assignment(F.Local(tempEventArgs, True), eArgsAccess))
+            'Dim block = F.Block(ImmutableArray.Create(Of LocalSymbol)(tempEventArgs),
+            '        raiseEventStatement)
             block = block.MakeCompilerGenerated
             Return block
 

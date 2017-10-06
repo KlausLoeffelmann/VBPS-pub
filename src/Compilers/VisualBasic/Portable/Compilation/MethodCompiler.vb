@@ -794,7 +794,6 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
                     _diagnostics.AddRange(diagnosticsThisMethod)
                     diagnosticsThisMethod.Free()
                 Else
-
                     Dim lazyVariableSlotAllocator As VariableSlotAllocator = Nothing
                     Dim statemachineTypeOpt As StateMachineTypeSymbol = Nothing
 

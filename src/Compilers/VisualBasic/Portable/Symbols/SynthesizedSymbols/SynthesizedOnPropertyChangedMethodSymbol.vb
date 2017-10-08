@@ -47,29 +47,84 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Symbols
             Dim eArgsAccess = New BoundParameter(Syntax, Me.Parameters(0),
                                                  compilationState.Compilation.GetWellKnownType(WellKnownType.System_ComponentModel_PropertyChangedEventArgs)).MakeRValue
 
+            Dim temp2 As LocalSymbol = New SynthesizedLocal(Me, compilationState.Compilation.GetSpecialType(SpecialType.System_Int32), SynthesizedLocalKind.LoweringTemp)
+            Dim tempAccess2 As BoundLocal = New BoundLocal(Syntax, temp2, temp2.Type).MakeCompilerGenerated
+            Dim tempAccess2AsObject = New BoundLocal(Syntax, temp2, Me.ContainingAssembly.GetSpecialType(SpecialType.System_Object)).MakeCompilerGenerated
+            Dim cv = ConstantValue.Create(5)
+            Dim tempInit2 = New BoundExpressionStatement(Syntax,
+                               New BoundAssignmentOperator(Syntax, tempAccess2,
+                                                           New BoundLiteral(Syntax, cv, compilationState.Compilation.GetSpecialType(SpecialType.System_Int32)),
+                                                           True)).MakeCompilerGenerated
+
             Dim eventInfoCall = New BoundCall(Syntax,
                                       invokeMethod,
                                       Nothing,
                                       receiver,
-                                      ImmutableArray.Create(Of BoundExpression)(meReferenceAsObject, eArgsAccess),
+                                      ImmutableArray.Create(Of BoundExpression)(tempAccess2AsObject.MakeRValue, eArgsAccess),
                                       Nothing,
                                       invokeMethod.ReturnType,
                                       suppressObjectClone:=True).MakeCompilerGenerated
 
-            Dim raiseEventStatement = New BoundRaiseEventStatement(Syntax, propertyChangedEvent, eventInfoCall)
-            Dim block As BoundBlock = New BoundBlock(Syntax,
-                                       Nothing,
-                                       ImmutableArray(Of LocalSymbol).Empty,
-                                       ImmutableArray.Create(Of BoundStatement)(raiseEventStatement))
 
-            'Dim F = New SyntheticBoundNodeFactory(Me, Me, Syntax, compilationState, diagnostics)
+            'Dim raiseEventStatement = New BoundRaiseEventStatement(Syntax, propertyChangedEvent, eventInfoCall)
+            'Dim block As BoundBlock = New BoundBlock(Syntax,
+            '                           Nothing,
+            '                           ImmutableArray(Of LocalSymbol).Empty,
+            '                           ImmutableArray.Create(Of BoundStatement)(raiseEventStatement))
+            Try
+                Dim temp As LocalSymbol = New SynthesizedLocal(Me, receiver.Type, SynthesizedLocalKind.LoweringTemp)
+                Dim tempAccess As BoundLocal = New BoundLocal(Syntax, temp, temp.Type).MakeCompilerGenerated
 
-            'Dim tempEventArgs As LocalSymbol = F.SynthesizedLocal(F.WellKnownType(WellKnownType.System_ComponentModel_PropertyChangedEventArgs))
+                Dim tempInit = New BoundExpressionStatement(Syntax,
+                               New BoundAssignmentOperator(Syntax, tempAccess, receiver, True, receiver.Type)).MakeCompilerGenerated
 
-            'Dim block = F.Block(ImmutableArray.Create(Of LocalSymbol)(tempEventArgs),
-            '        raiseEventStatement)
-            block = block.MakeCompilerGenerated
-            Return block
+
+                ' replace receiver with temp.
+                Dim raiseCallExpression = eventInfoCall.Update(eventInfoCall.Method,
+                                                        eventInfoCall.MethodGroupOpt,
+                                                        tempAccess,
+                                                        eventInfoCall.Arguments,
+                                                        eventInfoCall.ConstantValueOpt,
+                                                        isLValue:=eventInfoCall.IsLValue,
+                                                        suppressObjectClone:=eventInfoCall.SuppressObjectClone,
+                                                        type:=eventInfoCall.Type)
+
+                Dim invokeStatement = New BoundExpressionStatement(Syntax, raiseCallExpression)
+
+                Dim condition = New BoundBinaryOperator(Syntax,
+                                                        BinaryOperatorKind.Is,
+                                                        tempAccess.MakeRValue(),
+                                                        New BoundLiteral(Syntax, ConstantValue.Nothing,
+                                                                         compilationState.Compilation.GetSpecialType(SpecialType.System_Object)),
+                                                        False,
+                                                        compilationState.Compilation.GetSpecialType(SpecialType.System_Boolean)).MakeCompilerGenerated
+
+                Dim skipEventRaise As New GeneratedLabelSymbol("skipEventRaise")
+
+                Dim ifNullSkip = New BoundConditionalGoto(Syntax, condition, True, skipEventRaise).MakeCompilerGenerated
+
+                'Dim block = New BoundBlock(Syntax,
+                '                        Nothing,
+                '                        ImmutableArray.Create(temp),
+                '                        ImmutableArray.Create(Of BoundStatement)(
+                '                            tempInit,
+                '                            ifNullSkip,
+                '                            invokeStatement,
+                '                            New BoundLabelStatement(Syntax, skipEventRaise)))
+
+                Dim block = New BoundBlock(Syntax,
+                                        Nothing,
+                                        ImmutableArray.Create(temp, temp2),
+                                        ImmutableArray.Create(Of BoundStatement)(
+                                            tempInit2,
+                                            invokeStatement,
+                                            New BoundLabelStatement(Syntax, skipEventRaise)))
+
+                block = block.MakeCompilerGenerated
+                Return block
+            Catch ex As Exception
+                Return Nothing
+            End Try
 
         End Function
 
@@ -111,7 +166,7 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Symbols
 
         Public Overrides ReadOnly Property DeclaredAccessibility As Accessibility
             Get
-                Return Accessibility.ProtectedAndInternal
+                Return Accessibility.Protected
             End Get
         End Property
 

@@ -564,6 +564,9 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
                                                         scriptInitializer,
                                                         _diagnostics))
 
+                'Create synthesized OnPropertyChanged on demand.
+                CompileSynthesizedOnPropertyChangedMethodOnDemand(containingType, compilationState)
+
                 ' TODO: any flow analysis for initializers?
 
                 ' const fields of type date or decimal require a shared constructor. We decided that this constructor
@@ -738,9 +741,6 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
                 Next
             End If
 
-            'Create synthesized OnPropertyChanged on demand.
-            CompileSynthesizedOnPropertyChangedMethodOnDemand(containingType, compilationState)
-
             ' Add synthetic methods created for this type in above calls to CompileMethod
             If _moduleBeingBuiltOpt IsNot Nothing Then
                 CompileSynthesizedMethods(compilationState)
@@ -802,48 +802,60 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
                     Dim delegateRelaxationIdDispenser = 0
                     Dim dynamicAnalysisSpans As ImmutableArray(Of SourceSpan) = ImmutableArray(Of SourceSpan).Empty
 
-                    Dim rewrittenBody = Rewriter.LowerBodyOrInitializer(
-                            onPropertyChangedMethod,
-                            methodOrdinal:=DebugId.UndefinedOrdinal,
-                            body:=boundBody,
-                            previousSubmissionFields:=Nothing,
-                            compilationState:=compilationState,
-                            instrumentForDynamicAnalysis:=False,
-                            dynamicAnalysisSpans:=dynamicAnalysisSpans,
-                            debugDocumentProvider:=_debugDocumentProvider,
-                            diagnostics:=diagnosticsThisMethod,
-                            lazyVariableSlotAllocator:=lazyVariableSlotAllocator,
-                            lambdaDebugInfoBuilder:=lambdaDebugInfoBuilder,
-                            closureDebugInfoBuilder:=closureDebugInfoBuilder,
-                            delegateRelaxationIdDispenser:=delegateRelaxationIdDispenser,
-                            stateMachineTypeOpt:=statemachineTypeOpt,
-                            allowOmissionOfConditionalCalls:=_moduleBeingBuiltOpt.AllowOmissionOfConditionalCalls,
-                            isBodySynthesized:=True)
+                    'LowerAndEmitMethod(onPropertyChangedMethod,
+                    '               DebugId.UndefinedOrdinal,
+                    '               boundBody,
+                    '               Nothing,
+                    '               compilationState,
+                    '               diagnosticsThisMethod,
+                    '               Nothing,
+                    '               Nothing,
+                    '               Nothing,
+                    '               delegateRelaxationIdDispenser)
 
-                    Dim emittedBody = GenerateMethodBody(_moduleBeingBuiltOpt,
-                                                         onPropertyChangedMethod,
-                                                         methodOrdinal:=DebugId.UndefinedOrdinal,
-                                                         block:=rewrittenBody,
-                                                         lambdaDebugInfo:=ImmutableArray(Of LambdaDebugInfo).Empty,
-                                                         closureDebugInfo:=ImmutableArray(Of ClosureDebugInfo).Empty,
-                                                         stateMachineTypeOpt:=Nothing,
-                                                         variableSlotAllocatorOpt:=Nothing,
-                                                         debugDocumentProvider:=If(_emitTestCoverageData, _debugDocumentProvider, Nothing),
-                                                         diagnostics:=diagnosticsThisMethod,
-                                                         emittingPdb:=False,
-                                                         emitTestCoverageData:=_emitTestCoverageData,
-                                                         dynamicAnalysisSpans:=ImmutableArray(Of SourceSpan).Empty)
+                    'Dim rewrittenBody = Rewriter.LowerBodyOrInitializer(
+                    '        onPropertyChangedMethod,
+                    '        methodOrdinal:=DebugId.UndefinedOrdinal,
+                    '        body:=boundBody,
+                    '        previousSubmissionFields:=Nothing,
+                    '        compilationState:=compilationState,
+                    '        instrumentForDynamicAnalysis:=False,
+                    '        dynamicAnalysisSpans:=dynamicAnalysisSpans,
+                    '        debugDocumentProvider:=_debugDocumentProvider,
+                    '        diagnostics:=diagnosticsThisMethod,
+                    '        lazyVariableSlotAllocator:=lazyVariableSlotAllocator,
+                    '        lambdaDebugInfoBuilder:=lambdaDebugInfoBuilder,
+                    '        closureDebugInfoBuilder:=closureDebugInfoBuilder,
+                    '        delegateRelaxationIdDispenser:=delegateRelaxationIdDispenser,
+                    '        stateMachineTypeOpt:=statemachineTypeOpt,
+                    '        allowOmissionOfConditionalCalls:=False,
+                    '        isBodySynthesized:=True)
+
+
+                    'Dim emittedBody = GenerateMethodBody(_moduleBeingBuiltOpt,
+                    '                                     onPropertyChangedMethod,
+                    '                                     methodOrdinal:=DebugId.UndefinedOrdinal,
+                    '                                     block:=boundBody,
+                    '                                     lambdaDebugInfo:=ImmutableArray(Of LambdaDebugInfo).Empty,
+                    '                                     closureDebugInfo:=ImmutableArray(Of ClosureDebugInfo).Empty,
+                    '                                     stateMachineTypeOpt:=Nothing,
+                    '                                     variableSlotAllocatorOpt:=Nothing,
+                    '                                     debugDocumentProvider:=If(_emitTestCoverageData, _debugDocumentProvider, Nothing),
+                    '                                     diagnostics:=diagnosticsThisMethod,
+                    '                                     emittingPdb:=False,
+                    '                                     emitTestCoverageData:=_emitTestCoverageData,
+                    '                                     dynamicAnalysisSpans:=ImmutableArray(Of SourceSpan).Empty)
 
                     _diagnostics.AddRange(diagnosticsThisMethod)
                     diagnosticsThisMethod.Free()
 
-                    ' error while generating IL
-                    If emittedBody Is Nothing Then
-                        Return
-                    End If
-
-                    _moduleBeingBuiltOpt.SetMethodBody(onPropertyChangedMethod, emittedBody)
-                    _moduleBeingBuiltOpt.AddSynthesizedDefinition(container, DirectCast(onPropertyChangedMethod, Microsoft.Cci.IMethodDefinition))
+                    '' error while generating IL
+                    'If emittedBody Is Nothing Then
+                    '    Return
+                    'End If
+                    compilationState.AddMethodWrapper(onPropertyChangedMethod, onPropertyChangedMethod, boundBody)
+                    _moduleBeingBuiltOpt.AddSynthesizedDefinition(container,
+                                                                  DirectCast(onPropertyChangedMethod, Microsoft.Cci.IMethodDefinition))
                 End If
             End If
         End Sub

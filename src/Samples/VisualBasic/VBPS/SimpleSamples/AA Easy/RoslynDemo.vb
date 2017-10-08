@@ -22,12 +22,13 @@ Module Program
         Dim intChar=aChar as Integer
         Console.WriteLine($"Char Value:{intChar}")
 
-        Dim testObject as Object = New Foo
-        Dim testFoo = testObject as Foo
-        Dim testBar as Bar = testObject as Bar
+        Dim testFoo As New Foo
+        Dim testBar as New Bar
 
         Console.WriteLine($"testFoo has instance:{(testFoo isnot Nothing)}")
         Console.WriteLine($"testBar has instance:{(testBar isnot Nothing)}")
+
+        testBar.FooProp = "Klaus"
 
         KickOfAsync
         Console.ReadLine
@@ -68,6 +69,23 @@ Public Class Foo
     Public Event PropertyChanged As PropertyChangedEventHandler Implements INotifyPropertyChanged.PropertyChanged
 
     <UserInterface(use:=True)>
+    Public Property FooProp As String
+End Class
+
+Public Class ABaseClass
+    Implements INotifyPropertyChanged
+
+    Public Event PropertyChanged As PropertyChangedEventHandler Implements INotifyPropertyChanged.PropertyChanged
+
+    Protected Overridable Sub OnPropertyChanged(e as PropertyChangedEventArgs)
+        RaiseEvent PropertyChanged(me, e)
+    End Sub
+End Class
+
+<UserInterface>
+Public Class BarWithPropertyChanged
+    Inherits ABaseClass
+
     Public Property FooProp As String
 End Class
 

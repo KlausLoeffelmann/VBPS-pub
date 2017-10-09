@@ -766,6 +766,7 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
             End If
 
             Dim siteDiagnostics As New HashSet(Of DiagnosticInfo)
+
             Dim isImplementingINotifyPropertyChanged = compilationState.Compilation.GetWellKnownType(
                 WellKnownType.System_ComponentModel_INotifyPropertyChanged).IsBaseTypeOrInterfaceOf(container, siteDiagnostics)
 
@@ -773,19 +774,18 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
                 Return
             End If
 
-            Dim needOnPropertyChangedMethod = False
+            Dim needsOnPropertyChangedMethod = False
 
             If userInterfaceAttribute IsNot Nothing Then
                 If userInterfaceAttribute.NamedArguments.Count = 0 Then
-                    needOnPropertyChangedMethod = True
+                    needsOnPropertyChangedMethod = True
                 Else
                     Debug.Assert(userInterfaceAttribute.NamedArguments(0).Key = "Use")
-                    needOnPropertyChangedMethod = CBool(userInterfaceAttribute.NamedArguments(0).Value.Value)
+                    needsOnPropertyChangedMethod = CBool(userInterfaceAttribute.NamedArguments(0).Value.Value)
                 End If
             End If
 
-            If needOnPropertyChangedMethod Then
-
+            If needsOnPropertyChangedMethod Then
                 'Well, wo ONLY need the method, if it is not there already!
                 Dim existing = TryCast(container.GetMembers.Where(Function(eventItem) eventItem.Name.ToUpper = "ONPROPERTYCHANGED").FirstOrDefault, MethodSymbol)
                 If existing IsNot Nothing Then
@@ -795,7 +795,26 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
                         Return
                     End If
                 Else
-                    'TODO 00KLAUS: We need to check, if the base class implements the method!
+                    'Let's check the base classes:
+                    'TODO: Need Unit Test!!
+                    Dim startType = container.BaseTypeNoUseSiteDiagnostics()
+                    If startType IsNot Nothing Then
+                        Dim symbol = startType.VisitType(Function(t As TypeSymbol, methodName As String)
+                                                             If TryCast(t.GetMembers.Where(
+                                                        Function(eventItem) eventItem.Name.ToUpper = methodName.ToUpper).FirstOrDefault, MethodSymbol) IsNot Nothing Then
+                                                                 Return True
+                                                             Else
+                                                                 Return False
+                                                             End If
+                                                         End Function, "OnPropertyChanged")
+                        If symbol IsNot Nothing Then
+                            Return
+                        Else
+                            'Report diagnostic, since we cannot raise the base class event.
+                            Dim location = userInterfaceAttribute.AttributeClass.Locations(0)
+                            Binder.ReportDiagnostic(_diagnostics, location, ERRID.WRN_EventDelegateTypeNotCLSCompliant2)
+                        End If
+                    End If
                 End If
 
                 Dim onPropertyChangedMethod = New SynthesizedOnPropertyChangedMethodSymbol(syntax, container, True)

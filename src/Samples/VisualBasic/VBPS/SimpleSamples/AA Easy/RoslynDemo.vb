@@ -77,9 +77,6 @@ Public Class ABaseClass
 
     Public Event PropertyChanged As PropertyChangedEventHandler Implements INotifyPropertyChanged.PropertyChanged
 
-    Protected Overridable Sub OnPropertyChanged(e as PropertyChangedEventArgs)
-        RaiseEvent PropertyChanged(me, e)
-    End Sub
 End Class
 
 <UserInterface>

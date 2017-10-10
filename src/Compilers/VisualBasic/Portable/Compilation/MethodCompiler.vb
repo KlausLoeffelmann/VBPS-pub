@@ -564,9 +564,6 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
                                                         scriptInitializer,
                                                         _diagnostics))
 
-                'Create synthesized OnPropertyChanged on demand.
-                CompileSynthesizedOnPropertyChangedMethodOnDemand(containingType, compilationState)
-
                 ' TODO: any flow analysis for initializers?
 
                 ' const fields of type date or decimal require a shared constructor. We decided that this constructor
@@ -598,7 +595,32 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
                         _moduleBeingBuiltOpt.AddSynthesizedDefinition(sourceTypeSymbol, sharedDefaultConstructor)
                     End If
                 End If
+
+                Dim onPropertyChanged = sourceTypeSymbol.CreateOnPropertyChangedIfRequired(sourceTypeBinder, _diagnostics)
+
+                If onPropertyChanged IsNot Nothing Then
+
+                    Dim onPropertyChangedWithEventPropertyIdDispenser = 0
+                    Dim onPropertyChangedDelegateRelaxationIdDispenser = 0
+
+                    CompileMethod(onPropertyChanged,
+                                  -1,
+                                  onPropertyChangedWithEventPropertyIdDispenser,
+                                  onPropertyChangedDelegateRelaxationIdDispenser,
+                                  filter,
+                                  compilationState,
+                                  processedStaticInitializers,
+                                  sourceTypeBinder,
+                                  synthesizedSubmissionFields)
+
+                    If _moduleBeingBuiltOpt IsNot Nothing Then
+                        _moduleBeingBuiltOpt.AddSynthesizedDefinition(sourceTypeSymbol, sharedDefaultConstructor)
+                    End If
+                End If
             End If
+
+            'Obsolote? Create synthesized OnPropertyChanged on demand.
+            'CompileSynthesizedOnPropertyChangedMethodOnDemand(containingType, compilationState)
 
             ' Constructor --> Constructor calls to be used in cycles detection
             Dim constructorCallMap As Dictionary(Of MethodSymbol, MethodSymbol) = Nothing
@@ -749,11 +771,15 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
             compilationState.Free()
         End Sub
 
+        'Maybe obselete.
         Private Sub CompileSynthesizedOnPropertyChangedMethodOnDemand(container As NamedTypeSymbol,
                                                                       compilationState As TypeCompilationState)
 
+            Dim syntaxRef = container.DeclaringSyntaxReferences.FirstOrDefault() ' use arbitrary part
+            If syntaxRef Is Nothing Then
+                Return
+            End If
 
-            Dim syntaxRef = container.DeclaringSyntaxReferences.First() ' use arbitrary part
             Dim syntax = syntaxRef.GetVisualBasicSyntax
 
             'Might also be defined on Class level.
@@ -833,6 +859,12 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
                     Dim closureDebugInfoBuilder = ArrayBuilder(Of ClosureDebugInfo).GetInstance()
                     Dim delegateRelaxationIdDispenser = 0
                     Dim dynamicAnalysisSpans As ImmutableArray(Of SourceSpan) = ImmutableArray(Of SourceSpan).Empty
+
+                    If _moduleBeingBuiltOpt Is Nothing Then
+                        _diagnostics.AddRange(diagnosticsThisMethod)
+                        diagnosticsThisMethod.Free()
+                        Return
+                    End If
 
                     Dim emittedBody = GenerateMethodBody(_moduleBeingBuiltOpt,
                                                          onPropertyChangedMethod,

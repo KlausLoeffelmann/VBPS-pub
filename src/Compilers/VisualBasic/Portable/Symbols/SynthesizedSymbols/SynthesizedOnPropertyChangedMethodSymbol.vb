@@ -34,8 +34,10 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Symbols
             Dim meReference = New BoundMeReference(Syntax, Me.ContainingType)
             Dim meReferenceAsObject = New BoundMeReference(Syntax, Me.ContainingAssembly.GetSpecialType(SpecialType.System_Object))
 
-            Dim propertyChangedEvent = Me.ContainingType.GetEventsToEmit().
+            Dim propertyChangedEvent = ContainingType.GetEventsToEmit().
                                        Where(Function(eventItem) eventItem.Name = "PropertyChanged").FirstOrDefault
+
+            Debug.Assert(propertyChangedEvent IsNot Nothing)
 
             Dim propertyChangedEventAccess = New BoundEventAccess(Syntax, meReference, propertyChangedEvent, propertyChangedEvent.Type)
             Dim invokeMethod = DirectCast(propertyChangedEvent.Type.GetMembers.Where(Function(methodItem) methodItem.Name = "Invoke").FirstOrDefault, MethodSymbol)

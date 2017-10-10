@@ -32,14 +32,14 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Symbols
                 '1st Requirement: Containing Type implements INotifyPropertyChanged
                 Dim iNotifyInterface = containingType.InterfacesNoUseSiteDiagnostics().
                                             Where(Function(interfaceItem) interfaceItem.Name = "INotifyPropertyChanged" AndAlso
-                                                                          interfaceItem.ContainingNamespace.Name = "ComponentModel").FirstOrDefault()
+                                                                          interfaceItem?.ContainingNamespace?.Name = "ComponentModel").FirstOrDefault()
 
                 'TODO: 2nd Requirement: Test, if the Event definition is present.
                 If iNotifyInterface IsNot Nothing Then
 
                     Dim propertyAttributes = propertySymbol.GetAttributes().
-                                        Where(Function(attributeItem) attributeItem.AttributeClass.Name = "UserInterfaceAttribute" AndAlso
-                                                                      attributeItem.AttributeClass.ContainingNamespace.Name = "CompilerServices").FirstOrDefault()
+                                        Where(Function(attributeItem) attributeItem?.AttributeClass?.Name = "UserInterfaceAttribute" AndAlso
+                                                                      attributeItem?.AttributeClass?.ContainingNamespace?.Name = "CompilerServices").FirstOrDefault()
                     If propertyAttributes IsNot Nothing Then
                         If propertyAttributes.NamedArguments.Count = 0 Then
                             isUserInterfaceAttributeAssigned = True

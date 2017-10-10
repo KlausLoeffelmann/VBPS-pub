@@ -3222,6 +3222,84 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Symbols
             Return Nothing
         End Function
 
+        'TODO Klaus: Fill with content.
+        Friend Function CreateOnPropertyChangedIfRequired(binder As Binder, diagnostic As DiagnosticBag) As MethodSymbol
+
+            Dim compilation = Me.DeclaringCompilation
+
+            'Might also be defined on Class level.
+            Dim userInterfaceAttribute = Me.GetAttributes().
+                                            Where(Function(attributeItem) attributeItem.AttributeClass.Name = "UserInterfaceAttribute" AndAlso
+                                                                          attributeItem.AttributeClass.ContainingNamespace.Name = "CompilerServices").FirstOrDefault()
+
+            If userInterfaceAttribute Is Nothing Then
+                Return Nothing
+            End If
+
+            Dim siteDiagnostics As New HashSet(Of DiagnosticInfo)
+
+            Dim isImplementingINotifyPropertyChanged = compilation.GetWellKnownType(
+                WellKnownType.System_ComponentModel_INotifyPropertyChanged).IsBaseTypeOrInterfaceOf(Me, siteDiagnostics)
+
+            If Not isImplementingINotifyPropertyChanged Then
+                Return Nothing
+            End If
+
+            Dim needsOnPropertyChangedMethod = False
+
+            If userInterfaceAttribute IsNot Nothing Then
+                If userInterfaceAttribute.NamedArguments.Count = 0 Then
+                    needsOnPropertyChangedMethod = True
+                Else
+                    Debug.Assert(userInterfaceAttribute.NamedArguments(0).Key = "Use")
+                    needsOnPropertyChangedMethod = CBool(userInterfaceAttribute.NamedArguments(0).Value.Value)
+                End If
+            End If
+
+            If needsOnPropertyChangedMethod Then
+                'Well, wo ONLY need the method, if it is not there already!
+                Dim existing = TryCast(Me.GetMembers.Where(Function(eventItem) eventItem.Name.ToUpper = "ONPROPERTYCHANGED").FirstOrDefault, MethodSymbol)
+                If existing IsNot Nothing Then
+                    If existing.ParameterCount = 1 AndAlso existing.Parameters(0).Type =
+                        compilation.GetWellKnownType(WellKnownType.System_ComponentModel_PropertyChangedEventArgs) Then
+                        'Name, case-insensitve, is the same, also the signature - we do not need the method!
+                        Return Nothing
+                    End If
+                Else
+                    'Let's check the base classes:
+                    'TODO: Need Unit Test!!
+                    Dim startType = Me.BaseTypeNoUseSiteDiagnostics()
+                    If startType IsNot Nothing Then
+                        Dim symbol = startType.VisitType(Function(t As TypeSymbol, methodName As String)
+                                                             If TryCast(t.GetMembers.Where(
+                                                        Function(eventItem) eventItem.Name.ToUpper = methodName.ToUpper).FirstOrDefault, MethodSymbol) IsNot Nothing Then
+                                                                 Return True
+                                                             Else
+                                                                 Return False
+                                                             End If
+                                                         End Function, "OnPropertyChanged")
+                        If symbol IsNot Nothing Then
+                            Return Nothing
+                        Else
+                            'Report diagnostic, since we cannot raise the base class event.
+                            Dim location = userInterfaceAttribute.AttributeClass.Locations(0)
+                            Binder.ReportDiagnostic(diagnostic, location, ERRID.WRN_EventDelegateTypeNotCLSCompliant2)
+                        End If
+                    End If
+                End If
+
+                Dim syntaxRef = SyntaxReferences.First()
+
+                Dim onPropertyChangedMethod = New SynthesizedOnPropertyChangedMethodSymbol(syntaxRef.GetVisualBasicSyntax, Me, True)
+
+                Dim diagnosticsThisMethod = DiagnosticBag.GetInstance()
+                Return onPropertyChangedMethod
+            End If
+
+            Return Nothing
+
+        End Function
+
         Friend Overrides Iterator Function GetFieldsToEmit() As IEnumerable(Of FieldSymbol)
             For Each member In GetMembersForCci()
                 If member.Kind = SymbolKind.Field Then

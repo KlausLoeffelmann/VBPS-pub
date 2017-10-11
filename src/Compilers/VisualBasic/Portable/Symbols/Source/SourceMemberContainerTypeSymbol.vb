@@ -3222,7 +3222,6 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Symbols
             Return Nothing
         End Function
 
-        'TODO Klaus: Fill with content.
         Friend Function CreateOnPropertyChangedIfRequired(binder As Binder, diagnostic As DiagnosticBag) As MethodSymbol
 
             Dim compilation = Me.DeclaringCompilation
@@ -3282,8 +3281,9 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Symbols
                             Return Nothing
                         Else
                             'Report diagnostic, since we cannot raise the base class event.
-                            Dim location = userInterfaceAttribute.AttributeClass.Locations(0)
+                            Dim location = userInterfaceAttribute.ApplicationSyntaxReference.GetLocation()
                             Binder.ReportDiagnostic(diagnostic, location, ERRID.WRN_EventDelegateTypeNotCLSCompliant2)
+                            Return Nothing
                         End If
                     End If
                 End If

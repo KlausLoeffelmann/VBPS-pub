@@ -360,7 +360,7 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Symbols
                             End If
 
                             If onPropertyChangedMethod Is Nothing Then
-                                onPropertyChangedMethod = New SynthesizedOnPropertyChangedMethodSymbol(syntax, accessor.ContainingType, True)
+                                onPropertyChangedMethod = New SynthesizedOnPropertyChangedMethodSymbol(syntax, accessor.ContainingType)
                             End If
                         End If
 

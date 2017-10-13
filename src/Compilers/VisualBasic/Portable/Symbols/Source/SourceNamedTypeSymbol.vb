@@ -2580,6 +2580,69 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Symbols
             End If
         End Sub
 
+        ''' <summary>
+        ''' Check, if we need to add OnPropertyChanged(eArgs as PropertyChangedEventArgs)
+        ''' </summary>
+        ''' <remarks>
+        ''' This method needs to bee added under the following conditions:
+        ''' 1. The Type implements INotifyPropertyChanged directly.
+        ''' 2. The Type is tagged with the UserInterface Attribute.
+        ''' 3. The Method does not exist.
+        ''' </remarks>
+        ''' <param name="membersBuilder"></param>
+        Protected Overrides Sub AddCustomSyntheticMethod(membersBuilder As MembersAndInitializersBuilder, diagnostics As DiagnosticBag)
+
+            Dim compilation = Me.DeclaringCompilation
+
+            Dim isImplementingINotifyPropertyChanged = False
+
+            Dim iNotifyPropertyChanged = Me.InterfacesNoUseSiteDiagnostics.Where(
+                                                        Function(IItem) IItem.Name = "INotifyPropertyChanged").FirstOrDefault
+            If iNotifyPropertyChanged IsNot Nothing Then
+                isImplementingINotifyPropertyChanged = True
+            End If
+
+            If Not isImplementingINotifyPropertyChanged Then
+                Return
+            End If
+
+            'Might also be defined on Class level.
+            Dim userInterfaceAttribute = Me.GetAttributesBag().Attributes.
+                                            Where(Function(attributeItem) attributeItem.AttributeClass.Name = "UserInterfaceAttribute" AndAlso
+                                                                          attributeItem.AttributeClass.ContainingNamespace.Name = "CompilerServices").FirstOrDefault()
+
+            If userInterfaceAttribute Is Nothing Then
+                Return
+            End If
+
+            Dim siteDiagnostics As New HashSet(Of DiagnosticInfo)
+
+
+            Dim needsOnPropertyChangedMethod = False
+
+            If userInterfaceAttribute IsNot Nothing Then
+                If userInterfaceAttribute.NamedArguments.Count = 0 Then
+                    needsOnPropertyChangedMethod = True
+                Else
+                    Debug.Assert(userInterfaceAttribute.NamedArguments(0).Key = "Use")
+                    needsOnPropertyChangedMethod = CBool(userInterfaceAttribute.NamedArguments(0).Value.Value)
+                End If
+            End If
+
+            If needsOnPropertyChangedMethod Then
+                'Well, wo ONLY need the method, if it is not there already!
+                Dim existing = Me.MemberNames.Where(Function(eventItem) eventItem.ToUpper = "ONPROPERTYCHANGED").FirstOrDefault
+                If Not String.IsNullOrEmpty(existing) Then
+                    Dim temp = GetTypeMembers()
+                End If
+
+                Dim syntaxRef = SyntaxReferences.First() ' use arbitrary part
+
+                Dim tmpBinder As Binder = BinderBuilder.CreateBinderForType(ContainingSourceModule, syntaxRef.SyntaxTree, Me)
+                Dim onPropertyChangedMethod = New SynthesizedOnPropertyChangedMethodSymbol(syntaxRef.GetVisualBasicSyntax, Me)
+                AddMember(onPropertyChangedMethod, tmpBinder, membersBuilder, omitDiagnostics:=True)
+            End If
+        End Sub
     End Class
 End Namespace
 

@@ -13,9 +13,9 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Symbols
         Private ReadOnly _isOverrides As Boolean
         Private const METHOD_NAME As String = "OnPropertyChanged"
 
-        Public Sub New(node As VisualBasicSyntaxNode, container As NamedTypeSymbol, isOverrides As Boolean)
+        Public Sub New(node As VisualBasicSyntaxNode, container As NamedTypeSymbol)
             MyBase.New(node, container, METHOD_NAME)
-            _isOverrides = isOverrides
+            _isOverrides = False
 
             Dim decCompilation = DeclaringCompilation
 
@@ -34,8 +34,20 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Symbols
             Dim meReference = New BoundMeReference(Syntax, Me.ContainingType)
             Dim meReferenceAsObject = New BoundMeReference(Syntax, Me.ContainingAssembly.GetSpecialType(SpecialType.System_Object))
 
+            'We need a well know type at this point.
             Dim propertyChangedEvent = ContainingType.GetEventsToEmit().
                                        Where(Function(eventItem) eventItem.Name = "PropertyChanged").FirstOrDefault
+
+            'TODO 00Klaus: Can we find a better way to do this when the event is not known, yet?
+            If propertyChangedEvent Is Nothing Then
+                'Let's just return an empty BoundBlock
+                Return New BoundBlock(Syntax,
+                                        Nothing,
+                                        ImmutableArray.Create(Of LocalSymbol),
+                                        ImmutableArray.Create(Of BoundStatement)(
+                                            New BoundReturnStatement(Syntax, Nothing, Nothing, Nothing)))
+
+            End If
 
             Debug.Assert(propertyChangedEvent IsNot Nothing)
 

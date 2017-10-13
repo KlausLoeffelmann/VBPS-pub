@@ -2516,6 +2516,9 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Symbols
             ' Add synthetic Main method, if needed.
             AddEntryPointIfNeeded(membersBuilder)
 
+            'Add other synthetic Methods, if needed.
+            AddCustomSyntheticMethod(membersBuilder, diagnostics)
+
             CheckMemberDiagnostics(membersBuilder, diagnostics)
 
             Dim membersAndInitializers = membersBuilder.ToReadOnlyAndFree()
@@ -2527,6 +2530,10 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Symbols
         End Function
 
         Protected Overridable Sub AddEntryPointIfNeeded(membersBuilder As MembersAndInitializersBuilder)
+        End Sub
+
+        'TODO: John, please check.
+        Protected Overridable Sub AddCustomSyntheticMethod(membersBuilder As MembersAndInitializersBuilder, diagnostics As DiagnosticBag)
         End Sub
 
         Protected MustOverride Sub AddDeclaredNonTypeMembers(membersBuilder As MembersAndInitializersBuilder, diagnostics As DiagnosticBag)
@@ -3290,7 +3297,7 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Symbols
 
                 Dim syntaxRef = SyntaxReferences.First()
 
-                Dim onPropertyChangedMethod = New SynthesizedOnPropertyChangedMethodSymbol(syntaxRef.GetVisualBasicSyntax, Me, True)
+                Dim onPropertyChangedMethod = New SynthesizedOnPropertyChangedMethodSymbol(syntaxRef.GetVisualBasicSyntax, Me)
 
                 Dim diagnosticsThisMethod = DiagnosticBag.GetInstance()
                 Return onPropertyChangedMethod

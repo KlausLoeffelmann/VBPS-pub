@@ -843,7 +843,7 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
                     End If
                 End If
 
-                Dim onPropertyChangedMethod = New SynthesizedOnPropertyChangedMethodSymbol(syntax, container, True)
+                Dim onPropertyChangedMethod = New SynthesizedOnPropertyChangedMethodSymbol(syntax, container)
 
                 Dim diagnosticsThisMethod = DiagnosticBag.GetInstance()
                 Dim boundBody = onPropertyChangedMethod.GetBoundMethodBody(compilationState, diagnosticsThisMethod)

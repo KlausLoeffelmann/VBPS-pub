@@ -6,11 +6,6 @@
             MyBase.New
         End Sub
 
-        Sub New(use As Boolean)
-            MyBase.New
-            Me.Use = use
-        End Sub
-
         Public Property Use As Boolean = True
 
     End Class

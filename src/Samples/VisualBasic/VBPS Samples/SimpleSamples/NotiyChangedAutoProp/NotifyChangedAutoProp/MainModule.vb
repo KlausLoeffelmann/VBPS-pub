@@ -28,7 +28,7 @@ Public Class OverPropertyWithOn
     <UserInterface>
     Public Property FooProp As String
 
-    Protected Overridable Sub OnNotifyPropertyChanged(eArgs As PropertyChangedEventArgs)
+    Protected Overridable Sub OnPropertyChanged(eArgs As PropertyChangedEventArgs)
         RaiseEvent PropertyChanged(Me, eArgs)
     End Sub
 
@@ -48,7 +48,7 @@ Public Class OverClass
     Public Property BarProp As String
 
     'Should ignore.
-    <UserInterface(False)>
+    <UserInterface(Use:=False)>
     Public Property FooProp As String
 
 End Class
@@ -75,7 +75,7 @@ Public Class BaseClassImplementsNotifyChangedProperly
 
     Public Event PropertyChanged As PropertyChangedEventHandler Implements INotifyPropertyChanged.PropertyChanged
 
-    Protected Overridable Sub OnNotifyPropertyChanged(eArgs As PropertyChangedEventArgs)
+    Protected Overridable Sub OnPropertyChanged(eArgs As PropertyChangedEventArgs)
         RaiseEvent PropertyChanged(Me, eArgs)
     End Sub
 End Class

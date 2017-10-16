@@ -4,7 +4,25 @@ Imports System.Runtime.CompilerServices
 Module MainModule
 
     Sub Main()
+        Dim overClassInstance As New OverClass
+        AddHandler overClassInstance.PropertyChanged,
+            Sub(s As Object, e As PropertyChangedEventArgs)
+                Console.WriteLine($"{s.GetType.ToString()} changed property {e.PropertyName}.")
+            End Sub
 
+        overClassInstance.BarProp = "Value1"
+        overClassInstance.FooProp = "Value2"
+        overClassInstance.ManualProp = "Value3"
+
+        Dim inheritedFromOverClassInstance As New InheritedFromOverClass
+        AddHandler inheritedFromOverClassInstance.PropertyChanged,
+            Sub(s As Object, e As PropertyChangedEventArgs)
+                Console.WriteLine($"{s.GetType.ToString()} changed property {e.PropertyName}.")
+            End Sub
+
+        inheritedFromOverClassInstance.FooPropInherited = "Value4"
+
+        Console.ReadLine()
     End Sub
 
 End Module
@@ -38,9 +56,7 @@ End Class
 Public Class OverClass
     Implements INotifyPropertyChanged
 
-    Sub Test()
-
-    End Sub
+    Private _manualProp As String
 
     Public Event PropertyChanged As PropertyChangedEventHandler Implements INotifyPropertyChanged.PropertyChanged
 
@@ -50,6 +66,18 @@ Public Class OverClass
     'Should ignore.
     <UserInterface(Use:=False)>
     Public Property FooProp As String
+
+    Public Property ManualProp As String
+        Get
+            Return _manualProp
+        End Get
+        Set(value As String)
+            If Not Object.Equals(value, _manualProp) Then
+                'This method is present, because we use the UserClassAttribute on Class level.
+                OnPropertyChanged(New PropertyChangedEventArgs(NameOf(ManualProp)))
+            End If
+        End Set
+    End Property
 
 End Class
 

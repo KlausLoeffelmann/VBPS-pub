@@ -1737,6 +1737,8 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
         ERR_InvalidSocialModifiers = 37302
         ERR_InvalidSocialInteratorModifiers = 37303
         ERR_MissingSocialIndependentAsyncModifiers = 37304
+        ERR_MissingINotifyPropertyChangedInterface = 37305
+        ERR_MissingOnPropertyChangedMethod = 37306
 
         '// WARNINGS BEGIN HERE
         WRN_UseOfObsoleteSymbol2 = 40000

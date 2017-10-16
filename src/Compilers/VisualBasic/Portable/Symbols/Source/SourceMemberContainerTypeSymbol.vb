@@ -3248,6 +3248,8 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Symbols
                 WellKnownType.System_ComponentModel_INotifyPropertyChanged).IsBaseTypeOrInterfaceOf(Me, siteDiagnostics)
 
             If Not isImplementingINotifyPropertyChanged Then
+                Dim location = userInterfaceAttribute.ApplicationSyntaxReference.GetLocation()
+                Binder.ReportDiagnostic(diagnostic, location, ERRID.ERR_MissingINotifyPropertyChangedInterface)
                 Return Nothing
             End If
 
@@ -3270,26 +3272,23 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Symbols
                         compilation.GetWellKnownType(WellKnownType.System_ComponentModel_PropertyChangedEventArgs) Then
                         'Name, case-insensitve, is the same, also the signature - we do not need the method!
                         Return Nothing
+                    Else
+                        Dim location = userInterfaceAttribute.ApplicationSyntaxReference.GetLocation()
+                        Binder.ReportDiagnostic(diagnostic, location, ERRID.ERR_MissingOnPropertyChangedMethod)
+                        Return Nothing
                     End If
                 Else
                     'Let's check the base classes:
                     'TODO: Need Unit Test!!
                     Dim startType = Me.BaseTypeNoUseSiteDiagnostics()
                     If startType IsNot Nothing Then
-                        Dim symbol = startType.VisitType(Function(t As TypeSymbol, methodName As String)
-                                                             If TryCast(t.GetMembers.Where(
-                                                        Function(eventItem) eventItem.Name.ToUpper = methodName.ToUpper).FirstOrDefault, MethodSymbol) IsNot Nothing Then
-                                                                 Return True
-                                                             Else
-                                                                 Return False
-                                                             End If
-                                                         End Function, "OnPropertyChanged")
-                        If symbol IsNot Nothing Then
+                        Dim members = Me.GetMembersFromTypeAndAllBaseTypes("OnPropertyChanged", compilation)
+                        If members.Count > 0 Then
                             Return Nothing
                         Else
                             'Report diagnostic, since we cannot raise the base class event.
                             Dim location = userInterfaceAttribute.ApplicationSyntaxReference.GetLocation()
-                            Binder.ReportDiagnostic(diagnostic, location, ERRID.WRN_EventDelegateTypeNotCLSCompliant2)
+                            Binder.ReportDiagnostic(diagnostic, location, ERRID.ERR_MissingOnPropertyChangedMethod)
                             Return Nothing
                         End If
                     End If

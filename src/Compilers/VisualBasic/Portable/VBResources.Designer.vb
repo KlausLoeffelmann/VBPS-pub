@@ -7162,6 +7162,15 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
         End Property
         
         '''<summary>
+        '''  Looks up a localized string similar to Unable to apply the UserInterfaceAttribute since this type needs to implement INotifyPropertyChanged..
+        '''</summary>
+        Friend ReadOnly Property ERR_MissingINotifyPropertyChangedInterface() As String
+            Get
+                Return ResourceManager.GetString("ERR_MissingINotifyPropertyChangedInterface", resourceCulture)
+            End Get
+        End Property
+        
+        '''<summary>
         '''  Looks up a localized string similar to &apos;Is&apos; expected..
         '''</summary>
         Friend ReadOnly Property ERR_MissingIsInTypeOf() As String
@@ -7194,6 +7203,15 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
         Friend ReadOnly Property ERR_MissingNext() As String
             Get
                 Return ResourceManager.GetString("ERR_MissingNext", resourceCulture)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized string similar to Unable to apply the UserInterfaceAttribute because neither this class nor its base types implement the OnPropertyChange method to raise the PropertyChangeEvent..
+        '''</summary>
+        Friend ReadOnly Property ERR_MissingOnPropertyChangedMethod() As String
+            Get
+                Return ResourceManager.GetString("ERR_MissingOnPropertyChangedMethod", resourceCulture)
             End Get
         End Property
         

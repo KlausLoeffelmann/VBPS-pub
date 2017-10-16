@@ -32,6 +32,7 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Symbols
             Dim containingType = accessor.ContainingType
 
             Dim userInterfaceScope = UserInterfaceUsageScope.None
+            Dim userInterfaceAttribute As VisualBasicAttributeData = Nothing
 
             If accessor.MethodKind = MethodKind.PropertySet Then
 
@@ -41,19 +42,18 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Symbols
                 Dim isImplementingINotifyPropertyChanged = compilationState.Compilation.GetWellKnownType(
                                         WellKnownType.System_ComponentModel_INotifyPropertyChanged).IsBaseTypeOrInterfaceOf(containingType, siteDiagnostics)
 
-                '2nd Requirement: Must have Attribute defined.
-                If isImplementingINotifyPropertyChanged Then
-
-                    Dim propertyAttributes = propertySymbol.GetAttributes().
+                userInterfaceAttribute = propertySymbol.GetAttributes().
                                         Where(Function(attributeItem) attributeItem?.AttributeClass?.Name = "UserInterfaceAttribute" AndAlso
                                                                       attributeItem?.AttributeClass?.ContainingNamespace?.Name = "CompilerServices").FirstOrDefault()
 
-                    If propertyAttributes IsNot Nothing Then
-                        If propertyAttributes.NamedArguments.Count = 0 Then
+                '2nd Requirement: Must have Attribute defined.
+                If isImplementingINotifyPropertyChanged Then
+                    If userInterfaceAttribute IsNot Nothing Then
+                        If userInterfaceAttribute.NamedArguments.Count = 0 Then
                             userInterfaceScope = UserInterfaceUsageScope.Property
                         Else
-                            Debug.Assert(propertyAttributes.NamedArguments(0).Key = "Use")
-                            userInterfaceScope = If(CBool(propertyAttributes.NamedArguments(0).Value.Value),
+                            Debug.Assert(userInterfaceAttribute.NamedArguments(0).Key = "Use")
+                            userInterfaceScope = If(CBool(userInterfaceAttribute.NamedArguments(0).Value.Value),
                                                                   UserInterfaceUsageScope.Property,
                                                                   UserInterfaceUsageScope.None)
                         End If
@@ -72,6 +72,12 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Symbols
                                                                   UserInterfaceUsageScope.None)
                             End If
                         End If
+                    End If
+                Else
+                    If userInterfaceAttribute IsNot Nothing Then
+                        'Not implementing interface, but UserInterfaceAttribute --> Diagnostics!
+                        Dim location = userInterfaceAttribute.ApplicationSyntaxReference.GetLocation()
+                        Binder.ReportDiagnostic(diagnostics, location, ERRID.ERR_MissingINotifyPropertyChangedInterface)
                     End If
                 End If
             End If
@@ -425,17 +431,23 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Symbols
                             Dim propertyChangedEvent = accessor.ContainingType.GetEventsToEmit().
                                                     Where(Function(eventItem) eventItem.Name = "PropertyChanged").FirstOrDefault
 
-                            Dim propertyChangedEventAccess = New BoundEventAccess(syntax, meReference, propertyChangedEvent, propertyChangedEvent.Type)
+                            If propertyChangedEvent Is Nothing Then
+                                'We need to report the dignostic that the event cannot be raised!
+                                Dim location = userInterfaceAttribute.ApplicationSyntaxReference.GetLocation()
+                                Binder.ReportDiagnostic(diagnostics, location, ERRID.ERR_MissingOnPropertyChangedMethod)
+                            Else
+                                Dim propertyChangedEventAccess = New BoundEventAccess(syntax, meReference, propertyChangedEvent, propertyChangedEvent.Type)
 
-                            Dim invokeMethod = DirectCast(propertyChangedEvent.Type.GetMembers.Where(Function(methodItem) methodItem.Name = "Invoke").FirstOrDefault, MethodSymbol)
 
-                            Dim receiver = New BoundFieldAccess(syntax,
+                                Dim invokeMethod = DirectCast(propertyChangedEvent.Type.GetMembers.Where(Function(methodItem) methodItem.Name = "Invoke").FirstOrDefault, MethodSymbol)
+
+                                Dim receiver = New BoundFieldAccess(syntax,
                                                 meReference,
                                                 propertyChangedEvent.AssociatedField,
                                                 False,
                                                 propertyChangedEvent.AssociatedField.Type).MakeCompilerGenerated
 
-                            Dim eventInfoCall = New BoundCall(syntax,
+                                Dim eventInfoCall = New BoundCall(syntax,
                                                           invokeMethod,
                                                           Nothing,
                                                           receiver,
@@ -444,10 +456,10 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Symbols
                                                           invokeMethod.ReturnType,
                                                           suppressObjectClone:=True).MakeCompilerGenerated
 
-                            Dim rEventStatement = New BoundRaiseEventStatement(syntax, propertyChangedEvent, eventInfoCall)
+                                Dim rEventStatement = New BoundRaiseEventStatement(syntax, propertyChangedEvent, eventInfoCall)
 
-                            consequenceStatementList.Add(rEventStatement)
-
+                                consequenceStatementList.Add(rEventStatement)
+                            End If
                         End If
                         Dim objectsEqualityTest = New BoundIfStatement(
                                              syntax,

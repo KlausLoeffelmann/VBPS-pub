@@ -5509,4 +5509,10 @@
   <data name="ERR_MissingSocialIndependentAsyncModifiers" xml:space="preserve">
     <value>Subs or Functions in Social classes must have the 'Social', 'Independent' or 'Async' modifier.</value>
   </data>
+  <data name="ERR_MissingINotifyPropertyChangedInterface" xml:space="preserve">
+    <value>Unable to apply the UserInterfaceAttribute since this type needs to implement INotifyPropertyChanged.</value>
+  </data>
+  <data name="ERR_MissingOnPropertyChangedMethod" xml:space="preserve">
+    <value>Unable to apply the UserInterfaceAttribute because neither this class nor its base types implement the OnPropertyChange method to raise the PropertyChangeEvent.</value>
+  </data>
 </root>

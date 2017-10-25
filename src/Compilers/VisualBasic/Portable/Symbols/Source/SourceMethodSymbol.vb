@@ -2322,7 +2322,6 @@ lReportErrorOnTwoTokens:
                             End If
                             Binder.DisallowTypeCharacter(GetNameToken(methodStatement), diagBag, ERRID.ERR_TypeCharOnSub)
 
-
                             'TODO John: Please check!
                             If Me.IsSocial Then
                                 Dim compilation = Me.DeclaringCompilation

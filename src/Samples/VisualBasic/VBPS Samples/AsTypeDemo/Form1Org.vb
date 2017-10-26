@@ -5,22 +5,22 @@
     Sub SimpleConversions()
 
         Dim aDouble = 42.42
-        Dim anInteger = CInt(aDouble)
+        Dim anInteger = aDouble As Integer
 
         Dim aSingle = 42.42R
-        Dim aShort = CShort(aSingle)
+        Dim aShort = aSingle As Short
 
         Dim aControl = New Button
-        Dim aButton = TryCast(aControl, Button)
+        Dim aButton = aControl As Button
 
         'Conversion from char value to char was only possible with ChrW!
         Dim firstName As String = ""
         Dim charValues = {65, 100, 114, 105, 97, 110, 97}
-        For Each cItem In charValues : firstName &= ChrW(cItem) : Next
+        For Each cItem In charValues : firstName &= cItem As Char : Next
 
         'Converting to nullable
         Dim iAsObject = "Klaus"
-        Dim iNullable = CType(iAsObject, Integer?)
+        Dim iNullable = iAsObject As Integer?
 
         'Boxing:
         Dim boxedInteger As Object = 42
@@ -29,7 +29,7 @@
         aShort = CShort(boxedInteger)
 
         'That's the way to do it:
-        aShort = CShort(CShort(boxedInteger))
+        aShort = boxedInteger As Integer As Short
 
     End Sub
 

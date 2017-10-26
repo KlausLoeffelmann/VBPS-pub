@@ -119,6 +119,7 @@
     <Compile Include="UserInterfaceAttribute.vb" />
     <Compile Include="UwpTask\FileIoTasks.vb" />
     <Compile Include="UwpTask\StorageFileTasks.vb" />
+    <Compile Include="ViewModel.vb" />
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="Package.appxmanifest">

@@ -1,4 +1,4 @@
-Imports System
+﻿Imports System
 Imports System.Threading.Tasks
 Imports System.ComponentModel
 Imports System.Runtime.CompilerServices
@@ -52,6 +52,7 @@ Module Program
         Task.Delay(1000)
     End Sub
 
+    <UserInterface>
     Public Social Function SocialFooAsync As Integer
         Task.Delay(2000)
         Return Get42Async
@@ -76,6 +77,10 @@ Public Class ABaseClass
     Implements INotifyPropertyChanged
 
     Public Event PropertyChanged As PropertyChangedEventHandler Implements INotifyPropertyChanged.PropertyChanged
+
+    Protected Overridable Sub OnPropertyChanged(eArgs As PropertyChangedEventArgs)
+        RaiseEvent PropertyChanged(Me, eArgs)
+    End Sub
 
 End Class
 

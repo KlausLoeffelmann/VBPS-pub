@@ -819,6 +819,12 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
 
             Dim candidate = bestResult.Candidate
             Dim methodOrProperty = candidate.UnderlyingSymbol
+
+            'Check for existance of UserInterface-Attribute.
+            Dim uiAttribute = methodOrProperty.GetAttributes.
+                Where(Function(item) item?.AttributeClass.Name = "UserInterfaceAttribute" AndAlso
+                                     item?.AttributeClass.ContainingNamespace.Name = "CompilerServices").FirstOrDefault
+
             Dim returnType = candidate.ReturnType
 
             If group.ResultKind = LookupResultKind.Inaccessible Then
@@ -936,8 +942,9 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
 
                 If Me.IsInSocialContext Then
 
-                    'TODO: K/J Make the Argument true, when we detect the correlating attribute.
-                    Dim configureAwaitArgument As BoundExpression = New BoundLiteral(node, ConstantValue.Create(False),
+                    'TODO: KL Examine the Parameter of uiAttribute, if exist! 
+                    Dim boolValue = ConstantValue.Create(If(uiAttribute Is Nothing, False, True))
+                    Dim configureAwaitArgument As BoundExpression = New BoundLiteral(node, boolValue,
                                                                                      GetSpecialType(SpecialType.System_Boolean, node, diagnostics))
                     configureAwaitArgument.SetWasCompilerGenerated()
 

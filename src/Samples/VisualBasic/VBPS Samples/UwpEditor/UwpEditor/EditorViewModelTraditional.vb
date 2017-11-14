@@ -1,7 +1,7 @@
 ﻿Imports System.Threading
 Imports Windows.Storage.Pickers
 
-Public Class EditorViewModelTraditional
+Public Class EditorViewModelTraditional2
     Implements INotifyPropertyChanged
 
     Public Event PropertyChanged As PropertyChangedEventHandler Implements INotifyPropertyChanged.PropertyChanged

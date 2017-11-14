@@ -48,11 +48,11 @@ Module Program
     '    Task.Delay(0)
     'End Sub
 
-    public Social Sub SocialSubFooAsync
+    <UserInterface>
+    Public Social Sub SocialSubFooAsync
         Task.Delay(1000)
     End Sub
 
-    <UserInterface>
     Public Social Function SocialFooAsync As Integer
         Task.Delay(2000)
         Return Get42Async

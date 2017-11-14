@@ -820,11 +820,6 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
             Dim candidate = bestResult.Candidate
             Dim methodOrProperty = candidate.UnderlyingSymbol
 
-            'Check for existance of UserInterface-Attribute.
-            Dim uiAttribute = methodOrProperty.GetAttributes.
-                Where(Function(item) item?.AttributeClass.Name = "UserInterfaceAttribute" AndAlso
-                                     item?.AttributeClass.ContainingNamespace.Name = "CompilerServices").FirstOrDefault
-
             Dim returnType = candidate.ReturnType
 
             If group.ResultKind = LookupResultKind.Inaccessible Then
@@ -889,6 +884,11 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
 
             If methodOrProperty.Kind = SymbolKind.Method Then
 
+                'Check for existance of UserInterface-Attribute.
+                Dim uiAttribute = Me.ContainingMember.GetAttributes.
+                    Where(Function(item) item?.AttributeClass.Name = "UserInterfaceAttribute" AndAlso
+                                         item?.AttributeClass.ContainingNamespace.Name = "CompilerServices").FirstOrDefault
+
                 Dim method = DirectCast(methodOrProperty, MethodSymbol)
                 Dim reducedFrom = method.ReducedFrom
                 Dim constantValue As ConstantValue = Nothing
@@ -942,14 +942,13 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
 
                 If Me.IsInSocialContext Then
 
-                    'TODO: KL Examine the Parameter of uiAttribute, if exist! 
-                    Dim boolValue = ConstantValue.Create(If(uiAttribute Is Nothing, False, True))
+                    Dim boolValue = constantValue.Create(If(uiAttribute Is Nothing, False, True))
                     Dim configureAwaitArgument As BoundExpression = New BoundLiteral(node, boolValue,
                                                                                      GetSpecialType(SpecialType.System_Boolean, node, diagnostics))
                     configureAwaitArgument.SetWasCompilerGenerated()
 
                     If method.ReturnType.OriginalDefinition.Equals(Compilation.GetWellKnownType(WellKnownType.System_Threading_Tasks_Task_T)) Then
-                        'TODO K/J: Figure out a correct statement for bindAsStatement.
+
                         Dim configureAwaitSymbol = Me.GetWellKnownTypeMember(WellKnownMember.System_Threading_Tasks_Task_T__ConfigureAwait,
                                                                          node,
                                                                          diagnostics)

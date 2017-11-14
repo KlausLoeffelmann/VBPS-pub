@@ -110,6 +110,7 @@
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
     <Compile Include="EditorViewModel.vb" />
+    <Compile Include="EditorViewModelTraditionalTemp.vb" />
     <Compile Include="EditorViewModelTraditional.vb" />
     <Compile Include="MainPage.xaml.vb">
       <DependentUpon>MainPage.xaml</DependentUpon>
@@ -119,7 +120,6 @@
     <Compile Include="UserInterfaceAttribute.vb" />
     <Compile Include="UwpTask\FileIoTasks.vb" />
     <Compile Include="UwpTask\StorageFileTasks.vb" />
-    <Compile Include="ViewModel.vb" />
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="Package.appxmanifest">

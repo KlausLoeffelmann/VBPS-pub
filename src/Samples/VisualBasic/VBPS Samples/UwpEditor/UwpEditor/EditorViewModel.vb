@@ -3,7 +3,7 @@ Imports Windows.Storage
 Imports Windows.Storage.Pickers
 
 <UserInterface>
-Public Social Class EditorViewModel
+Public Social Class EditorViewModel2
     Implements INotifyPropertyChanged
 
     Public Event PropertyChanged As PropertyChangedEventHandler Implements INotifyPropertyChanged.PropertyChanged

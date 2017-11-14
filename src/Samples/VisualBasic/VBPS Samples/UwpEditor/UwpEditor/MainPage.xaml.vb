@@ -11,11 +11,11 @@ Public Class MainPage
         ' This call is required by the designer.
         InitializeComponent()
 
-        '' Add any initialization after the InitializeComponent() call.
-        'Me.DataContext = New EditorViewModel
-
         ' Add any initialization after the InitializeComponent() call.
-        Me.DataContext = New EditorViewModelTraditional
+        Me.DataContext = New EditorViewModel
+
+        '' Add any initialization after the InitializeComponent() call.
+        'Me.DataContext = New EditorViewModelTraditional
 
     End Sub
 

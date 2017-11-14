@@ -109,6 +109,10 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Symbols
 
         End Function
 
+        'TODO: Klaus: What to do here?
+        Friend Overrides Sub SetMetadataName(metadataName As String)
+        End Sub
+
         Public Overrides ReadOnly Property IsOverrides As Boolean
             Get
                 Return _isOverrides

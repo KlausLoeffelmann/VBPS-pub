@@ -854,6 +854,12 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Symbols
                     End Get
                 End Property
 
+                Public Overrides ReadOnly Property IsUserInterface As Boolean
+                    Get
+                        Return False
+                    End Get
+                End Property
+
                 Public Overrides ReadOnly Property IsNotInheritable As Boolean
                     Get
                         Return False
@@ -1780,6 +1786,18 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Symbols
                 End Property
 
                 Public Overrides ReadOnly Property IsShared As Boolean
+                    Get
+                        Return False
+                    End Get
+                End Property
+
+                Public Overrides ReadOnly Property IsUserInterface As Boolean
+                    Get
+                        Return False
+                    End Get
+                End Property
+
+                Public Overrides ReadOnly Property IsIndependent As Boolean
                     Get
                         Return False
                     End Get

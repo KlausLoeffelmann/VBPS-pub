@@ -662,6 +662,18 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Symbols
             End Get
         End Property
 
+        Public Overrides ReadOnly Property IsUserInterface As Boolean
+            Get
+                Return (_flags And SourceMemberFlags.UserInterface) <> 0
+            End Get
+        End Property
+
+        Public Overrides ReadOnly Property IsIndependent As Boolean
+            Get
+                Return (_flags And SourceMemberFlags.Independent) <> 0
+            End Get
+        End Property
+
         Public Overrides ReadOnly Property GetMethod As MethodSymbol
             Get
                 Return _getMethod
@@ -1077,7 +1089,9 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Symbols
                 SourceMemberFlags.MustOverride Or
                 SourceMemberFlags.ReadOnly Or
                 SourceMemberFlags.Iterator Or
-                SourceMemberFlags.WriteOnly,
+                SourceMemberFlags.WriteOnly Or
+                SourceMemberFlags.UserInterface Or
+                SourceMemberFlags.Independent,
                 ERRID.ERR_BadPropertyFlags1,
                 Accessibility.Public,
                 diagBag)

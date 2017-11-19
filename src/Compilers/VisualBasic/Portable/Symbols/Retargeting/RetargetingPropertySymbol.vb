@@ -157,6 +157,18 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Symbols.Retargeting
             End Get
         End Property
 
+        Public Overrides ReadOnly Property IsUserInterface As Boolean
+            Get
+                Return _underlyingProperty.IsUserInterface
+            End Get
+        End Property
+
+        Public Overrides ReadOnly Property IsIndependent As Boolean
+            Get
+                Return _underlyingProperty.IsIndependent
+            End Get
+        End Property
+
         Public Overrides ReadOnly Property Name As String
             Get
                 Return _underlyingProperty.Name

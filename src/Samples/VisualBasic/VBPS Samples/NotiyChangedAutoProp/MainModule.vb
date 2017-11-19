@@ -33,8 +33,7 @@ Public Class OverProperty
     Public Event PropertyChanged As PropertyChangedEventHandler Implements INotifyPropertyChanged.PropertyChanged
 
     'Should raise Event directly.
-    <UserInterface>
-    Public Property FooProp As String
+    Public UserInterface Property FooProp As String
 End Class
 
 Public Class OverPropertyWithOn
@@ -43,8 +42,7 @@ Public Class OverPropertyWithOn
     Public Event PropertyChanged As PropertyChangedEventHandler Implements INotifyPropertyChanged.PropertyChanged
 
     'Should raise Event over OnNotifyPropertyChanged.
-    <UserInterface>
-    Public Property FooProp As String
+    Public UserInterface Property FooProp As String
 
     Protected Overridable Sub OnPropertyChanged(eArgs As PropertyChangedEventArgs)
         RaiseEvent PropertyChanged(Me, eArgs)
@@ -52,8 +50,7 @@ Public Class OverPropertyWithOn
 
 End Class
 
-<UserInterface>
-Public Class HavingCustomOnPropertyChanged
+Public UserInterface Class HavingCustomOnPropertyChanged
     Implements INotifyPropertyChanged
 
     Public Event PropertyChanged As PropertyChangedEventHandler Implements INotifyPropertyChanged.PropertyChanged
@@ -66,8 +63,7 @@ Public Class HavingCustomOnPropertyChanged
 
 End Class
 
-<UserInterface>
-Public Class OverClass
+Public UserInterface Class OverClass
     Implements INotifyPropertyChanged
 
     Private _manualProp As String
@@ -77,9 +73,8 @@ Public Class OverClass
     'Should generate and use OnPropertyChanged
     Public Property BarProp As String
 
-    'Should ignore.
-    <UserInterface(Use:=False)>
-    Public Property FooProp As String
+'Should ignore.
+Public Independent Property FooProp As String
 
     Public Property ManualProp As String
         Get
@@ -95,22 +90,20 @@ Public Class OverClass
 
 End Class
 
-<UserInterface>
-Public Class InheritedFromOverClass
+Public UserInterface Class InheritedFromOverClass
     Inherits OverClass
 
     'Should call Mybase.OnPropertyChanged
     Public Property FooPropInherited As String
 End Class
 
-'Should report 'Does not implement INotifyPropertyChange.'
-'<UserInterface>
-Public Class OverClassMissingInterface
+''Should report 'Does not implement INotifyPropertyChange.'
+'Public UserInterface Class OverClassMissingInterface
 
-    'Shouldn't generate.
-    Public Property BarProp As String
+'    'Shouldn't generate.
+'    Public Property BarProp As String
 
-End Class
+'End Class
 
 Public Class BaseClassImplementsNotifyChangedProperly
     Implements INotifyPropertyChanged
@@ -122,16 +115,14 @@ Public Class BaseClassImplementsNotifyChangedProperly
     End Sub
 End Class
 
-<UserInterface>
-Public Class InheritedFromProperly
+Public UserInterface Class InheritedFromProperly
     Inherits BaseClassImplementsNotifyChangedProperly
 
     'Should call Mybase.OnNotifyPropertyChanged.
     Public Property FooProp As String
 End Class
 
-<UserInterface>
-Public Class Bar
+Public UserInterface Class Bar
     Implements INotifyPropertyChanged
 
     Public Event PropertyChanged As PropertyChangedEventHandler Implements INotifyPropertyChanged.PropertyChanged
@@ -153,7 +144,6 @@ Public Class Bar
         End Set
     End Property
 
-    <UserInterface(Use:=False)>
-    Public Property FooPropIgnored As String
+    Public Independent Property FooPropIgnored As String
 
 End Class

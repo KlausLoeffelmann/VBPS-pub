@@ -215,6 +215,7 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Syntax
                 SyntaxKind.YieldKeyword, None,
                 SyntaxKind.SocialKeyword, None,
                 SyntaxKind.IndependentKeyword, None,
+                SyntaxKind.UserInterfaceKeyword, None,
                 SyntaxKind.EndIfKeyword, None,
                 SyntaxKind.GosubKeyword, None,
                 SyntaxKind.TypeKeyword, None,

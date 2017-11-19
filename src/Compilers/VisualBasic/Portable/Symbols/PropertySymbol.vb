@@ -163,6 +163,17 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Symbols
 
         End Function
 
+        ''' <summary>
+        ''' Source: Returns whether this property is independent; i.e., does it have the Independent modifier?
+        ''' Metadata: Returns False; properties from metadata cannot be independent.
+        ''' </summary>
+        Public MustOverride ReadOnly Property IsIndependent As Boolean
+
+        ''' <summary>
+        ''' Source: Returns whether this property is a user interface property; i.e., does it have the UserInterface modifier?
+        ''' Metadata: Returns False; it is not meaningful to treat properties from metadata as user interface properties.
+        ''' </summary>
+        Public MustOverride ReadOnly Property IsUserInterface As Boolean
 
         ''' <summary>
         ''' Gets the associated "get" method for this property. If this property

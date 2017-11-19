@@ -108,6 +108,18 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Symbols
             End Get
         End Property
 
+        Public Overrides ReadOnly Property IsUserInterface As Boolean
+            Get
+                Return Me._underlyingProperty.IsUserInterface
+            End Get
+        End Property
+
+        Public Overrides ReadOnly Property IsIndependent As Boolean
+            Get
+                Return Me._underlyingProperty.IsIndependent
+            End Get
+        End Property
+
         Friend Overrides ReadOnly Property ObsoleteAttributeData As ObsoleteAttributeData
             Get
                 Return Me._underlyingProperty.ObsoleteAttributeData

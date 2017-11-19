@@ -170,6 +170,18 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Symbols
             End Get
         End Property
 
+        Public Overrides ReadOnly Property IsUserInterface As Boolean
+            Get
+                Return _baseProperty.IsUserInterface
+            End Get
+        End Property
+
+        Public Overrides ReadOnly Property IsIndependent As Boolean
+            Get
+                Return _baseProperty.IsIndependent
+            End Get
+        End Property
+
         Friend Overrides Function GetLexicalSortKey() As LexicalSortKey
             Return _containingType.GetLexicalSortKey()
         End Function

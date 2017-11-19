@@ -16,7 +16,7 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.CodeStyle
                 SyntaxKind.NotInheritableKeyword, SyntaxKind.StaticKeyword, SyntaxKind.SharedKeyword, SyntaxKind.ShadowsKeyword,
                 SyntaxKind.ReadOnlyKeyword, SyntaxKind.WriteOnlyKeyword, SyntaxKind.DimKeyword, SyntaxKind.ConstKeyword,
                 SyntaxKind.WithEventsKeyword, SyntaxKind.WideningKeyword, SyntaxKind.NarrowingKeyword, SyntaxKind.CustomKeyword,
-                SyntaxKind.AsyncKeyword, SyntaxKind.SocialKeyword, SyntaxKind.IndependentKeyword,
+                SyntaxKind.AsyncKeyword, SyntaxKind.SocialKeyword, SyntaxKind.IndependentKeyword, SyntaxKind.UserInterfaceKeyword,
                 SyntaxKind.IteratorKeyword)
 
         Public ReadOnly PreferredModifierOrder As [Option](Of CodeStyleOption(Of String)) = New [Option](Of CodeStyleOption(Of String))(

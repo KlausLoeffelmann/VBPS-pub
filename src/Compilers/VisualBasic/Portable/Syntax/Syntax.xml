@@ -8418,6 +8418,10 @@ Unify Enum declarations with other block type declarations.
         <lm-equiv name="IndependentKeyword" />
         <native-equiv name="" />
       </node-kind>
+      <node-kind name="UserInterfaceKeyword" token-text="UserInterface">
+        <lm-equiv name="UserInterfaceKeyword" />
+        <native-equiv name="" />
+      </node-kind>
       <!-- Obsolete Keywords -->
       <node-kind name="EndIfKeyword" token-text="EndIf">
         <lm-equiv name="EndIfKeyword" />

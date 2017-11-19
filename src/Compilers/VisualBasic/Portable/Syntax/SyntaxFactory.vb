@@ -174,7 +174,8 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
                      SyntaxKind.InterpolatedStringTextToken,
                      SyntaxKind.EndOfInterpolatedStringToken,
                      SyntaxKind.SocialKeyword,
-                     SyntaxKind.IndependentKeyword
+                     SyntaxKind.IndependentKeyword,
+                     SyntaxKind.UserInterfaceKeyword
 
                 Case Else
                     Throw New ArgumentOutOfRangeException(NameOf(kind))

@@ -117,6 +117,18 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Symbols
             End Get
         End Property
 
+        Public Overrides ReadOnly Property IsUserInterface As Boolean
+            Get
+                Return False
+            End Get
+        End Property
+
+        Public Overrides ReadOnly Property IsIndependent As Boolean
+            Get
+                Return False
+            End Get
+        End Property
+
         Public MustOverride Overrides ReadOnly Property IsImplicitlyDeclared As Boolean
 
         Friend Overrides ReadOnly Property ObsoleteAttributeData As ObsoleteAttributeData

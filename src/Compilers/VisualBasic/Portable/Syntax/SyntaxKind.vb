@@ -3204,5 +3204,7 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
         SocialKeyword = 794
 
         IndependentKeyword = 795
+
+        UserInterfaceKeyword = 796
     End Enum
 End Namespace

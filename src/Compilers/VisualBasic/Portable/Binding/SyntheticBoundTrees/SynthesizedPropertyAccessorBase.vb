@@ -32,7 +32,6 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Symbols
             Dim containingType = accessor.ContainingType
 
             Dim userInterfaceScope = UserInterfaceUsageScope.None
-            Dim userInterfaceAttribute As VisualBasicAttributeData = Nothing
 
             If accessor.MethodKind = MethodKind.PropertySet Then
 
@@ -42,41 +41,17 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Symbols
                 Dim isImplementingINotifyPropertyChanged = compilationState.Compilation.GetWellKnownType(
                                         WellKnownType.System_ComponentModel_INotifyPropertyChanged).IsBaseTypeOrInterfaceOf(containingType, siteDiagnostics)
 
-                userInterfaceAttribute = propertySymbol.GetAttributes().
-                                        Where(Function(attributeItem) attributeItem?.AttributeClass?.Name = "UserInterfaceAttribute" AndAlso
-                                                                      attributeItem?.AttributeClass?.ContainingNamespace?.Name = "CompilerServices").FirstOrDefault()
-
                 '2nd Requirement: Must have Attribute defined.
                 If isImplementingINotifyPropertyChanged Then
-                    If userInterfaceAttribute IsNot Nothing Then
-                        If userInterfaceAttribute.NamedArguments.Count = 0 Then
-                            userInterfaceScope = UserInterfaceUsageScope.Property
-                        Else
-                            Debug.Assert(userInterfaceAttribute.NamedArguments(0).Key = "Use")
-                            userInterfaceScope = If(CBool(userInterfaceAttribute.NamedArguments(0).Value.Value),
-                                                                  UserInterfaceUsageScope.Property,
-                                                                  UserInterfaceUsageScope.None)
-                        End If
-                    Else
-                        'Might also be defined on Class level.
-                        Dim typeAttributes = containingType.GetAttributes().
-                                            Where(Function(attributeItem) attributeItem.AttributeClass.Name = "UserInterfaceAttribute" AndAlso
-                                                                          attributeItem.AttributeClass.ContainingNamespace.Name = "CompilerServices").FirstOrDefault()
-                        If typeAttributes IsNot Nothing Then
-                            If typeAttributes.NamedArguments.Count = 0 Then
-                                userInterfaceScope = UserInterfaceUsageScope.Type
-                            Else
-                                Debug.Assert(typeAttributes.NamedArguments(0).Key = "Use")
-                                userInterfaceScope = If(CBool(typeAttributes.NamedArguments(0).Value.Value),
-                                                                  UserInterfaceUsageScope.Type,
-                                                                  UserInterfaceUsageScope.None)
-                            End If
-                        End If
+                    If propertySymbol.IsUserInterface Then
+                        userInterfaceScope = UserInterfaceUsageScope.Property
+                    ElseIf containingType.IsUserInterface AndAlso Not propertySymbol.IsIndependent Then
+                        userInterfaceScope = UserInterfaceUsageScope.Type
                     End If
                 Else
-                    If userInterfaceAttribute IsNot Nothing Then
+                    If propertySymbol.IsUserInterface Then
                         'Not implementing interface, but UserInterfaceAttribute --> Diagnostics!
-                        Dim location = userInterfaceAttribute.ApplicationSyntaxReference.GetLocation()
+                        Dim location = propertySymbol.DeclaringSyntaxReferences.First.GetLocation()
                         Binder.ReportDiagnostic(diagnostics, location, ERRID.ERR_MissingINotifyPropertyChangedInterface)
                     End If
                 End If
@@ -434,7 +409,7 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Symbols
 
                             If propertyChangedEvent Is Nothing Then
                                 'We need to report the dignostic that the event cannot be raised!
-                                Dim location = userInterfaceAttribute.ApplicationSyntaxReference.GetLocation()
+                                Dim location = propertySymbol.DeclaringSyntaxReferences.First.GetLocation()
                                 Binder.ReportDiagnostic(diagnostics, location, ERRID.ERR_MissingOnPropertyChangedMethod)
                             Else
                                 Dim propertyChangedEventAccess = New BoundEventAccess(syntax, meReference, propertyChangedEvent, propertyChangedEvent.Type)

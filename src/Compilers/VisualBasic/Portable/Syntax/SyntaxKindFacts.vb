@@ -21,8 +21,9 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
             Return kind = SyntaxKind.ReferenceKeyword OrElse
                 (SyntaxKind.AggregateKeyword <= kind AndAlso
                 kind <= SyntaxKind.YieldKeyword) OrElse
-                (SyntaxKind.SocialKeyword <= kind AndAlso
-                kind <= SyntaxKind.IndependentKeyword)
+                kind = SyntaxKind.SocialKeyword OrElse
+                kind = SyntaxKind.IndependentKeyword OrElse
+                kind = SyntaxKind.UserInterfaceKeyword
         End Function
 
         ''' <summary>
@@ -291,7 +292,8 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
             SyntaxKind.IteratorKeyword,
             SyntaxKind.YieldKeyword,
             SyntaxKind.SocialKeyword,
-            SyntaxKind.IndependentKeyword
+            SyntaxKind.IndependentKeyword,
+            SyntaxKind.UserInterfaceKeyword
             }
         ''' <summary>
         ''' Get contextual keywords
@@ -403,7 +405,8 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
                     SyntaxKind.AsyncKeyword,
                     SyntaxKind.IteratorKeyword,
                     SyntaxKind.SocialKeyword,
-                    SyntaxKind.IndependentKeyword
+                    SyntaxKind.IndependentKeyword,
+                    SyntaxKind.UserInterfaceKeyword
                     Return True
             End Select
 
@@ -822,7 +825,8 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
                    {"iterator", SyntaxKind.IteratorKeyword},
                    {"yield", SyntaxKind.YieldKeyword},
                    {"social", SyntaxKind.SocialKeyword},
-                   {"independent", SyntaxKind.IndependentKeyword}
+                   {"independent", SyntaxKind.IndependentKeyword},
+                   {"userinterface", SyntaxKind.UserInterfaceKeyword}
             }
 
         Public Shared Function GetContextualKeywordKind(text As String) As SyntaxKind

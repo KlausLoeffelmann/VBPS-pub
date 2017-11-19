@@ -231,6 +231,12 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Symbols
             End Get
         End Property
 
+        Public NotOverridable Overrides ReadOnly Property IsUserInterface As Boolean
+            Get
+                Return False
+            End Get
+        End Property
+
         Public NotOverridable Overrides ReadOnly Property IsNotInheritable As Boolean
             Get
                 Return False

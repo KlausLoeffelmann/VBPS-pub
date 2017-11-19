@@ -56,6 +56,7 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Symbols
 
         Social = 1 << 22
         Independent = 1 << 23
+        UserInterface = 1 << 24
 
         [Dim] = 1 << 26
         [Const] = 1 << 27

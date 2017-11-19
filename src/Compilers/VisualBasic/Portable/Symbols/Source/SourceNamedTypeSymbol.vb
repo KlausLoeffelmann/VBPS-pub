@@ -414,7 +414,7 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Symbols
                 Case SyntaxKind.ClassBlock
                     err = ERRID.ERR_BadClassFlags1
                     allowableModifiers = SourceMemberFlags.AllAccessibilityModifiers Or SourceMemberFlags.Shadows Or SourceMemberFlags.MustInherit Or
-                                         SourceMemberFlags.NotInheritable Or SourceMemberFlags.Partial Or SourceMemberFlags.Social
+                                         SourceMemberFlags.NotInheritable Or SourceMemberFlags.Partial Or SourceMemberFlags.Social Or SourceMemberFlags.UserInterface
                     typeBlock = DirectCast(node, TypeBlockSyntax)
                     modifiers = typeBlock.BlockStatement.Modifiers
                     id = typeBlock.BlockStatement.Identifier
@@ -2590,50 +2590,22 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Symbols
         ''' 3. The Method does not exist.
         ''' </remarks>
         ''' <param name="membersBuilder"></param>
-        Protected Overrides Sub AddOnPropertyChangedSyntheticMethod(membersBuilder As MembersAndInitializersBuilder, diagnostics As DiagnosticBag)
+        Protected Overrides Sub AddOnPropertyChangedSyntheticMethodIfNeeded(membersBuilder As MembersAndInitializersBuilder, diagnostics As DiagnosticBag)
 
-            Dim compilation = Me.DeclaringCompilation
-
-            Dim isImplementingINotifyPropertyChanged = False
+            If Not Me.IsUserInterface Then
+                Return
+            End If
 
             Dim iNotifyPropertyChanged = Me.InterfacesNoUseSiteDiagnostics.Where(
                                                         Function(IItem) IItem.Name = "INotifyPropertyChanged").FirstOrDefault
             If iNotifyPropertyChanged IsNot Nothing Then
-                isImplementingINotifyPropertyChanged = True
-            End If
 
-            If Not isImplementingINotifyPropertyChanged Then
-                Return
-            End If
-
-            'Might also be defined on Class level.
-            Dim userInterfaceAttribute = Me.GetAttributesBag().Attributes.
-                                            Where(Function(attributeItem) attributeItem.AttributeClass.Name = "UserInterfaceAttribute" AndAlso
-                                                                          attributeItem.AttributeClass.ContainingNamespace.Name = "CompilerServices").FirstOrDefault()
-
-            If userInterfaceAttribute Is Nothing Then
-                Return
-            End If
-
-            Dim siteDiagnostics As New HashSet(Of DiagnosticInfo)
-
-
-            Dim needsOnPropertyChangedMethod = False
-
-            If userInterfaceAttribute IsNot Nothing Then
-                If userInterfaceAttribute.NamedArguments.Count = 0 Then
-                    needsOnPropertyChangedMethod = True
-                Else
-                    Debug.Assert(userInterfaceAttribute.NamedArguments(0).Key = "Use")
-                    needsOnPropertyChangedMethod = CBool(userInterfaceAttribute.NamedArguments(0).Value.Value)
-                End If
-            End If
-
-            If needsOnPropertyChangedMethod Then
                 ' We need the method only if it is not there already.
                 Dim symbols As ArrayBuilder(Of Symbol) = Nothing
+                Dim compilation = Me.DeclaringCompilation
                 If membersBuilder.Members.TryGetValue("OnPropertyChanged", symbols) AndAlso
                     symbols.Any(Function(symbol) IsOnPropertyChangedMethod(symbol, compilation)) Then
+
                     Return
                 End If
 

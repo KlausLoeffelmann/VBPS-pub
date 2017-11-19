@@ -1650,6 +1650,18 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
             End Get
         End Property
 
+        Public Overrides ReadOnly Property IsUserInterface As Boolean
+            Get
+                Return _originalDefinition.IsUserInterface
+            End Get
+        End Property
+
+        Public Overrides ReadOnly Property IsIndependent As Boolean
+            Get
+                Return _originalDefinition.IsIndependent
+            End Get
+        End Property
+
         Public Overrides ReadOnly Property Locations As ImmutableArray(Of Location)
             Get
                 Return _originalDefinition.Locations

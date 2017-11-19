@@ -130,6 +130,12 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
             End Get
         End Property
 
+        Public NotOverridable Overrides ReadOnly Property IsUserInterface As Boolean
+            Get
+                Return False
+            End Get
+        End Property
+
         Public NotOverridable Overrides ReadOnly Property MightContainExtensionMethods As Boolean
             Get
                 Return False

@@ -43,6 +43,7 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Symbols
             [Shadows] = 1 << 10
             [Partial] = 1 << 11
             Social = 1 << 12
+            UserInterface = 1 << 13
         End Enum
 
         ' Flags about the type
@@ -213,10 +214,14 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Symbols
                 flags = flags Or SourceTypeFlags.Shadows
             End If
 
-            'TODO: John, please check!
             'Compute Social
             If (modifiers And DeclarationModifiers.Social) <> 0 Then
                 flags = flags Or SourceTypeFlags.Social
+            End If
+
+            'Compute UserInterface
+            If (modifiers And DeclarationModifiers.UserInterface) <> 0 Then
+                flags = flags Or SourceTypeFlags.UserInterface
             End If
 
             Return flags
@@ -1262,6 +1267,12 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Symbols
         Public Overrides ReadOnly Property IsSocial As Boolean
             Get
                 Return (_flags And SourceTypeFlags.Social) <> 0
+            End Get
+        End Property
+
+        Public Overrides ReadOnly Property IsUserInterface As Boolean
+            Get
+                Return (_flags And SourceTypeFlags.UserInterface) <> 0
             End Get
         End Property
 
@@ -2517,7 +2528,7 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Symbols
             AddEntryPointIfNeeded(membersBuilder)
 
             'Add other synthetic Methods, if needed.
-            AddOnPropertyChangedSyntheticMethod(membersBuilder, diagnostics)
+            AddOnPropertyChangedSyntheticMethodIfNeeded(membersBuilder, diagnostics)
 
             CheckMemberDiagnostics(membersBuilder, diagnostics)
 
@@ -2532,7 +2543,7 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Symbols
         Protected Overridable Sub AddEntryPointIfNeeded(membersBuilder As MembersAndInitializersBuilder)
         End Sub
 
-        Protected Overridable Sub AddOnPropertyChangedSyntheticMethod(membersBuilder As MembersAndInitializersBuilder, diagnostics As DiagnosticBag)
+        Protected Overridable Sub AddOnPropertyChangedSyntheticMethodIfNeeded(membersBuilder As MembersAndInitializersBuilder, diagnostics As DiagnosticBag)
         End Sub
 
         Protected MustOverride Sub AddDeclaredNonTypeMembers(membersBuilder As MembersAndInitializersBuilder, diagnostics As DiagnosticBag)

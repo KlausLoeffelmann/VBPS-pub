@@ -443,6 +443,12 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Symbols.Retargeting
             End Get
         End Property
 
+        Public Overrides ReadOnly Property IsUserInterface As Boolean
+            Get
+                Return _underlyingType.IsUserInterface
+            End Get
+        End Property
+
         Friend Overrides ReadOnly Property IsMetadataAbstract As Boolean
             Get
                 Return _underlyingType.IsMetadataAbstract

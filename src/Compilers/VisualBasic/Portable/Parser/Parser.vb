@@ -799,7 +799,8 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Syntax.InternalSyntax
                         ElseIf contextualKind = SyntaxKind.AsyncKeyword OrElse
                             contextualKind = SyntaxKind.IteratorKeyword OrElse
                             contextualkind = SyntaxKind.SocialKeyword OrElse
-                            contextualkind = SyntaxKind.IndependentKeyword Then
+                            contextualkind = SyntaxKind.IndependentKeyword OrElse
+                            contextualKind = SyntaxKind.UserInterfaceKeyword Then
                             Return ParseSpecifierDeclaration()
                         End If
                     End If
@@ -1129,7 +1130,8 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Syntax.InternalSyntax
                         ElseIf contextualKind = SyntaxKind.AsyncKeyword OrElse
                             contextualKind = SyntaxKind.IteratorKeyword OrElse
                             contextualKind = SyntaxKind.SocialKeyword OrElse
-                            contextualkind = SyntaxKind.IndependentKeyword Then
+                            contextualkind = SyntaxKind.IndependentKeyword OrElse
+                            contextualkind = syntaxkind.UserInterfaceKeyword Then
 
                             Dim nextToken = PeekToken(1)
 
@@ -1919,7 +1921,8 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Syntax.InternalSyntax
                         SyntaxKind.AsyncKeyword,
                         SyntaxKind.IteratorKeyword,
                         SyntaxKind.SocialKeyword,
-                        SyntaxKind.IndependentKeyword
+                        SyntaxKind.IndependentKeyword,
+                        SyntaxKind.UserInterfaceKeyword
 
                     Case SyntaxKind.IdentifierToken
                         Select Case DirectCast(token, IdentifierTokenSyntax).PossibleKeywordKind
@@ -1927,7 +1930,8 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Syntax.InternalSyntax
                                 SyntaxKind.AsyncKeyword,
                                 SyntaxKind.IteratorKeyword,
                                 SyntaxKind.SocialKeyword,
-                                SyntaxKind.IndependentKeyword
+                                SyntaxKind.IndependentKeyword,
+                                SyntaxKind.UserInterfaceKeyword
 
                             Case Else
                                 Return False
@@ -2051,7 +2055,8 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Syntax.InternalSyntax
                             ElseIf possibleKeyword.Kind = SyntaxKind.AsyncKeyword OrElse
                                 possibleKeyword.Kind = SyntaxKind.IteratorKeyword OrElse
                                 possibleKeyword.Kind = SyntaxKind.SocialKeyword OrElse
-                                possibleKeyword.Kind = SyntaxKind.IndependentKeyword Then
+                                possibleKeyword.Kind = SyntaxKind.IndependentKeyword OrElse
+                                possibleKeyword.Kind = SyntaxKind.UserInterfaceKeyword Then
 
                                 Dim nextToken As SyntaxToken = PeekToken(1)
                                 If SyntaxFacts.IsSpecifier(nextToken.Kind) OrElse

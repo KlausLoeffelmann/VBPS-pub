@@ -109,6 +109,7 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
                 Case SyntaxKind.IteratorKeyword : Return SourceMemberFlags.Iterator
                 Case SyntaxKind.SocialKeyword : Return SourceMemberFlags.Social
                 Case SyntaxKind.IndependentKeyword : Return SourceMemberFlags.Independent
+                Case SyntaxKind.UserInterfaceKeyword : Return SourceMemberFlags.UserInterface
 
                 Case Else
 #If DEBUG Then
@@ -1587,6 +1588,7 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
 
         Social = CUInt(DeclarationModifiers.Social) << CInt(DeclarationModifierFlagShift)
         Independent = CULng(DeclarationModifiers.Independent) << CInt(DeclarationModifierFlagShift)
+        UserInterface = CULng(DeclarationModifiers.UserInterface) << CInt(DeclarationModifierFlagShift)
 
         DeclarationModifierFlagMask = &HFFFFFFFFFFFFFF8
         DeclarationModifierFlagShift = 3
@@ -1713,6 +1715,13 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
                 SyntaxKind.SocialKeyword,
                 SyntaxKind.IndependentKeyword
             }
+
+        Public InvalidUserInterfaceIndependent() As SyntaxKind =
+            {
+                SyntaxKind.UserInterfaceKeyword,
+                SyntaxKind.IndependentKeyword
+            }
+
     End Module
 
     Friend Structure MemberModifiers

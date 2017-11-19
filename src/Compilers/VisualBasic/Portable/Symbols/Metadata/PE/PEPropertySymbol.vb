@@ -221,6 +221,18 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Symbols.Metadata.PE
             End Get
         End Property
 
+        Public Overrides ReadOnly Property IsUserInterface As Boolean
+            Get
+                Return False
+            End Get
+        End Property
+
+        Public Overrides ReadOnly Property IsIndependent As Boolean
+            Get
+                Return False
+            End Get
+        End Property
+
         Public Overrides ReadOnly Property IsWithEvents As Boolean
             Get
                 'NOTE: If no-one set the IsWithEvents, getting the value will permanently set it to Unknown.

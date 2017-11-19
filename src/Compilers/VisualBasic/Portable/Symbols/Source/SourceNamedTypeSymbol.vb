@@ -2581,16 +2581,16 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Symbols
         End Sub
 
         ''' <summary>
-        ''' Check, if we need to add OnPropertyChanged(eArgs as PropertyChangedEventArgs)
+        ''' Check if we need to add OnPropertyChanged(eArgs as PropertyChangedEventArgs)
         ''' </summary>
         ''' <remarks>
-        ''' This method needs to bee added under the following conditions:
+        ''' This method needs to be added under the following conditions:
         ''' 1. The Type implements INotifyPropertyChanged directly.
-        ''' 2. The Type is tagged with the UserInterface Attribute.
+        ''' 2. The Type is tagged with UserInterface.
         ''' 3. The Method does not exist.
         ''' </remarks>
         ''' <param name="membersBuilder"></param>
-        Protected Overrides Sub AddCustomSyntheticMethod(membersBuilder As MembersAndInitializersBuilder, diagnostics As DiagnosticBag)
+        Protected Overrides Sub AddOnPropertyChangedSyntheticMethod(membersBuilder As MembersAndInitializersBuilder, diagnostics As DiagnosticBag)
 
             Dim compilation = Me.DeclaringCompilation
 
@@ -2630,10 +2630,11 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Symbols
             End If
 
             If needsOnPropertyChangedMethod Then
-                'Well, wo ONLY need the method, if it is not there already!
-                Dim existing = Me.MemberNames.Where(Function(eventItem) eventItem.ToUpper = "ONPROPERTYCHANGED").FirstOrDefault
-                If Not String.IsNullOrEmpty(existing) Then
-                    Dim temp = GetTypeMembers()
+                ' We need the method only if it is not there already.
+                Dim symbols As ArrayBuilder(Of Symbol) = Nothing
+                If membersBuilder.Members.TryGetValue("OnPropertyChanged", symbols) AndAlso
+                    symbols.Any(Function(symbol) IsOnPropertyChangedMethod(symbol, compilation)) Then
+                    Return
                 End If
 
                 Dim syntaxRef = SyntaxReferences.First() ' use arbitrary part

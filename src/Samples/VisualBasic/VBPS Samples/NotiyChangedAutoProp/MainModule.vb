@@ -53,6 +53,20 @@ Public Class OverPropertyWithOn
 End Class
 
 <UserInterface>
+Public Class HavingCustomOnPropertyChanged
+    Implements INotifyPropertyChanged
+
+    Public Event PropertyChanged As PropertyChangedEventHandler Implements INotifyPropertyChanged.PropertyChanged
+
+    Public Property FooProp As String
+
+    Protected Overridable Sub OnPropertyChanged(eArgs As PropertyChangedEventArgs)
+        RaiseEvent PropertyChanged(Me, eArgs)
+    End Sub
+
+End Class
+
+<UserInterface>
 Public Class OverClass
     Implements INotifyPropertyChanged
 
@@ -90,7 +104,7 @@ Public Class InheritedFromOverClass
 End Class
 
 'Should report 'Does not implement INotifyPropertyChange.'
-<UserInterface>
+'<UserInterface>
 Public Class OverClassMissingInterface
 
     'Shouldn't generate.

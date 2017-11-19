@@ -2517,7 +2517,7 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Symbols
             AddEntryPointIfNeeded(membersBuilder)
 
             'Add other synthetic Methods, if needed.
-            AddCustomSyntheticMethod(membersBuilder, diagnostics)
+            AddOnPropertyChangedSyntheticMethod(membersBuilder, diagnostics)
 
             CheckMemberDiagnostics(membersBuilder, diagnostics)
 
@@ -2532,8 +2532,7 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Symbols
         Protected Overridable Sub AddEntryPointIfNeeded(membersBuilder As MembersAndInitializersBuilder)
         End Sub
 
-        'TODO: John, please check.
-        Protected Overridable Sub AddCustomSyntheticMethod(membersBuilder As MembersAndInitializersBuilder, diagnostics As DiagnosticBag)
+        Protected Overridable Sub AddOnPropertyChangedSyntheticMethod(membersBuilder As MembersAndInitializersBuilder, diagnostics As DiagnosticBag)
         End Sub
 
         Protected MustOverride Sub AddDeclaredNonTypeMembers(membersBuilder As MembersAndInitializersBuilder, diagnostics As DiagnosticBag)
@@ -3229,7 +3228,7 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Symbols
             Return Nothing
         End Function
 
-        Friend Function CreateOnPropertyChangedIfRequired(binder As Binder, diagnostic As DiagnosticBag) As MethodSymbol
+        Friend Sub ReportDiagnosticsForOnPropertyChanged(binder As Binder, diagnostic As DiagnosticBag)
 
             Dim compilation = Me.DeclaringCompilation
 
@@ -3239,7 +3238,7 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Symbols
                                                                           attributeItem.AttributeClass.ContainingNamespace.Name = "CompilerServices").FirstOrDefault()
 
             If userInterfaceAttribute Is Nothing Then
-                Return Nothing
+                Return
             End If
 
             Dim siteDiagnostics As New HashSet(Of DiagnosticInfo)
@@ -3250,7 +3249,7 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Symbols
             If Not isImplementingINotifyPropertyChanged Then
                 Dim location = userInterfaceAttribute.ApplicationSyntaxReference.GetLocation()
                 Binder.ReportDiagnostic(diagnostic, location, ERRID.ERR_MissingINotifyPropertyChangedInterface)
-                Return Nothing
+                Return
             End If
 
             Dim needsOnPropertyChangedMethod = False
@@ -3265,46 +3264,13 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Symbols
             End If
 
             If needsOnPropertyChangedMethod Then
-                'Well, wo ONLY need the method, if it is not there already!
-                Dim existing = TryCast(Me.GetMembers.Where(Function(eventItem) eventItem.Name.ToUpper = "ONPROPERTYCHANGED").FirstOrDefault, MethodSymbol)
-                If existing IsNot Nothing Then
-                    If existing.ParameterCount = 1 AndAlso existing.Parameters(0).Type =
-                        compilation.GetWellKnownType(WellKnownType.System_ComponentModel_PropertyChangedEventArgs) Then
-                        'Name, case-insensitve, is the same, also the signature - we do not need the method!
-                        Return Nothing
-                    Else
-                        Dim location = userInterfaceAttribute.ApplicationSyntaxReference.GetLocation()
-                        Binder.ReportDiagnostic(diagnostic, location, ERRID.ERR_MissingOnPropertyChangedMethod)
-                        Return Nothing
-                    End If
-                Else
-                    'Let's check the base classes:
-                    'TODO: Need Unit Test!!
-                    Dim startType = Me.BaseTypeNoUseSiteDiagnostics()
-                    If startType IsNot Nothing Then
-                        Dim members = Me.GetMembersFromTypeAndAllBaseTypes("OnPropertyChanged", compilation)
-                        If members.Count > 0 Then
-                            Return Nothing
-                        Else
-                            'Report diagnostic, since we cannot raise the base class event.
-                            Dim location = userInterfaceAttribute.ApplicationSyntaxReference.GetLocation()
-                            Binder.ReportDiagnostic(diagnostic, location, ERRID.ERR_MissingOnPropertyChangedMethod)
-                            Return Nothing
-                        End If
-                    End If
+                Dim existing = Me.GetMemberFromTypeAndAllBaseTypes("OnPropertyChanged", compilation, Function(symbol) IsOnPropertyChangedMethod(symbol, compilation))
+                If existing Is Nothing Then
+                    Dim location = userInterfaceAttribute.ApplicationSyntaxReference.GetLocation()
+                    Binder.ReportDiagnostic(diagnostic, location, ERRID.ERR_MissingOnPropertyChangedMethod)
                 End If
-
-                Dim syntaxRef = SyntaxReferences.First()
-
-                Dim onPropertyChangedMethod = New SynthesizedOnPropertyChangedMethodSymbol(syntaxRef.GetVisualBasicSyntax, Me)
-
-                Dim diagnosticsThisMethod = DiagnosticBag.GetInstance()
-                Return onPropertyChangedMethod
             End If
-
-            Return Nothing
-
-        End Function
+        End Sub
 
         Friend Overrides Iterator Function GetFieldsToEmit() As IEnumerable(Of FieldSymbol)
             For Each member In GetMembersForCci()

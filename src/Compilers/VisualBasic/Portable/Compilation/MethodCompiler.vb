@@ -595,32 +595,9 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
                         _moduleBeingBuiltOpt.AddSynthesizedDefinition(sourceTypeSymbol, sharedDefaultConstructor)
                     End If
                 End If
-
-                Dim onPropertyChanged = sourceTypeSymbol.CreateOnPropertyChangedIfRequired(sourceTypeBinder, _diagnostics)
-
-                If onPropertyChanged IsNot Nothing Then
-
-                    Dim onPropertyChangedWithEventPropertyIdDispenser = 0
-                    Dim onPropertyChangedDelegateRelaxationIdDispenser = 0
-
-                    CompileMethod(onPropertyChanged,
-                                  -1,
-                                  onPropertyChangedWithEventPropertyIdDispenser,
-                                  onPropertyChangedDelegateRelaxationIdDispenser,
-                                  filter,
-                                  compilationState,
-                                  processedStaticInitializers,
-                                  sourceTypeBinder,
-                                  synthesizedSubmissionFields)
-
-                    If _moduleBeingBuiltOpt IsNot Nothing Then
-                        _moduleBeingBuiltOpt.AddSynthesizedDefinition(sourceTypeSymbol, sharedDefaultConstructor)
-                    End If
-                End If
             End If
 
-            'Obsolote? Create synthesized OnPropertyChanged on demand.
-            'CompileSynthesizedOnPropertyChangedMethodOnDemand(containingType, compilationState)
+            sourceTypeSymbol.ReportDiagnosticsForOnPropertyChanged(sourceTypeBinder, _diagnostics)
 
             ' Constructor --> Constructor calls to be used in cycles detection
             Dim constructorCallMap As Dictionary(Of MethodSymbol, MethodSymbol) = Nothing
@@ -769,125 +746,6 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
             End If
 
             compilationState.Free()
-        End Sub
-
-        'Maybe obselete.
-        Private Sub CompileSynthesizedOnPropertyChangedMethodOnDemand(container As NamedTypeSymbol,
-                                                                      compilationState As TypeCompilationState)
-
-            Dim syntaxRef = container.DeclaringSyntaxReferences.FirstOrDefault() ' use arbitrary part
-            If syntaxRef Is Nothing Then
-                Return
-            End If
-
-            Dim syntax = syntaxRef.GetVisualBasicSyntax
-
-            'Might also be defined on Class level.
-            Dim userInterfaceAttribute = container.GetAttributes().
-                                            Where(Function(attributeItem) attributeItem.AttributeClass.Name = "UserInterfaceAttribute" AndAlso
-                                                                          attributeItem.AttributeClass.ContainingNamespace.Name = "CompilerServices").FirstOrDefault()
-
-            If userInterfaceAttribute Is Nothing Then
-                Return
-            End If
-
-            Dim siteDiagnostics As New HashSet(Of DiagnosticInfo)
-
-            Dim isImplementingINotifyPropertyChanged = compilationState.Compilation.GetWellKnownType(
-                WellKnownType.System_ComponentModel_INotifyPropertyChanged).IsBaseTypeOrInterfaceOf(container, siteDiagnostics)
-
-            If Not isImplementingINotifyPropertyChanged Then
-                Return
-            End If
-
-            Dim needsOnPropertyChangedMethod = False
-
-            If userInterfaceAttribute IsNot Nothing Then
-                If userInterfaceAttribute.NamedArguments.Count = 0 Then
-                    needsOnPropertyChangedMethod = True
-                Else
-                    Debug.Assert(userInterfaceAttribute.NamedArguments(0).Key = "Use")
-                    needsOnPropertyChangedMethod = CBool(userInterfaceAttribute.NamedArguments(0).Value.Value)
-                End If
-            End If
-
-            If needsOnPropertyChangedMethod Then
-                'Well, wo ONLY need the method, if it is not there already!
-                Dim existing = TryCast(container.GetMembers.Where(Function(eventItem) eventItem.Name.ToUpper = "ONPROPERTYCHANGED").FirstOrDefault, MethodSymbol)
-                If existing IsNot Nothing Then
-                    If existing.ParameterCount = 1 AndAlso existing.Parameters(0).Type =
-                        compilationState.Compilation.GetWellKnownType(WellKnownType.System_ComponentModel_PropertyChangedEventArgs) Then
-                        'Name, case-insensitve, is the same, also the signature - we do not need the method!
-                        Return
-                    End If
-                Else
-                    'Let's check the base classes:
-                    'TODO: Need Unit Test!!
-                    Dim startType = container.BaseTypeNoUseSiteDiagnostics()
-                    If startType IsNot Nothing Then
-                        Dim symbol = startType.VisitType(Function(t As TypeSymbol, methodName As String)
-                                                             If TryCast(t.GetMembers.Where(
-                                                        Function(eventItem) eventItem.Name.ToUpper = methodName.ToUpper).FirstOrDefault, MethodSymbol) IsNot Nothing Then
-                                                                 Return True
-                                                             Else
-                                                                 Return False
-                                                             End If
-                                                         End Function, "OnPropertyChanged")
-                        If symbol IsNot Nothing Then
-                            Return
-                        Else
-                            'Report diagnostic, since we cannot raise the base class event.
-                            Dim location = userInterfaceAttribute.AttributeClass.Locations(0)
-                            Binder.ReportDiagnostic(_diagnostics, location, ERRID.WRN_EventDelegateTypeNotCLSCompliant2)
-                        End If
-                    End If
-                End If
-
-                Dim onPropertyChangedMethod = New SynthesizedOnPropertyChangedMethodSymbol(syntax, container)
-
-                Dim diagnosticsThisMethod = DiagnosticBag.GetInstance()
-                Dim boundBody = onPropertyChangedMethod.GetBoundMethodBody(compilationState, diagnosticsThisMethod)
-
-                If diagnosticsThisMethod.HasAnyErrors Then
-                    _diagnostics.AddRange(diagnosticsThisMethod)
-                    diagnosticsThisMethod.Free()
-                Else
-                    Dim lazyVariableSlotAllocator As VariableSlotAllocator = Nothing
-                    Dim statemachineTypeOpt As StateMachineTypeSymbol = Nothing
-
-                    Dim lambdaDebugInfoBuilder = ArrayBuilder(Of LambdaDebugInfo).GetInstance()
-                    Dim closureDebugInfoBuilder = ArrayBuilder(Of ClosureDebugInfo).GetInstance()
-                    Dim delegateRelaxationIdDispenser = 0
-                    Dim dynamicAnalysisSpans As ImmutableArray(Of SourceSpan) = ImmutableArray(Of SourceSpan).Empty
-
-                    If _moduleBeingBuiltOpt Is Nothing Then
-                        _diagnostics.AddRange(diagnosticsThisMethod)
-                        diagnosticsThisMethod.Free()
-                        Return
-                    End If
-
-                    Dim emittedBody = GenerateMethodBody(_moduleBeingBuiltOpt,
-                                                         onPropertyChangedMethod,
-                                                         methodOrdinal:=DebugId.UndefinedOrdinal,
-                                                         block:=boundBody,
-                                                         lambdaDebugInfo:=ImmutableArray(Of LambdaDebugInfo).Empty,
-                                                         closureDebugInfo:=ImmutableArray(Of ClosureDebugInfo).Empty,
-                                                         stateMachineTypeOpt:=Nothing,
-                                                         variableSlotAllocatorOpt:=Nothing,
-                                                         debugDocumentProvider:=If(_emitTestCoverageData, _debugDocumentProvider, Nothing),
-                                                         diagnostics:=diagnosticsThisMethod,
-                                                         emittingPdb:=False,
-                                                         emitTestCoverageData:=_emitTestCoverageData,
-                                                         dynamicAnalysisSpans:=ImmutableArray(Of SourceSpan).Empty)
-
-                    _diagnostics.AddRange(diagnosticsThisMethod)
-                    diagnosticsThisMethod.Free()
-
-                    _moduleBeingBuiltOpt.SetMethodBody(onPropertyChangedMethod, emittedBody)
-                    _moduleBeingBuiltOpt.AddSynthesizedDefinition(container,
-                                                                  DirectCast(onPropertyChangedMethod, Microsoft.Cci.IMethodDefinition))
-                End If
-            End If
         End Sub
 
         Private Sub CreateExplicitInterfaceImplementationStubs(compilationState As TypeCompilationState, method As MethodSymbol)

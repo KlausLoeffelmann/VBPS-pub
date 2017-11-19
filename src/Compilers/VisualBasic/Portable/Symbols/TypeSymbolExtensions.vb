@@ -1013,27 +1013,20 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Symbols
         End Function
 
         <Extension()>
-        Public Function GetMembersFromTypeAndAllBaseTypes(type As TypeSymbol, member As String, compilation As VisualBasicCompilation) As ImmutableArray(Of Tuple(Of TypeSymbol, Symbol))
-            Dim foundList = ImmutableArray.Create(Of Tuple(Of TypeSymbol, Symbol))
-            Return GetMembersFromTypeAndAllBaseTypesInternal(member, type, compilation, foundList)
-        End Function
+        Public Function GetMemberFromTypeAndAllBaseTypes(type As TypeSymbol,
+                                                         memberName As String,
+                                                         compilation As VisualBasicCompilation,
+                                                         filter As Func(Of Symbol, Boolean)) As Symbol
+            While type IsNot Nothing
+                Dim members = type.GetMembers(memberName).Where(filter)
+                If members.Count > 0 Then
+                    Return members.First
+                End If
 
-        Private Function GetMembersFromTypeAndAllBaseTypesInternal(member As String, type As TypeSymbol, compilation As VisualBasicCompilation,
-                                                                  foundList As ImmutableArray(Of Tuple(Of TypeSymbol, Symbol))) As ImmutableArray(Of Tuple(Of TypeSymbol, Symbol))
+                type = type.BaseTypeNoUseSiteDiagnostics
+            End While
 
-            Dim members = type.GetMembers(member)
-            If members.Count > 0 Then
-                For Each memberItem In members
-                    foundList = foundList.Add(New Tuple(Of TypeSymbol, Symbol)(type, memberItem))
-                Next
-            End If
-
-            Dim baseType = type.BaseTypeNoUseSiteDiagnostics
-            If baseType IsNot Nothing Then
-                foundList = GetMembersFromTypeAndAllBaseTypesInternal(member, baseType, compilation, foundList)
-            End If
-            Return foundList
-
+            Return Nothing
         End Function
 
         ''' <summary>

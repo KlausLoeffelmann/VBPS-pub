@@ -136,6 +136,12 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Symbols
         Public MustOverride ReadOnly Property IsIndependent As Boolean
 
         ''' <summary>
+        ''' Source: Returns whether this method is declared with the the UserInterface modifier.
+        ''' Metadata: Returns False; methods from metadata cannot be UserInterface.
+        ''' </summary>
+        Public MustOverride ReadOnly Property IsUserInterface As Boolean
+
+        ''' <summary>
         ''' Source: Returns False; methods from source cannot return by reference.
         ''' Metadata: Returns whether or not this method returns by reference.
         ''' </summary>

@@ -447,7 +447,7 @@ lReportErrorOnTwoTokens:
                 SourceMemberFlags.Overridable Or SourceMemberFlags.NotOverridable Or
                 SourceMemberFlags.Overrides Or SourceMemberFlags.MustOverride Or
                 SourceMemberFlags.Async Or SourceMemberFlags.Iterator Or
-                SourceMemberFlags.Social Or SourceMemberFlags.Independent,
+                SourceMemberFlags.Social Or SourceMemberFlags.Independent Or SourceMemberFlags.UserInterface,
                 ERRID.ERR_BadMethodFlags1,
                 Accessibility.Public,
                 diagBag)
@@ -1341,6 +1341,12 @@ lReportErrorOnTwoTokens:
         Public NotOverridable Overrides ReadOnly Property IsIndependent As Boolean
             Get
                 Return (m_flags And SourceMemberFlags.Independent) <> 0
+            End Get
+        End Property
+
+        Public NotOverridable Overrides ReadOnly Property IsUserInterface As Boolean
+            Get
+                Return (m_flags And SourceMemberFlags.UserInterface) <> 0
             End Get
         End Property
 

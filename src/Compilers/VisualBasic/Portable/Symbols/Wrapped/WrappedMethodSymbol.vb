@@ -109,6 +109,12 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Symbols
             End Get
         End Property
 
+        Public Overrides ReadOnly Property IsUserInterface As Boolean
+            Get
+                Return Me.UnderlyingMethod.IsUserInterface
+            End Get
+        End Property
+
         Public Overrides ReadOnly Property IsOverrides As Boolean
             Get
                 Return Me.UnderlyingMethod.IsOverrides

@@ -63,6 +63,12 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Symbols
             End Get
         End Property
 
+        Public Overrides ReadOnly Property IsUserInterface As Boolean
+            Get
+                Return (_unboundLambda.Flags And SourceMemberFlags.UserInterface) <> 0
+            End Get
+        End Property
+
         Public Overrides ReadOnly Property AssociatedAnonymousDelegate As NamedTypeSymbol
             Get
                 If Me._lazyAnonymousDelegateSymbol Is ErrorTypeSymbol.UnknownResultType Then

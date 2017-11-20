@@ -884,11 +884,6 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
 
             If methodOrProperty.Kind = SymbolKind.Method Then
 
-                'Check for existance of UserInterface-Attribute.
-                Dim uiAttribute = Me.ContainingMember.GetAttributes.
-                    Where(Function(item) item?.AttributeClass.Name = "UserInterfaceAttribute" AndAlso
-                                         item?.AttributeClass.ContainingNamespace.Name = "CompilerServices").FirstOrDefault
-
                 Dim method = DirectCast(methodOrProperty, MethodSymbol)
                 Dim reducedFrom = method.ReducedFrom
                 Dim constantValue As ConstantValue = Nothing
@@ -941,8 +936,8 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
                     hasErrors:=hasErrors)
 
                 If Me.IsInSocialContext Then
-
-                    Dim boolValue = constantValue.Create(If(uiAttribute Is Nothing, False, True))
+                    Dim containingMethod = TryCast(Me.ContainingMember, MethodSymbol)
+                    Dim boolValue = ConstantValue.Create(If(containingMethod?.IsUserInterface, False))
                     Dim configureAwaitArgument As BoundExpression = New BoundLiteral(node, boolValue,
                                                                                      GetSpecialType(SpecialType.System_Boolean, node, diagnostics))
                     configureAwaitArgument.SetWasCompilerGenerated()

@@ -1,5 +1,7 @@
 ﻿Imports System.ComponentModel
 Imports System.Runtime.CompilerServices
+Imports System.Threading
+Imports System.Threading.Tasks
 
 Module MainModule
 
@@ -27,7 +29,40 @@ Module MainModule
 
 End Module
 
-Public Class OverProperty
+Public Class MarshallingConventional
+
+    Public Async Function TestConfigureAwaitTrue() As Task
+        Dim currentThreadID = Task.CurrentId
+        Await Task.Delay(100).ConfigureAwait(True)
+        Dim expect = (currentThreadID = Task.CurrentId)
+    End Function
+
+    Public Async Function TestConfigureAwaitfalse() As Task
+        Dim currentThreadID = Task.CurrentId
+        Await Task.Delay(100).ConfigureAwait(False)
+        Dim expect = (currentThreadID <> Task.CurrentId)
+    End Function
+
+End Class
+
+Public Social Class MarshallingSocial
+
+    Public UserInterface Social Sub TestConfigureAwaitTrue()
+    Dim currentThreadID = Task.CurrentId
+Task.Delay(100)
+Dim expect = (currentThreadID = Task.CurrentId)
+End Sub
+
+Public Social Sub TestConfigureAwaitFalse()
+    Dim currentThreadID = Task.CurrentId
+Task.Delay(100)
+Dim expect = (currentThreadID <> Task.CurrentId)
+End Sub
+
+End Class
+
+
+Public Class UserInterfaceOnProperty
     Implements INotifyPropertyChanged
 
     Public Event PropertyChanged As PropertyChangedEventHandler Implements INotifyPropertyChanged.PropertyChanged

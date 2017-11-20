@@ -595,9 +595,9 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
                         _moduleBeingBuiltOpt.AddSynthesizedDefinition(sourceTypeSymbol, sharedDefaultConstructor)
                     End If
                 End If
-            End If
 
-            sourceTypeSymbol.ReportDiagnosticsForOnPropertyChanged(sourceTypeBinder, _diagnostics)
+                sourceTypeSymbol.ReportDiagnosticsForOnPropertyChanged(sourceTypeBinder, _diagnostics)
+            End If
 
             ' Constructor --> Constructor calls to be used in cycles detection
             Dim constructorCallMap As Dictionary(Of MethodSymbol, MethodSymbol) = Nothing

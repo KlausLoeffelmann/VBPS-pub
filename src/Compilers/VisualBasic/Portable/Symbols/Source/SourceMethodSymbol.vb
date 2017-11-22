@@ -2328,6 +2328,8 @@ lReportErrorOnTwoTokens:
                             End If
                             Binder.DisallowTypeCharacter(GetNameToken(methodStatement), diagBag, ERRID.ERR_TypeCharOnSub)
 
+                            errorLocation = methodStatement.DeclarationKeyword
+
                             'TODO John: Please check!
                             If Me.IsSocial Then
                                 Dim compilation = Me.DeclaringCompilation
@@ -2343,7 +2345,6 @@ lReportErrorOnTwoTokens:
                                 retType = binder.GetSpecialType(SpecialType.System_Void, Syntax, diagBag)
                             End If
 
-                            errorLocation = methodStatement.DeclarationKeyword
                         Case Else
                             Dim getErrorInfo As Func(Of DiagnosticInfo) = Nothing
 

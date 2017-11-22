@@ -268,6 +268,12 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.ExpressionEvaluator
             End Get
         End Property
 
+        Public Overrides ReadOnly Property IsUserInterface As Boolean
+            Get
+                Return False
+            End Get
+        End Property
+
         Public Overrides ReadOnly Property ReturnType As TypeSymbol
             Get
                 If _lazyReturnType Is Nothing Then

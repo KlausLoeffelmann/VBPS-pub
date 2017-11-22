@@ -1,7 +1,8 @@
 ﻿Imports System.Threading
 Imports Windows.Storage.Pickers
 
-Public Social UserInterface Class EditorViewModelTraditional
+<UserInterface>
+Public Social Class EditorViewModelTraditional
     Implements INotifyPropertyChanged
 
     Public Event PropertyChanged As PropertyChangedEventHandler _
@@ -17,6 +18,7 @@ Public Social UserInterface Class EditorViewModelTraditional
         FileIoTasks.WriteTextAsync(file, MainDocument)
     End Sub
 
+    <UserInterface>
     Public Social Sub LoadFileAsync()
         Dim fop = New FileOpenPicker()
         fop.FileTypeFilter.Add(".txt")
@@ -42,7 +44,8 @@ Public Social UserInterface Class EditorViewModelTraditional
 
     Public Property MainDocument As String
 
-    Public Independent Property DocumentName As String
+    <UserInterface(Use:=False)>
+    Public Property DocumentName As String
 
     Public Property CurrentTime As String
 

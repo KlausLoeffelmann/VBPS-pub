@@ -2,7 +2,8 @@
 Imports Windows.Storage
 Imports Windows.Storage.Pickers
 
-Public Social UserInterface Class EditorViewModel2
+<UserInterface>
+Public Social Class EditorViewModel2
     Implements INotifyPropertyChanged
 
     Public Event PropertyChanged As PropertyChangedEventHandler Implements INotifyPropertyChanged.PropertyChanged
@@ -27,6 +28,7 @@ Public Social UserInterface Class EditorViewModel2
             End Sub, Nothing)
     End Sub
 
+    <UserInterface>
     Public Social Sub LoadFileAsync()
         Dim fop = New FileOpenPicker()
         fop.FileTypeFilter.Add(".txt")

@@ -68,18 +68,7 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
                 Return Nothing
             End If
 
-            'TODO: Could we start here to Parse CSharp and return VB?
-            Dim fileInfo = New FileInfo(file.Path)
-
-            Dim tree As SyntaxTree = Nothing
-
-            If fileInfo.Extension = ".cs" Then
-                Dim cSharpTree = CSharpSyntaxTree.ParseText(content, path:=file.Path)
-                'tree = cSharpTree.ToVisualBasicSyntaxTree()
-            Else
-                tree = VisualBasicSyntaxTree.ParseText(content, If(file.IsScript, scriptParseOptions, parseOptions), file.Path)
-            End If
-
+            Dim tree = VisualBasicSyntaxTree.ParseText(content, If(file.IsScript, scriptParseOptions, parseOptions), file.Path)
             Debug.Assert(tree IsNot Nothing, "Syntax-Tree must not be null!")
 
             ' prepopulate line tables.

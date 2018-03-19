@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Microsoft.AspNetCore.Server.Kestrel.Transport.Abstractions</name>
+    </assembly>
+    <members>
+        <member name="T:Microsoft.AspNetCore.Server.Kestrel.Transport.Abstractions.Internal.FileHandleType">
+            <summary>
+            Enumerates the <see cref="P:Microsoft.AspNetCore.Server.Kestrel.Transport.Abstractions.Internal.IEndPointInformation.FileHandle"/> types.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Server.Kestrel.Transport.Abstractions.Internal.IEndPointInformation.Type">
+            <summary>
+            The type of interface being described: either an <see cref="P:Microsoft.AspNetCore.Server.Kestrel.Transport.Abstractions.Internal.IEndPointInformation.IPEndPoint"/>, Unix domain socket path, or a file descriptor.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Server.Kestrel.Transport.Abstractions.Internal.IEndPointInformation.IPEndPoint">
+            <summary>
+            The <see cref="P:Microsoft.AspNetCore.Server.Kestrel.Transport.Abstractions.Internal.IEndPointInformation.IPEndPoint"/> to bind to.
+            Only set if <see cref="P:Microsoft.AspNetCore.Server.Kestrel.Transport.Abstractions.Internal.IEndPointInformation.Type"/> is <see cref="F:Microsoft.AspNetCore.Server.Kestrel.Transport.Abstractions.Internal.ListenType.IPEndPoint"/>.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Server.Kestrel.Transport.Abstractions.Internal.IEndPointInformation.SocketPath">
+            <summary>
+            The absolute path to a Unix domain socket to bind to.
+            Only set if <see cref="P:Microsoft.AspNetCore.Server.Kestrel.Transport.Abstractions.Internal.IEndPointInformation.Type"/> is <see cref="F:Microsoft.AspNetCore.Server.Kestrel.Transport.Abstractions.Internal.ListenType.SocketPath"/>.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Server.Kestrel.Transport.Abstractions.Internal.IEndPointInformation.FileHandle">
+            <summary>
+            A file descriptor for the socket to open.
+            Only set if <see cref="P:Microsoft.AspNetCore.Server.Kestrel.Transport.Abstractions.Internal.IEndPointInformation.Type"/> is <see cref="F:Microsoft.AspNetCore.Server.Kestrel.Transport.Abstractions.Internal.ListenType.FileHandle"/>.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Server.Kestrel.Transport.Abstractions.Internal.IEndPointInformation.HandleType">
+            <summary>
+            The type of file descriptor being used.
+            Only set if <see cref="P:Microsoft.AspNetCore.Server.Kestrel.Transport.Abstractions.Internal.IEndPointInformation.Type"/> is <see cref="F:Microsoft.AspNetCore.Server.Kestrel.Transport.Abstractions.Internal.ListenType.FileHandle"/>.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Server.Kestrel.Transport.Abstractions.Internal.IEndPointInformation.NoDelay">
+            <summary>
+            Set to false to enable Nagle's algorithm for all connections.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.Server.Kestrel.Transport.Abstractions.Internal.ListenType">
+            <summary>
+            Enumerates the <see cref="T:Microsoft.AspNetCore.Server.Kestrel.Transport.Abstractions.Internal.IEndPointInformation"/> types.
+            </summary>
+        </member>
+    </members>
+</doc>

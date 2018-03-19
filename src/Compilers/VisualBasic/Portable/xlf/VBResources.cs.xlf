@@ -9076,6 +9076,31 @@
         <target state="translated">{0} není platná operace složeného přiřazení Visual Basicu.</target>
         <note />
       </trans-unit>
+      <trans-unit id="ERR_InvalidSocialInteratorModifiers">
+        <source>'Social' and 'Iterator' modifiers cannot be used together.</source>
+        <target state="new">'Social' and 'Iterator' modifiers cannot be used together.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="ERR_InvalidSocialModifiers">
+        <source>'Social', 'Async', and 'Independent' modifiers cannot be combined.</source>
+        <target state="new">'Social', 'Async', and 'Independent' modifiers cannot be combined.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="ERR_MissingSocialIndependentAsyncModifiers">
+        <source>Subs or Functions in Social classes must have the 'Social', 'Independent' or 'Async' modifier.</source>
+        <target state="new">Subs or Functions in Social classes must have the 'Social', 'Independent' or 'Async' modifier.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="ERR_MissingINotifyPropertyChangedInterface">
+        <source>Unable to apply the UserInterfaceAttribute since this type needs to implement INotifyPropertyChanged.</source>
+        <target state="new">Unable to apply the UserInterfaceAttribute since this type needs to implement INotifyPropertyChanged.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="ERR_MissingOnPropertyChangedMethod">
+        <source>Unable to apply the UserInterfaceAttribute because neither this class nor its base types implement the OnPropertyChange method to raise the PropertyChangeEvent.</source>
+        <target state="new">Unable to apply the UserInterfaceAttribute because neither this class nor its base types implement the OnPropertyChange method to raise the PropertyChangeEvent.</target>
+        <note />
+      </trans-unit>
     </body>
   </file>
 </xliff>

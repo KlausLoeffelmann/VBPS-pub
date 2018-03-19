@@ -143,6 +143,7 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
                                                                             True, ' ExplicitCastInCode
                                                                             boundConversion.ConstantValueOpt,
                                                                             boundConversion.ExtendedInfoOpt,
+                                                                            boundConversion.IsAsTypeConversion,
                                                                             boundConversion.Type)
                             End If
 

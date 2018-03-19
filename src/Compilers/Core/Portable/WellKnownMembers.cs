@@ -3351,7 +3351,7 @@ namespace Microsoft.CodeAnalysis
                 ".ctor",                                    // System_Runtime_CompilerServices_ReferenceAssemblyAttribute__ctor
                 "ConfigureAwait",                           // System_Threading_Tasks_Task_T__ConfigureAwait
                 "ConfigureAwait",                           // System_Threading_Tasks_Task__ConfigureAwait
-                ".ctor"                                     // System_ComponentModel_PropertyChangedEventArgs__ctor
+                ".ctor",                                    // System_ComponentModel_PropertyChangedEventArgs__ctor
                 ".ctor",                                    // System_Runtime_CompilerServices_IsReadOnlyAttribute__ctor
                 ".ctor",                                    // System_Runtime_CompilerServices_IsByRefLikeAttribute__ctor
                 ".ctor",                                    // System_Runtime_CompilerServices_ObsoleteAttribute__ctor

@@ -454,6 +454,7 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
                 Dim conversion = DirectCast(left, BoundConversion)
                 left = conversion.Update(conversion.Operand, conversion.ConversionKind, conversion.Checked, explicitCastInCode:=False,
                                          constantValueOpt:=conversion.ConstantValueOpt, extendedInfoOpt:=conversion.ExtendedInfoOpt,
+                                         isAsTypeConversion:=conversion.IsAsTypeConversion,
                                          type:=conversion.Type)
             End If
 
@@ -482,6 +483,7 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
                     Dim conversion = DirectCast(right, BoundConversion)
                     right = conversion.Update(conversion.Operand, conversion.ConversionKind, conversion.Checked, explicitCastInCode:=False,
                                               constantValueOpt:=conversion.ConstantValueOpt, extendedInfoOpt:=conversion.ExtendedInfoOpt,
+                                              isAsTypeConversion:=conversion.IsAsTypeConversion,
                                               type:=conversion.Type)
                 End If
             End If

@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>System.Collections.Sequences</id>
+    <version>0.1.0-e170810-1</version>
+    <authors>Microsoft Corporation</authors>
+    <owners>Microsoft Corporation</owners>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <licenseUrl>http://go.microsoft.com/fwlink/?LinkId=329770</licenseUrl>
+    <projectUrl>https://github.com/dotnet/corefxlab</projectUrl>
+    <iconUrl>http://go.microsoft.com/fwlink/?linkid=833199</iconUrl>
+    <description>Non-allocating collections</description>
+    <releaseNotes>Pre-release package, for testing only</releaseNotes>
+    <copyright>Microsoft Corporation, All rights reserved</copyright>
+    <tags>collections, non-allocating, corefxlab</tags>
+    <dependencies>
+      <group targetFramework=".NETStandard1.1">
+        <dependency id="NETStandard.Library" version="1.6.1" exclude="Build,Analyzers" />
+        <dependency id="System.Memory" version="4.4.0-preview2-25317-01" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+  </metadata>
+</package>

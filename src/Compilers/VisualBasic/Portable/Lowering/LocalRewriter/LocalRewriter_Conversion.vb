@@ -23,6 +23,7 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
                         explicitCastInCode:=True,
                         constantValueOpt:=node.ConstantValueOpt,
                         extendedInfoOpt:=node.ExtendedInfoOpt,
+                        isAsTypeConversion:=node.IsAsTypeConversion,
                         type:=node.Type)
                 End If
 

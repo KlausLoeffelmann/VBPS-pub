@@ -5526,6 +5526,7 @@
   </data>
   <data name="ERR_MissingOnPropertyChangedMethod" xml:space="preserve">
     <value>Unable to apply the UserInterfaceAttribute because neither this class nor its base types implement the OnPropertyChange method to raise the PropertyChangeEvent.</value>
+  </data>
   <data name="IConversionExpressionIsNotVisualBasicConversion" xml:space="preserve">
     <value>{0} is not a valid Visual Basic conversion expression</value>
   </data>

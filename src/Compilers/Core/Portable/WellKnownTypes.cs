@@ -268,6 +268,13 @@ namespace Microsoft.CodeAnalysis
         System_Runtime_CompilerServices_ConfiguredTaskAwaitable,
         System_ComponentModel_PropertyChangedEventArgs,
 
+        System_Runtime_CompilerServices_IsReadOnlyAttribute,
+        System_Runtime_CompilerServices_IsByRefLikeAttribute,
+        System_Runtime_InteropServices_InAttribute,
+        System_ObsoleteAttribute,
+        System_Span_T,
+        System_ReadOnlySpan_T,
+
         NextAvailable,
     }
 
@@ -530,6 +537,12 @@ namespace Microsoft.CodeAnalysis
             "System.Runtime.CompilerServices.ConfiguredTaskAwaitable`1",
             "System.Runtime.CompilerServices.ConfiguredTaskAwaitable",
             "System.ComponentModel.PropertyChangedEventArgs",
+            "System.Runtime.CompilerServices.IsReadOnlyAttribute",
+            "System.Runtime.CompilerServices.IsByRefLikeAttribute",
+            "System.Runtime.InteropServices.InAttribute",
+            "System.ObsoleteAttribute",
+            "System.Span`1",
+            "System.ReadOnlySpan`1",
         };
 
         private readonly static Dictionary<string, WellKnownType> s_nameToTypeIdMap = new Dictionary<string, WellKnownType>((int)Count);

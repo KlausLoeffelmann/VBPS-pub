@@ -440,13 +440,24 @@
     <!-- ElseExpression the expression to be returned if TestExpression IS Nothing 
            (including possible conversions applied) 
       -->
-    <Field Name="ElseExpression" Type="BoundExpression"/>
-    <Field Name="ConstantValueOpt" PropertyOverrides="true" Type="ConstantValue" Null="allow"/>
-  </Node>
+      <Field Name="ElseExpression" Type="BoundExpression"/>
+      <Field Name="ConstantValueOpt" PropertyOverrides="true" Type="ConstantValue" Null="allow"/>
+    </Node>
 
-  <Node Name="BoundConversion" Base="BoundExpression" HasValidate="true">
-    <!-- Type is required for this node type; may not be null -->
-    <Field Name="Type" Type="TypeSymbol" Override="true" Null="disallow"/>
+    <AbstractNode Name="BoundConversionOrCast" Base="BoundExpression">
+        <!-- Type is required for this node type; may not be null -->
+        <Field Name="Type" Type="TypeSymbol" Override="true" Null="disallow"/>
+    </AbstractNode>
+  
+    <Node Name="BoundConversion" Base="BoundConversionOrCast" HasValidate="true">
+        <!-- Type is required for this node type; may not be null -->
+        <Field Name="Type" Type="TypeSymbol" Override="true" Null="disallow"/>
+
+        <Field Name="Operand" PropertyOverrides="true" Type="BoundExpression"/>
+        <Field Name="ConversionKind" PropertyOverrides="true" Type="ConversionKind"/>
+        <Field Name="Checked" Type="Boolean"/>
+        <Field Name="ExplicitCastInCode" PropertyOverrides="true" Type="Boolean"/>
+        <Field Name="ConstantValueOpt" PropertyOverrides="true" Type="ConstantValue" Null="allow"/>
 
     <Field Name="Operand" Type="BoundExpression"/>
     <Field Name="ConversionKind" Type="ConversionKind"/>
@@ -492,33 +503,33 @@
            
            Steps 1 and 3 are optional given the types are identical.
         -->
-    <Field Name="UnderlyingExpression" Type="BoundExpression"/>
+        <Field Name="UnderlyingExpression" Type="BoundExpression"/>
+      
+        <!-- Bit 0 is set if there is "in" conversion, bit 1 is set if there is "out" conversion. -->
+        <Field Name="InOutConversionFlags" Type="Byte"/>
+    </Node>
+    
+    <Node Name="BoundDirectCast" Base="BoundConversionOrCast" HasValidate="true">
+        <!-- Type is required for this node type; may not be null -->
+        <Field Name="Type" Type="TypeSymbol" Override="true" Null="disallow"/>
 
-    <!-- Bit 0 is set if there is "in" conversion, bit 1 is set if there is "out" conversion. -->
-    <Field Name="InOutConversionFlags" Type="Byte"/>
-  </Node>
-
-  <Node Name="BoundDirectCast" Base="BoundExpression" HasValidate="true">
-    <!-- Type is required for this node type; may not be null -->
-    <Field Name="Type" Type="TypeSymbol" Override="true" Null="disallow"/>
-
-    <Field Name="Operand" Type="BoundExpression"/>
-    <Field Name="ConversionKind" Type="ConversionKind"/>
-    <Field Name="SuppressVirtualCalls" PropertyOverrides="true" Type="Boolean"/>
-    <Field Name="ConstantValueOpt" PropertyOverrides="true" Type="ConstantValue" Null="allow"/>
+        <Field Name="Operand" PropertyOverrides="true" Type="BoundExpression"/>
+        <Field Name="ConversionKind" PropertyOverrides="true" Type="ConversionKind"/>
+        <Field Name="SuppressVirtualCalls" PropertyOverrides="true" Type="Boolean"/>
+        <Field Name="ConstantValueOpt" PropertyOverrides="true" Type="ConstantValue" Null="allow"/>
 
     <!-- If this is a lambda conversion which requires a stub, additional lambda 
                representing the stub is stored here -->
     <Field Name="RelaxationLambdaOpt" Type="BoundLambda" Null="allow" />
   </Node>
 
-  <Node Name="BoundTryCast" Base="BoundExpression" HasValidate="true">
-    <!-- Type is required for this node type; may not be null -->
-    <Field Name="Type" Type="TypeSymbol" Override="true" Null="disallow"/>
+    <Node Name="BoundTryCast" Base="BoundConversionOrCast" HasValidate="true">
+        <!-- Type is required for this node type; may not be null -->
+        <Field Name="Type" Type="TypeSymbol" Override="true" Null="disallow"/>
 
-    <Field Name="Operand" Type="BoundExpression"/>
-    <Field Name="ConversionKind" Type="ConversionKind"/>
-    <Field Name="ConstantValueOpt" PropertyOverrides="true" Type="ConstantValue" Null="allow"/>
+        <Field Name="Operand" PropertyOverrides="true" Type="BoundExpression"/>
+        <Field Name="ConversionKind" PropertyOverrides="true" Type="ConversionKind"/>
+        <Field Name="ConstantValueOpt" PropertyOverrides="true" Type="ConstantValue" Null="allow"/>
 
     <!-- If this is a lambda conversion which requires a stub, additional lambda 
                  representing the stub is stored here -->
@@ -1013,11 +1024,12 @@
   NOTE: The node does NOT introduce the referenced local into surrounding scope.
         A local must be explicitly declared in a BoundBlock to be usable inside it.
   -->
-  <Node Name="BoundLocalDeclaration" Base="BoundLocalDeclarationBase" HasValidate="true">
-    <Field Name="LocalSymbol" Type="LocalSymbol"/>
-    <Field Name="InitializerOpt" Type="BoundExpression" Null="allow"/>
-    <Field Name="InitializedByAsNew" Type="Boolean" />
-  </Node>
+    <Node Name="BoundLocalDeclaration" Base="BoundLocalDeclarationBase" HasValidate="true">
+        <Field Name="LocalSymbol" Type="LocalSymbol"/>
+        <Field Name="DeclarationInitializerOpt" Type="BoundExpression" Null="allow" />
+        <Field Name="IdentifierInitializerOpt" Type="BoundArrayCreation" Null="allow"/>
+        <Field Name="InitializedByAsNew" Type="Boolean" />
+    </Node>
 
   <Node Name="BoundAsNewLocalDeclarations" Base="BoundLocalDeclarationBase">
     <Field Name="LocalDeclarations" Type="ImmutableArray(Of BoundLocalDeclaration)" />

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 Microsoft.CodeAnalysis.VisualBasic.LanguageVersion.VisualBasic15_5 = 1505 -> Microsoft.CodeAnalysis.VisualBasic.LanguageVersion
 Microsoft.CodeAnalysis.VisualBasic.Syntax.AsCastExpressionSyntax
 Microsoft.CodeAnalysis.VisualBasic.Syntax.AsCastExpressionSyntax.AsKeyword() -> Microsoft.CodeAnalysis.SyntaxToken
@@ -18,3 +19,5 @@ Overrides Microsoft.CodeAnalysis.VisualBasic.Syntax.AsCastExpressionSyntax.Accep
 Overrides Microsoft.CodeAnalysis.VisualBasic.VisualBasicSyntaxRewriter.VisitAsCastExpression(node As Microsoft.CodeAnalysis.VisualBasic.Syntax.AsCastExpressionSyntax) -> Microsoft.CodeAnalysis.SyntaxNode
 Shared Microsoft.CodeAnalysis.VisualBasic.SyntaxFactory.AsCastExpression(expression As Microsoft.CodeAnalysis.VisualBasic.Syntax.ExpressionSyntax, asKeyword As Microsoft.CodeAnalysis.SyntaxToken, type As Microsoft.CodeAnalysis.VisualBasic.Syntax.TypeSyntax) -> Microsoft.CodeAnalysis.VisualBasic.Syntax.AsCastExpressionSyntax
 Shared Microsoft.CodeAnalysis.VisualBasic.SyntaxFactory.AsCastExpression(expression As Microsoft.CodeAnalysis.VisualBasic.Syntax.ExpressionSyntax, type As Microsoft.CodeAnalysis.VisualBasic.Syntax.TypeSyntax) -> Microsoft.CodeAnalysis.VisualBasic.Syntax.AsCastExpressionSyntax
+=======
+>>>>>>> upstream/dev15.6.x

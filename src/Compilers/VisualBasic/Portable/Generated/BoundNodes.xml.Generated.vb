@@ -2146,10 +2146,29 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
         End Function
     End Class
 
-    Friend NotInheritable Partial Class BoundConversion
+    Friend MustInherit Partial Class BoundConversionOrCast
         Inherits BoundExpression
 
-        Public Sub New(syntax As SyntaxNode, operand As BoundExpression, conversionKind As ConversionKind, checked As Boolean, explicitCastInCode As Boolean, constantValueOpt As ConstantValue, extendedInfoOpt As BoundExtendedConversionInfo, isAsTypeConversion As Boolean, type As TypeSymbol, Optional hasErrors As Boolean = False)
+        Protected Sub New(kind As BoundKind, syntax as SyntaxNode, type As TypeSymbol, hasErrors As Boolean)
+            MyBase.New(kind, syntax, type, hasErrors)
+
+            Debug.Assert(type IsNot Nothing, "Field 'type' cannot be null (use Null=""allow"" in BoundNodes.xml to remove this check)")
+
+        End Sub
+
+        Protected Sub New(kind As BoundKind, syntax as SyntaxNode, type As TypeSymbol)
+            MyBase.New(kind, syntax, type)
+
+            Debug.Assert(type IsNot Nothing, "Field 'type' cannot be null (use Null=""allow"" in BoundNodes.xml to remove this check)")
+
+        End Sub
+
+    End Class
+
+    Friend NotInheritable Partial Class BoundConversion
+        Inherits BoundConversionOrCast
+
+        Public Sub New(syntax As SyntaxNode, operand As BoundExpression, conversionKind As ConversionKind, checked As Boolean, explicitCastInCode As Boolean, constantValueOpt As ConstantValue, extendedInfoOpt As BoundExtendedConversionInfo, type As TypeSymbol, Optional hasErrors As Boolean = False)
             MyBase.New(BoundKind.Conversion, syntax, type, hasErrors OrElse operand.NonNullAndHasErrors() OrElse extendedInfoOpt.NonNullAndHasErrors())
 
             Debug.Assert(operand IsNot Nothing, "Field 'operand' cannot be null (use Null=""allow"" in BoundNodes.xml to remove this check)")
@@ -2171,14 +2190,14 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
 
 
         Private ReadOnly _Operand As BoundExpression
-        Public ReadOnly Property Operand As BoundExpression
+        Public Overrides ReadOnly Property Operand As BoundExpression
             Get
                 Return _Operand
             End Get
         End Property
 
         Private ReadOnly _ConversionKind As ConversionKind
-        Public ReadOnly Property ConversionKind As ConversionKind
+        Public Overrides ReadOnly Property ConversionKind As ConversionKind
             Get
                 Return _ConversionKind
             End Get
@@ -2192,7 +2211,7 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
         End Property
 
         Private ReadOnly _ExplicitCastInCode As Boolean
-        Public ReadOnly Property ExplicitCastInCode As Boolean
+        Public Overrides ReadOnly Property ExplicitCastInCode As Boolean
             Get
                 Return _ExplicitCastInCode
             End Get
@@ -2398,7 +2417,7 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
     End Class
 
     Friend NotInheritable Partial Class BoundDirectCast
-        Inherits BoundExpression
+        Inherits BoundConversionOrCast
 
         Public Sub New(syntax As SyntaxNode, operand As BoundExpression, conversionKind As ConversionKind, suppressVirtualCalls As Boolean, constantValueOpt As ConstantValue, relaxationLambdaOpt As BoundLambda, type As TypeSymbol, Optional hasErrors As Boolean = False)
             MyBase.New(BoundKind.DirectCast, syntax, type, hasErrors OrElse operand.NonNullAndHasErrors() OrElse relaxationLambdaOpt.NonNullAndHasErrors())
@@ -2420,14 +2439,14 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
 
 
         Private ReadOnly _Operand As BoundExpression
-        Public ReadOnly Property Operand As BoundExpression
+        Public Overrides ReadOnly Property Operand As BoundExpression
             Get
                 Return _Operand
             End Get
         End Property
 
         Private ReadOnly _ConversionKind As ConversionKind
-        Public ReadOnly Property ConversionKind As ConversionKind
+        Public Overrides ReadOnly Property ConversionKind As ConversionKind
             Get
                 Return _ConversionKind
             End Get
@@ -2473,7 +2492,7 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
     End Class
 
     Friend NotInheritable Partial Class BoundTryCast
-        Inherits BoundExpression
+        Inherits BoundConversionOrCast
 
         Public Sub New(syntax As SyntaxNode, operand As BoundExpression, conversionKind As ConversionKind, constantValueOpt As ConstantValue, relaxationLambdaOpt As BoundLambda, type As TypeSymbol, Optional hasErrors As Boolean = False)
             MyBase.New(BoundKind.TryCast, syntax, type, hasErrors OrElse operand.NonNullAndHasErrors() OrElse relaxationLambdaOpt.NonNullAndHasErrors())
@@ -2494,14 +2513,14 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
 
 
         Private ReadOnly _Operand As BoundExpression
-        Public ReadOnly Property Operand As BoundExpression
+        Public Overrides ReadOnly Property Operand As BoundExpression
             Get
                 Return _Operand
             End Get
         End Property
 
         Private ReadOnly _ConversionKind As ConversionKind
-        Public ReadOnly Property ConversionKind As ConversionKind
+        Public Overrides ReadOnly Property ConversionKind As ConversionKind
             Get
                 Return _ConversionKind
             End Get
@@ -4631,13 +4650,14 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
     Friend NotInheritable Partial Class BoundLocalDeclaration
         Inherits BoundLocalDeclarationBase
 
-        Public Sub New(syntax As SyntaxNode, localSymbol As LocalSymbol, initializerOpt As BoundExpression, initializedByAsNew As Boolean, Optional hasErrors As Boolean = False)
-            MyBase.New(BoundKind.LocalDeclaration, syntax, hasErrors OrElse initializerOpt.NonNullAndHasErrors())
+        Public Sub New(syntax As SyntaxNode, localSymbol As LocalSymbol, declarationInitializerOpt As BoundExpression, identifierInitializerOpt As BoundArrayCreation, initializedByAsNew As Boolean, Optional hasErrors As Boolean = False)
+            MyBase.New(BoundKind.LocalDeclaration, syntax, hasErrors OrElse declarationInitializerOpt.NonNullAndHasErrors() OrElse identifierInitializerOpt.NonNullAndHasErrors())
 
             Debug.Assert(localSymbol IsNot Nothing, "Field 'localSymbol' cannot be null (use Null=""allow"" in BoundNodes.xml to remove this check)")
 
             Me._LocalSymbol = localSymbol
-            Me._InitializerOpt = initializerOpt
+            Me._DeclarationInitializerOpt = declarationInitializerOpt
+            Me._IdentifierInitializerOpt = identifierInitializerOpt
             Me._InitializedByAsNew = initializedByAsNew
 
             Validate()
@@ -4654,10 +4674,17 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
             End Get
         End Property
 
-        Private ReadOnly _InitializerOpt As BoundExpression
-        Public ReadOnly Property InitializerOpt As BoundExpression
+        Private ReadOnly _DeclarationInitializerOpt As BoundExpression
+        Public ReadOnly Property DeclarationInitializerOpt As BoundExpression
             Get
-                Return _InitializerOpt
+                Return _DeclarationInitializerOpt
+            End Get
+        End Property
+
+        Private ReadOnly _IdentifierInitializerOpt As BoundArrayCreation
+        Public ReadOnly Property IdentifierInitializerOpt As BoundArrayCreation
+            Get
+                Return _IdentifierInitializerOpt
             End Get
         End Property
 
@@ -4672,9 +4699,9 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
             Return visitor.VisitLocalDeclaration(Me)
         End Function
 
-        Public Function Update(localSymbol As LocalSymbol, initializerOpt As BoundExpression, initializedByAsNew As Boolean) As BoundLocalDeclaration
-            If localSymbol IsNot Me.LocalSymbol OrElse initializerOpt IsNot Me.InitializerOpt OrElse initializedByAsNew <> Me.InitializedByAsNew Then
-                Dim result = New BoundLocalDeclaration(Me.Syntax, localSymbol, initializerOpt, initializedByAsNew, Me.HasErrors)
+        Public Function Update(localSymbol As LocalSymbol, declarationInitializerOpt As BoundExpression, identifierInitializerOpt As BoundArrayCreation, initializedByAsNew As Boolean) As BoundLocalDeclaration
+            If localSymbol IsNot Me.LocalSymbol OrElse declarationInitializerOpt IsNot Me.DeclarationInitializerOpt OrElse identifierInitializerOpt IsNot Me.IdentifierInitializerOpt OrElse initializedByAsNew <> Me.InitializedByAsNew Then
+                Dim result = New BoundLocalDeclaration(Me.Syntax, localSymbol, declarationInitializerOpt, identifierInitializerOpt, initializedByAsNew, Me.HasErrors)
                 
                 If Me.WasCompilerGenerated Then
                     result.SetWasCompilerGenerated()
@@ -11911,7 +11938,8 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
         End Function
 
         Public Overrides Function VisitLocalDeclaration(node as BoundLocalDeclaration) As BoundNode
-            Me.Visit(node.InitializerOpt)
+            Me.Visit(node.DeclarationInitializerOpt)
+            Me.Visit(node.IdentifierInitializerOpt)
             Return Nothing
         End Function
 
@@ -12937,8 +12965,9 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
         End Function
 
         Public Overrides Function VisitLocalDeclaration(node As BoundLocalDeclaration) As BoundNode
-            Dim initializerOpt As BoundExpression = DirectCast(Me.Visit(node.InitializerOpt), BoundExpression)
-            Return node.Update(node.LocalSymbol, initializerOpt, node.InitializedByAsNew)
+            Dim declarationInitializerOpt As BoundExpression = DirectCast(Me.Visit(node.DeclarationInitializerOpt), BoundExpression)
+            Dim identifierInitializerOpt As BoundArrayCreation = DirectCast(Me.Visit(node.IdentifierInitializerOpt), BoundArrayCreation)
+            Return node.Update(node.LocalSymbol, declarationInitializerOpt, identifierInitializerOpt, node.InitializedByAsNew)
         End Function
 
         Public Overrides Function VisitAsNewLocalDeclarations(node As BoundAsNewLocalDeclarations) As BoundNode
@@ -14212,7 +14241,8 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
         Public Overrides Function VisitLocalDeclaration(node As BoundLocalDeclaration, arg As Object) As TreeDumperNode
             Return New TreeDumperNode("localDeclaration", Nothing, New TreeDumperNode() {
                 New TreeDumperNode("localSymbol", node.LocalSymbol, Nothing),
-                New TreeDumperNode("initializerOpt", Nothing, new TreeDumperNode() { Visit(node.InitializerOpt, Nothing) }),
+                New TreeDumperNode("declarationInitializerOpt", Nothing, new TreeDumperNode() { Visit(node.DeclarationInitializerOpt, Nothing) }),
+                New TreeDumperNode("identifierInitializerOpt", Nothing, new TreeDumperNode() { Visit(node.IdentifierInitializerOpt, Nothing) }),
                 New TreeDumperNode("initializedByAsNew", node.InitializedByAsNew, Nothing)
             })
         End Function

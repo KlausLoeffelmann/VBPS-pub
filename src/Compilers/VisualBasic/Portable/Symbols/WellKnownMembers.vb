@@ -363,11 +363,12 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
 
                 Dim mdName As String = WellKnownTypes.GetMetadataName(type)
                 Dim result As NamedTypeSymbol
+                Dim conflicts As (AssemblySymbol, AssemblySymbol) = Nothing
 
                 If IsTypeMissing(type) Then
                     result = Nothing
                 Else
-                    result = Me.Assembly.GetTypeByMetadataName(mdName, includeReferences:=True, isWellKnownType:=True, useCLSCompliantNameArityEncoding:=True,
+                    result = Me.Assembly.GetTypeByMetadataName(mdName, includeReferences:=True, isWellKnownType:=True, useCLSCompliantNameArityEncoding:=True, conflicts:=conflicts,
                                                                ignoreCorLibraryDuplicatedTypes:=Me.Options.IgnoreCorLibraryDuplicatedTypes)
                 End If
 
@@ -375,8 +376,18 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
                     Dim emittedName As MetadataTypeName = MetadataTypeName.FromFullName(mdName, useCLSCompliantNameArityEncoding:=True)
 
                     If type.IsValueTupleType() Then
-                        result = New MissingMetadataTypeSymbol.TopLevelWithCustomErrorInfo(Assembly.Modules(0), emittedName,
-                                       Function(t) ErrorFactory.ErrorInfo(ERRID.ERR_ValueTupleTypeRefResolutionError1, t))
+
+                        Dim delayedErrorInfo As Func(Of MissingMetadataTypeSymbol.TopLevelWithCustomErrorInfo, DiagnosticInfo)
+                        If conflicts.Item1 Is Nothing Then
+                            Debug.Assert(conflicts.Item2 Is Nothing)
+
+                            delayedErrorInfo = Function(t) ErrorFactory.ErrorInfo(ERRID.ERR_ValueTupleTypeRefResolutionError1, t)
+                        Else
+                            Dim capturedConflicts = conflicts
+                            delayedErrorInfo = Function(t) ErrorFactory.ErrorInfo(ERRID.ERR_ValueTupleResolutionAmbiguous3, t, capturedConflicts.Item1, capturedConflicts.Item2)
+                        End If
+
+                        result = New MissingMetadataTypeSymbol.TopLevelWithCustomErrorInfo(Assembly.Modules(0), emittedName, delayedErrorInfo)
                     Else
                         result = New MissingMetadataTypeSymbol.TopLevel(Assembly.Modules(0), emittedName)
                     End If
@@ -612,6 +623,10 @@ Namespace Microsoft.CodeAnalysis.VisualBasic
 
             Protected Overrides Function IsByRefParam(ByVal parameter As ParameterSymbol) As Boolean
                 Return parameter.IsByRef
+            End Function
+
+            Protected Overrides Function IsByRefMethod(ByVal method As MethodSymbol) As Boolean
+                Return method.ReturnsByRef
             End Function
 
             Protected Overrides Function IsGenericMethodTypeParam(type As TypeSymbol, paramPosition As Integer) As Boolean

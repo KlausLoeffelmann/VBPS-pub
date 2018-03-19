@@ -76,6 +76,7 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Symbols
                 Case DeclarationModifiers.Protected : Return Accessibility.Protected
                 Case DeclarationModifiers.Friend : Return Accessibility.Friend
                 Case DeclarationModifiers.Friend Or DeclarationModifiers.Protected : Return Accessibility.ProtectedOrFriend
+                Case DeclarationModifiers.Private Or DeclarationModifiers.Protected : Return Accessibility.ProtectedAndFriend
                 Case Else
                     ' this method shouldn't be used if modifiers contain conflicting accessibility flags
                     Throw ExceptionUtilities.UnexpectedValue(modifiers)

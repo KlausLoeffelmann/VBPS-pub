@@ -2273,10 +2273,6 @@ Namespace Microsoft.CodeAnalysis.VisualBasic.Syntax.InternalSyntax
                     Else
                         typeName = ParseTypeName()
 
-                        If typeName.Kind = SyntaxKind.TupleType Then
-                            typeName = ReportSyntaxError(typeName, ERRID.ERR_NewWithTupleTypeSyntax)
-                        End If
-
                         If CurrentToken.Kind = SyntaxKind.OpenParenToken Then
                             ' New <Type> ( <Arguments> )
                             newArguments = ParseParenthesizedArguments()
@@ -5603,7 +5599,7 @@ checkNullable:
                         typeName = ResyncAt(typeName, SyntaxKind.GreaterThanToken)
 
                     ElseIf CurrentToken.Kind = SyntaxKind.OpenParenToken Then
-                        arguments = ParseParenthesizedArguments()
+                        arguments = ParseParenthesizedArguments(attributeListParent:=True)
                     End If
 
                     Dim attribute As AttributeSyntax = SyntaxFactory.Attribute(optionalTarget, typeName, arguments)
